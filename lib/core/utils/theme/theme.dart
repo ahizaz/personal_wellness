@@ -14,6 +14,7 @@ class AppTheme {
       primaryColor: Colors.red,
       scaffoldBackgroundColor: Colors.white,
       textTheme: AppTextTheme.lightTextTheme,
+      fontFamily: 'SFPro',
       
   );
   static ThemeData darkTheme = ThemeData(
@@ -23,5 +24,6 @@ class AppTheme {
       primaryColor: Colors.red,
       scaffoldBackgroundColor: Colors.black,
       textTheme: AppTextTheme.darkTextTheme,
+      fontFamily: 'SFPro',
   );
 }

@@ -1,0 +1,3 @@
+class IconPath {
+  IconPath._();
+}
