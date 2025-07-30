@@ -28,11 +28,14 @@ class SignInController extends GetxController {
   void clearEmail() {
     emailController.clear();
     hasText.value = false;
+    registerController.clear();
+    hasRegisterText.value=false;
   }
 
   @override
   void onClose() {
     emailController.dispose();
+    registerController.dispose();
     super.onClose();
   }
 }
