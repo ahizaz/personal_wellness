@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:personal_wellness/core/utils/constants/colors.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 
 class GetStarted extends StatelessWidget {
   const GetStarted({super.key});
@@ -19,20 +22,10 @@ class GetStarted extends StatelessWidget {
           children: [
             Spacer(),
             Padding(padding: EdgeInsets.symmetric(horizontal: 17.w),
-            child: Container(
-               width: double.infinity,
-               height: 56.h,
-               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999.r),
-                color: AppColors.buttonColor,
-               ),
-               child: Center(child: Text('Get Started',style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
-                color: Color(0xffFFFFFF)
-               ),),),
-
-            ),
+            child: CustomButton(text: "Get Started ", color: Color(0xff0E1701), onTap: (){
+              Get.to(()=>SignInForm(),transition: Transition.noTransition);
+              
+            })
             
             ),
             SizedBox(height: 40.h,),
