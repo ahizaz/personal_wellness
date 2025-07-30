@@ -35,15 +35,15 @@ class CustomEmailTextField extends StatelessWidget {
           child: TextField(
             controller: controller,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 17.sp,
               fontFamily: 'SFPro',
               fontWeight: FontWeight.w400,
-              color: Colors.black,
+              color: Color(0xff172601),
             ),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
               border: InputBorder.none,
-              hintText: 'Enter mail Address',
+              hintText: 'Email Address',
               hintStyle: TextStyle(
                 fontSize: 17.sp,
                 fontFamily: 'SFPro',

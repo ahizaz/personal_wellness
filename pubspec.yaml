@@ -64,6 +64,7 @@ flutter:
     - family: SFPro
       fonts:
         - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        
          
 
    
