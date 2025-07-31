@@ -17,6 +17,7 @@ class Password extends StatelessWidget {
     final passwordController = Get.find<PasswordController>();
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -29,7 +30,7 @@ class Password extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: double.infinity,

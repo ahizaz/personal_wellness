@@ -13,6 +13,7 @@ class SignInForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SignInController());
     return Scaffold(
+       resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -25,7 +26,7 @@ class SignInForm extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 17.w),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+           mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: double.infinity,
