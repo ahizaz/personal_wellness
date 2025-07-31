@@ -1,3 +1,4 @@
+// import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,7 +35,6 @@ class CustomButton extends StatelessWidget {
                   fontSize: 17.sp,
                   fontFamily: 'SFPro',
                   fontWeight: FontWeight.w600,
-       
                   color: const Color(0xFFFFFFFF),
                 ),
           ),
