@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:personal_wellness/core/utils/theme/theme.dart';
@@ -9,21 +10,24 @@ class PeronalWellNess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Lock orientation to portrait only
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     return ScreenUtilInit(
-      designSize: const Size(402, 847),
-       minTextAdapt: true,
+      designSize: const Size(402, 874), // Portrait design size
+      minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context,index){
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-            title: 'Personal Wellness',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.light,
-            home:SplashScreen(),
-            
-        );
-      },
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Personal Wellness',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.light,
+        home: SplashScreen(),
+      ),
     );
   }
 }

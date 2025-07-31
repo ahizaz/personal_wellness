@@ -101,7 +101,7 @@ class CustomEmailTextField extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: isFocused.value || controller.text.isNotEmpty
-                  ? Color(0xff172601)
+                  ? Color(0xff485908)
                   : const Color(0xffE8E9E6),
               width: 1.w,
             ),
