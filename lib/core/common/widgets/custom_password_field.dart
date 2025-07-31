@@ -254,7 +254,7 @@ class CustomPasswordField extends StatelessWidget {
   Widget _buildStrengthBar({required bool isActive}) {
     return Container(
       width: 100.w, // Increased width
-      height: 6.h, // Increased height
+      height: 3.h, // Increased height
       decoration: BoxDecoration(
         color: isActive ? const Color(0xff172601) : const Color(0xffE8E9E6),
         borderRadius: BorderRadius.circular(3.r),
@@ -264,11 +264,11 @@ class CustomPasswordField extends StatelessWidget {
 
   Color _getStrengthColor(String strength) {
     switch (strength) {
-      case 'easy':
+      case 'Weak':
         return Colors.red;
-      case 'medium':
+      case 'Medium':
         return Colors.orange;
-      case 'strong':
+      case 'Strong':
         return Colors.green;
       default:
         return Colors.grey;
