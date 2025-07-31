@@ -29,7 +29,7 @@ class RegisterForm extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                height: 405.h,
+                height: 482.h,
                 decoration: BoxDecoration(
                   color: const Color(0xffFFFFFF),
                   borderRadius: BorderRadius.circular(32.r),
@@ -135,7 +135,16 @@ class RegisterForm extends StatelessWidget {
 
                         ],
                       ),
-                        SizedBox(height: 24.h,),
+                        SizedBox(height: 21.h,),
+                         CustomButton(text: "Continue with Google",textStyle: TextStyle(
+                           color: Color(0xff172601),
+                          fontFamily: 'SFPro',
+                          fontSize: 17.5.sp,
+                          fontWeight: FontWeight.w600,
+                      ), color: Color(0xffEDEEE6),leadingIcon: Image.asset(IconPath.google,width: 20.w,height: 20.h,fit: BoxFit.cover,), onTap: (){
+
+                      }),
+                      SizedBox(height: 24.h,),
                           RichText(textAlign: TextAlign.center,
                       text: TextSpan(
                     style: TextStyle(

@@ -33,7 +33,7 @@ class Password extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                height: 326.h,
+                height: 450.h,
                 decoration: BoxDecoration(
                   color: const Color(0xffFFFFFF),
                   borderRadius: BorderRadius.circular(32.r),
@@ -98,6 +98,81 @@ class Password extends StatelessWidget {
                           ),
                         );
                       }),
+                      SizedBox(height: 24.h,),
+                         Row(
+                        children: [
+                        Expanded(
+                          child: Divider(
+                            color: Color(0xff000000).withValues(alpha: 0.1),
+                            height: 1,
+                            thickness: 1,
+                            endIndent: 10,
+                          
+                          ),
+                        ),
+                           SizedBox(width: 4.w),
+                           Text("Or",style: TextStyle(
+                            fontFamily: "SFPro",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff121221).withValues(alpha: 0.5),
+                           ),),
+                           SizedBox(width: 4,),
+                          Expanded(
+                            child: Divider(
+                                                  color: Color(0xff000000).withValues(alpha: 0.1),
+                            height: 1,
+                            thickness: 1,
+                            indent: 10,
+                            
+                            ),
+                          ),
+
+                        ],
+                      ),
+                       SizedBox(height: 21.h,),
+                           CustomButton(text: "Continue with Google",textStyle: TextStyle(
+                           color: Color(0xff172601),
+                          fontFamily: 'SFPro',
+                          fontSize: 17.5.sp,
+                          fontWeight: FontWeight.w600,
+                      ), color: Color(0xffEDEEE6),leadingIcon: Image.asset(IconPath.google,width: 20.w,height: 20.h,fit: BoxFit.cover,), onTap: (){
+
+                      }),
+                      SizedBox(height: 24.h,),
+                         RichText(textAlign: TextAlign.center,
+                      text: TextSpan(
+                    style: TextStyle(
+                      fontFamily: 'SFPro',
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff3E4B2C),
+
+
+                    ),
+
+                    children: [
+                      TextSpan(text: 'By continuing, you agree to our '),
+                      TextSpan(
+                         text: 'Terms of Service',
+                         style: TextStyle(
+                           decoration: TextDecoration.underline,
+                            color: Color(0xff3E4B2C),
+                         )
+                      ),
+                      const TextSpan(text: ' and '),
+                      TextSpan(
+                         text: 'Privacy Policy',
+                         style: TextStyle(
+                           decoration: TextDecoration.underline,
+                            color: Color(0xff3E4B2C),
+                         )
+                      ),
+
+                    ]
+                      )),
+
+
                     ],
                   ),
                 ),
