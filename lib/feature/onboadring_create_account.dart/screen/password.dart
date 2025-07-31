@@ -153,6 +153,7 @@ class Password extends StatelessWidget {
                       ),
                       SizedBox(height: 33.h),
                     CustomPasswordField(),
+                    SizedBox(height: ,)
                     ],
                   ),
                 ),
