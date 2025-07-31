@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:personal_wellness/core/common/widgets/custom_password_field.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-
 class Password extends StatelessWidget {
   const Password({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +23,6 @@ class Password extends StatelessWidget {
            mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              
               width: double.infinity,
               height: 326.h,
                decoration: BoxDecoration(
@@ -69,11 +65,8 @@ class Password extends StatelessWidget {
                   CustomPasswordField(),
 
                   ],
+                ),       
                 ),
-                
-                ),
-
-
             ),
                 SizedBox(height: 30.h),
           ],
