@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/otp_verification_controller.dart';
+import 'package:personal_wellness/feature/forgot_otp_verification.dart/screen/create_new_password.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/back_butoon_title.dart';
 import 'package:pinput/pinput.dart';
 
@@ -29,7 +31,7 @@ class OtpVerification extends StatelessWidget {
           children: [
            Container(
                 width: double.infinity,
-                height: 338.h,
+                
                   decoration: BoxDecoration(
                   color: const Color(0xffFFFFFF),
                   borderRadius: BorderRadius.circular(32.r),
@@ -79,6 +81,23 @@ class OtpVerification extends StatelessWidget {
                      
                        ),
                        SizedBox(height: 24.h),
+                       Obx(() => CustomButton(
+  text: "Verify",
+           color: const Color(0xff485908), // সবসময় একই background color
+        textStyle: TextStyle(
+         fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        fontFamily: 'SFPro',
+        color: controller.isOtpValid.value
+        ? Colors.white
+        : Colors.white.withValues(alpha: 0.5), // Text জhapsha
+  ),
+  onTap: controller.isOtpValid.value ? () {
+   Get.to(()=>CreateNewPassword());
+  } : () {}, // অথবা null
+)),
+
+                       SizedBox(height: 24.h,),
                   ],
                 ),
                 ),

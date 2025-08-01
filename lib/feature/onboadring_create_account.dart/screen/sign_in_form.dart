@@ -139,14 +139,57 @@ class SignInForm extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 21.h,),
-                        CustomButton(text: "Continue with Google",textStyle: TextStyle(
-                             color: Color(0xff172601),
-                            fontFamily: 'SFPro',
-                            fontSize: 17.5.sp,
-                            fontWeight: FontWeight.w600,
-                        ), color: Color(0xffEDEEE6),leadingIcon: Image.asset(IconPath.google,width: 20.w,height: 20.h,fit: BoxFit.cover,), onTap: (){
-        
-                        }),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: CustomButton(
+                                text: " Google",
+                                textStyle: TextStyle(
+                                  color: Color(0xff172601),
+                                  fontFamily: 'SFPro',
+                                  fontSize: 17.5.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                color: Color(0xffEDEEE6),
+                                leadingIcon: Image.asset(
+                                  IconPath.google,
+                                  width: 20.w,
+                                  height: 20.h,
+                                  fit: BoxFit.cover,
+                                ),
+                                onTap: () {
+                                  // Placeholder for Google sign-in logic
+                                  print('Continue with Google tapped');
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 12,),
+                            Expanded(
+                              child: CustomButton(
+                                text: "Apple",
+                                textStyle: TextStyle(
+                                  color: Color(0xff172601),
+                                  fontFamily: 'SFPro',
+                                  fontSize: 17.5.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                color: Color(0xffEDEEE6),
+                                leadingIcon: Image.asset(
+                                  IconPath.apple, // Replace with actual Apple icon path
+                                  width: 20.w,
+                                  height: 23.h,
+                                  fit: BoxFit.cover,
+                                ),
+                                onTap: () {
+                                  // Placeholder for Apple sign-in logic
+                                  print('Continue with Apple tapped');
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+
                          SizedBox(height: 24.h,),
                         RichText(textAlign: TextAlign.center,
                         text: TextSpan(

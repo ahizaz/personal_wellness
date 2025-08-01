@@ -13,13 +13,7 @@ class OtpVerificationController extends GetxController{
       isOtpValid.value = otpController.text.length == 6;
     });
   }
-   // Placeholder for future API call to verify OTP
-  Future<void> verifyOtp() async {
-    // TODO: Implement API call here in the future
-    // Example: await apiService.verifyOtp(otpController.text);
-    print('OTP submitted for verification: ${otpController.text}');
-    // Placeholder logic - can be replaced with actual API integration later
-  }
+ 
 
   void clearOtp() {
     otpController.clear();
