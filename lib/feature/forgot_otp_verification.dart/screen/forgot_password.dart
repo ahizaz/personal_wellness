@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/forgot_otp_verification_controller.dart';
+import 'package:personal_wellness/feature/forgot_otp_verification.dart/screen/otp_verification.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/back_butoon_title.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/custom_forgot_email.dart';
 
@@ -40,6 +41,7 @@ class ForgotPassword extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 33.h),
                       const BackButtonWithTitle(
@@ -47,7 +49,7 @@ class ForgotPassword extends StatelessWidget {
                       ),
                       SizedBox(height: 33.h),
                       Text(
-                        "Now worry.We're here to helo you.\n Submit your registered email address to\n reset your password.",
+                        "Now worry.We're here to helo you.\nSubmit your registered email address to\nreset your password.",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Color(0xff3E4B2C),
@@ -74,7 +76,8 @@ class ForgotPassword extends StatelessWidget {
                             ),
                             onTap: controller.hasForgotEmailText.value
                                 ? () {
-                                    // Add submit logic here if needed
+                                  controller.clearForgotEmail();
+                                 Get.to(()=>OtpVerification());
                                   }
                                 : () {}, // Disable tap when no text
                           )),
