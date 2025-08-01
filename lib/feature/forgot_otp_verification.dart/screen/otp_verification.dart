@@ -93,6 +93,7 @@ class OtpVerification extends StatelessWidget {
         : Colors.white.withValues(alpha: 0.5), // Text জhapsha
   ),
   onTap: controller.isOtpValid.value ? () {
+    controller.clearOtp();
    Get.to(()=>CreateNewPassword());
   } : () {}, // অথবা null
 )),

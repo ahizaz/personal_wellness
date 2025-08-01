@@ -178,7 +178,7 @@ class SignInForm extends StatelessWidget {
                                 leadingIcon: Image.asset(
                                   IconPath.apple, // Replace with actual Apple icon path
                                   width: 20.w,
-                                  height: 23.h,
+                                  height: 20.h,
                                   fit: BoxFit.cover,
                                 ),
                                 onTap: () {

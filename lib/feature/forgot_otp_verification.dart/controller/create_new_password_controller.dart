@@ -25,6 +25,10 @@ class CreateNewPasswordController extends GetxController{
       passwordStrength.value = 'easy';
     }
   }
+    void clearPassword() {
+    passwordController.clear();
+    passwordStrength.value = 'none';
+  }
   @override
   void onInit() {
    passwordController.addListener((){

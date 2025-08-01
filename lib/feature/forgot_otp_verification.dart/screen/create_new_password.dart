@@ -6,6 +6,7 @@ import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/create_new_password_controller.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/custom_create_newPass_field.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 
 
 class CreateNewPassword extends StatelessWidget {
@@ -84,8 +85,10 @@ class CreateNewPassword extends StatelessWidget {
                           color: const Color(0xff485908),
                           onTap: () {
                             if (isStrong) {
-                              // Perform continue action
+                               createNewPasswordController.clearPassword();
+                           Get.to(SignInForm());
                             }
+
                           },
                           textStyle: TextStyle(
                             fontSize: 17.sp,
