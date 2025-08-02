@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
+import 'package:personal_wellness/core/common/widgets/custom_terms_text.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/screen/forgot_password.dart';
@@ -145,7 +146,7 @@ class SignInPassword extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: controller.hasText.value?Color(0xffFFFFFF):Color(0xffff999999)
                         
-                          ), color: Color(0xff485908), onTap: (){
+                          ), color: Color(0xff172601), onTap: (){
                                controller.signInPasswordController.clear();
                                Get.to(()=>SignInForm());
                          // Get.to(()=>SignInForm());
@@ -162,37 +163,7 @@ class SignInPassword extends StatelessWidget {
                           
                         }),
                         SizedBox(height: 24.h,),
-                         RichText(textAlign: TextAlign.center,
-                      text: TextSpan(
-                    style: TextStyle(
-                      fontFamily: 'SFPro',
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff3E4B2C),
-
-
-                    ),
-
-                    children: [
-                      TextSpan(text: 'By continuing, you agree to our '),
-                      TextSpan(
-                         text: 'Terms of Service',
-                         style: TextStyle(
-                           decoration: TextDecoration.underline,
-                            color: Color(0xff3E4B2C),
-                         )
-                      ),
-                      const TextSpan(text: ' and '),
-                      TextSpan(
-                         text: 'Privacy Policy',
-                         style: TextStyle(
-                           decoration: TextDecoration.underline,
-                            color: Color(0xff3E4B2C),
-                         )
-                      ),
-
-                    ]
-                      )),
+                        CustomTermsText(),
                       SizedBox(height: 24.h,),
                       ],
                     ),

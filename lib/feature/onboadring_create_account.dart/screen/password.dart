@@ -7,6 +7,7 @@ import 'package:personal_wellness/core/common/widgets/custom_password_field.dart
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/password_controller.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/privacy_policy_terms.dart';
 
 class Password extends StatelessWidget {
   const Password({super.key});
@@ -30,7 +31,7 @@ class Password extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: double.infinity,
@@ -85,10 +86,11 @@ class Password extends StatelessWidget {
 
                         return CustomButton(
                           text: 'Continue',
-                          color: const Color(0xff485908),
+                          color: const Color(0xff172601),
                           onTap: () {
                             if (isStrong) {
-                              // Perform continue action
+                                passwordController.clear();
+                            Get.to(()=>PrivacyPolicyTerms());
                             }
                           },
                           textStyle: TextStyle(

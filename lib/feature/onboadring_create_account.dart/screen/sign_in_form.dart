@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
+import 'package:personal_wellness/core/common/widgets/custom_terms_text.dart';
 import 'package:personal_wellness/core/common/widgets/custom_textField.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
@@ -78,7 +79,7 @@ class SignInForm extends StatelessWidget {
                         SizedBox(height: 12.h),
                         Obx(() => CustomButton(
                               text: 'Continue',
-                              color: Color(0xff485908),
+                              color: Color(0xff172601),
                               textStyle: TextStyle(
                                 fontSize: 17.sp,
                                 fontFamily: 'SFPro',
@@ -139,12 +140,12 @@ class SignInForm extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 21.h,),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // Center the Google button
                           children: [
                             Expanded(
                               child: CustomButton(
-                                text: " Google",
+                                text: "Continue with Google",
                                 textStyle: TextStyle(
                                   color: Color(0xff172601),
                                   fontFamily: 'SFPro',
@@ -160,30 +161,6 @@ class SignInForm extends StatelessWidget {
                                 ),
                                 onTap: () {
                                   // Placeholder for Google sign-in logic
-                                  print('Continue with Google tapped');
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 12,),
-                            Expanded(
-                              child: CustomButton(
-                                text: "Apple",
-                                textStyle: TextStyle(
-                                  color: Color(0xff172601),
-                                  fontFamily: 'SFPro',
-                                  fontSize: 17.5.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                color: Color(0xffEDEEE6),
-                                leadingIcon: Image.asset(
-                                  IconPath.apple, // Replace with actual Apple icon path
-                                  width: 20.w,
-                                  height: 20.h,
-                                  fit: BoxFit.cover,
-                                ),
-                                onTap: () {
-                                  // Placeholder for Apple sign-in logic
-                                  print('Continue with Apple tapped');
                                 },
                               ),
                             ),
@@ -191,37 +168,7 @@ class SignInForm extends StatelessWidget {
                         ),
 
                          SizedBox(height: 24.h,),
-                        RichText(textAlign: TextAlign.center,
-                        text: TextSpan(
-                      style: TextStyle(
-                        fontFamily: 'SFPro',
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff3E4B2C),
-        
-        
-                      ),
-        
-                      children: [
-                        TextSpan(text: 'By continuing, you agree to our '),
-                        TextSpan(
-                           text: 'Terms of Service',
-                           style: TextStyle(
-                             decoration: TextDecoration.underline,
-                              color: Color(0xff3E4B2C),
-                           )
-                        ),
-                        const TextSpan(text: ' and '),
-                        TextSpan(
-                           text: 'Privacy Policy',
-                           style: TextStyle(
-                             decoration: TextDecoration.underline,
-                              color: Color(0xff3E4B2C),
-                           )
-                        ),
-        
-                      ]
-                        )),
+                     CustomTermsText(),
                         SizedBox(height: 24.h,),
                         
                       ],

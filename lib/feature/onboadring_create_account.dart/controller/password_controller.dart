@@ -28,6 +28,11 @@ class PasswordController extends GetxController {
       passwordStrength.value = 'easy';
     }
   }
+  void clear(){
+    passwordController.clear();
+    passwordStrength.value = 'none';
+    isPasswordVisible.value = false;
+  }
 
   @override
   void onInit() {
