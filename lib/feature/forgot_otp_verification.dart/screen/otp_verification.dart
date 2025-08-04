@@ -83,7 +83,7 @@ class OtpVerification extends StatelessWidget {
                        SizedBox(height: 24.h),
                        Obx(() => CustomButton(
   text: "Verify",
-           color: const Color(0xff485908), // সবসময় একই background color
+           color: const Color(0xff172601), // সবসময় একই background color
         textStyle: TextStyle(
          fontSize: 16.sp,
         fontWeight: FontWeight.w600,

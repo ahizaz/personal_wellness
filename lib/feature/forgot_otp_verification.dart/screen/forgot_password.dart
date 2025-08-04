@@ -65,7 +65,7 @@ class ForgotPassword extends StatelessWidget {
                       SizedBox(height: 12.h),
                       Obx(() => CustomButton(
                             text: 'Submit',
-                            color:Color(0xff485908),
+                            color:Color(0xff172601),
                             textStyle: TextStyle(
                               fontSize: 17.sp,
                               fontFamily: 'SFPro',

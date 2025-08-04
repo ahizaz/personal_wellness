@@ -82,7 +82,7 @@ class CreateNewPassword extends StatelessWidget {
 
                         return CustomButton(
                           text: 'Continue',
-                          color: const Color(0xff485908),
+                          color: const Color(0xff),
                           onTap: () {
                             if (isStrong) {
                                createNewPasswordController.clearPassword();
