@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/controller/account_personlization_controller.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/screen/date_of_birth.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/widget/custom_display_nametextfield.dart';
-
 class DisplayName extends StatelessWidget {
   const DisplayName({super.key});
-
   @override
   Widget build(BuildContext context) {
     final personalizationController = Get.put(AccountPersonlizationController());
 
     return Scaffold(
+          resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -30,7 +31,7 @@ class DisplayName extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                height: 412.h,
+            
                 decoration: BoxDecoration(
                   color: const Color(0xffFFFFFF),
                   borderRadius: BorderRadius.circular(32.r),
@@ -84,6 +85,39 @@ class DisplayName extends StatelessWidget {
                         controller: personalizationController.displayNameController,
                         isFocused: personalizationController.isDisplayNameFocused, hintText: 'First name',
                       ),
+                       SizedBox(height: 12.h),
+                      CustomDisplayNameTextField(
+                        controller: personalizationController.lastNameController,
+                        isFocused: personalizationController.isLastNameFocused,
+                        hintText: 'Last Name',
+                      ),
+                      SizedBox(height: 24.h,),
+                      Obx(()=>Row(
+                        children: [
+                        Expanded(child: Opacity(opacity: personalizationController.isFormValid.value ? 1.0 : 0.5, 
+                        
+                        child: CustomButton(text:"Continue 1/5",color: const Color(0xff172601), onTap: personalizationController.isFormValid.value
+                                        ? () {
+                                            Get.to(() => const DateOfBirth());
+                                          }
+                                        : (){}, // Disable button when form is invalid),
+                        )),
+                        ),
+                        SizedBox(width: 12.w),
+                       Expanded(child: CustomButton(text:"Skip", color: const Color(0xffEDEEE6),textStyle: TextStyle(
+                        color: const Color(0xff172601),
+                                    fontFamily: "SFPro",
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w600,
+                       ), onTap: (){
+                        personalizationController.clearAllData();
+                                    Get.to(() => const DateOfBirth());
+                       }))
+
+                      ],)),
+                
+                      SizedBox(height: 24.h,)
+                 
                     ],
                   ),
                 ),

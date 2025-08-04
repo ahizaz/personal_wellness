@@ -82,7 +82,7 @@ class CreateNewPassword extends StatelessWidget {
 
                         return CustomButton(
                           text: 'Continue',
-                          color: const Color(0xff),
+                          color: const Color(0xff172601 ),
                           onTap: () {
                             if (isStrong) {
                                createNewPasswordController.clearPassword();
@@ -99,36 +99,7 @@ class CreateNewPassword extends StatelessWidget {
                         );
                       }),
                       SizedBox(height: 24.h),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontFamily: 'SFPro',
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xff3E4B2C),
-                          ),
-                          children: [
-                            const TextSpan(text: 'By continuing, you agree to our '),
-                            TextSpan(
-                              text: 'Terms of Service',
-                              style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: const Color(0xff3E4B2C),
-                              ),
-                            ),
-                            const TextSpan(text: ' and '),
-                            TextSpan(
-                              text: 'Privacy Policy',
-                              style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: const Color(0xff3E4B2C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24.h),
+                    
                     ],
                   ),
                 ),
