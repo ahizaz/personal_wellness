@@ -23,7 +23,7 @@ class CustomForgotEmailTextField extends StatelessWidget{
 return Container(
 decoration: BoxDecoration(
   border: Border.all(
-  color:isFocused.value|| controller.text.isNotEmpty?const Color(0xff485908):const Color(0xffE8E9E6),width: 1.w,
+  color:isFocused.value|| controller.text.isNotEmpty?const Color(0xff485908):const Color(0xffE8E9E6),  width: isFocused.value || controller.text.isNotEmpty ? 3.w : 1.w,
 
   ),
   borderRadius: BorderRadius.circular(12.r),

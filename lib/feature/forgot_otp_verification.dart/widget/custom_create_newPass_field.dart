@@ -17,6 +17,7 @@ class CustomCreateNewpassField extends StatelessWidget {
       final borderColor = strength != 'none'
           ? const Color(0xff172601)
           : const Color(0xffE8E9E6);
+          
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
