@@ -8,6 +8,7 @@ class ImagePath {
   static const String dryface = "assets/images/dry_face.png";
   static const String normalface = "assets/images/normal_face.png";
   static const String oilyface ="assets/images/oily_face.png";
+  static const String notification = "assets/images/notification.png";
 
 
   
