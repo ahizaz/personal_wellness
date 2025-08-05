@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 
@@ -78,12 +79,28 @@ class NotificationsPerson extends StatelessWidget {
                         ),),
                       ),
                       SizedBox(height: 16.h,),
-                      Text("     Allow notifications to be the first to\n  discover exclusive perks and benefits\n                  for the community",style: TextStyle(
+                      Text("     Allow notifications to be the first to\n  discover exclusive perks and benefits\n                   for the community",style: TextStyle(
                         fontSize: 17.sp,
                         fontFamily: "SFPro",
                         fontWeight: FontWeight.w400,
                         color: Color(0xff78816C)
-                      ),)
+                      ),),
+                      SizedBox(height: 34.h,),
+                      Row(
+                        children: [
+                          Expanded(child: CustomButton(text: "Continue 5/5", color: Color(0xff172601), onTap: (){
+
+                          })),
+                          SizedBox(width: 16.w,),
+                             Expanded(child: CustomButton(text: "Skip",textStyle: TextStyle(
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff121221)
+                             ), color: Color(0xffEDEEE6), onTap: (){
+
+                          })),
+                        ],
+                      )
 
 
                   ],
