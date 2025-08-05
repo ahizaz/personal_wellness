@@ -4,6 +4,11 @@ class SkinTypeController extends GetxController {
   final RxString selectedSkinType = ''.obs;
 
   void selectSkinType(String skinType) {
-    selectedSkinType.value = skinType;
+    if (selectedSkinType.value == skinType) {
+      selectedSkinType.value = ''; // Deselect if the same skin type is clicked again
+    } else {
+      selectedSkinType.value = skinType; // Select the new skin type
+    }
+    print('Selected skin type: ${selectedSkinType.value}'); // Debug print to verify selection
   }
 }
