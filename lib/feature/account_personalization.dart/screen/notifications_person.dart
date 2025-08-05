@@ -5,6 +5,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 
 class NotificationsPerson extends StatelessWidget {
   const NotificationsPerson({super.key});
@@ -89,6 +90,7 @@ class NotificationsPerson extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(child: CustomButton(text: "Continue 5/5", color: Color(0xff172601), onTap: (){
+                            Get.off(()=>BottomNavbar());
 
                           })),
                           SizedBox(width: 16.w,),
