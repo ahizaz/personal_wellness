@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
+import 'package:personal_wellness/core/utils/constants/image_path.dart';
 
 class EmptyRoutineView extends StatelessWidget {
   const EmptyRoutineView({super.key});
@@ -20,6 +21,7 @@ class EmptyRoutineView extends StatelessWidget {
           SizedBox(width: 16.w,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text("Hi there!",style: TextStyle(
                 fontFamily: "SFPro",
@@ -50,7 +52,23 @@ class EmptyRoutineView extends StatelessWidget {
         fontSize: 34.sp,
         fontWeight: FontWeight.w500,
         color: Color(0xff172601)
-      ),)
+      ),),
+      SizedBox(height: 40.h,),
+      Center(child: Image.asset(ImagePath.homenodata,width: 162.w,height: 164.h,fit: BoxFit.cover,),),
+      SizedBox(height: 40.h,),
+      Center(child: Text("Let's build your new routine to get started\n     on your skin care journey",textAlign: TextAlign.center,style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w400,
+        color: Color(0xff172601)
+      ),)),
+      SizedBox(height: 24.h,),
+      Center(child: Text("Explore",style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w600,
+        color: Color(0xff121221)
+      ),),)
       ],
      ),
    );

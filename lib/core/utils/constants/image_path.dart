@@ -9,7 +9,7 @@ class ImagePath {
   static const String normalface = "assets/images/normal_face.png";
   static const String oilyface ="assets/images/oily_face.png";
   static const String notification = "assets/images/notification.png";
-  static const String homenodata = ""
+  static const String homenodata = "assets/images/home_no_data.png";
 
 
   
