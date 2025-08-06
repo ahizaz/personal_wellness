@@ -1,5 +1,7 @@
-class RoutineStep {
+class RoutineItem {
   final String name;
+  final String time;
   final bool isCompleted;
-    RoutineStep({required this.name, this.isCompleted = false});
+
+  RoutineItem({required this.name, required this.time, this.isCompleted = false});
 }
