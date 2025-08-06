@@ -32,9 +32,7 @@ class RoutineInProgressview extends StatelessWidget {
                   return CircleAvatar(
                     radius: 24.r,
                     backgroundImage: imagePath.isNotEmpty
-                        ? FileImage(
-                            File(imagePath),
-                          ) as ImageProvider
+                        ? FileImage(File(imagePath)) as ImageProvider
                         : AssetImage(IconPath.profileicon),
                   );
                 }),
@@ -52,55 +50,120 @@ class RoutineInProgressview extends StatelessWidget {
                           color: Color(0xff3E4B2C),
                         ),
                       ),
-                          Text("Good Morning",style: TextStyle(
-                fontFamily: "SFPro",
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
-                   color: Color(0xff3E4B2C)
-                
-              ),),
-              
-
+                      Text(
+                        "Good Morning",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff3E4B2C),
+                        ),
+                      ),
                     ],
                   )),
-                    Spacer(),
-          Image.asset(IconPath.notificationhome,height: 48.h,width: 48.w,fit: BoxFit.cover,),
-          SizedBox(width: 5.w,),
-          Image.asset(IconPath.search,height: 48.h,width: 48.w,fit: BoxFit.cover,),
+              const Spacer(),
+              Image.asset(IconPath.notificationhome,
+                  height: 48.h, width: 48.w, fit: BoxFit.cover),
+              SizedBox(width: 5.w),
+              Image.asset(IconPath.search,
+                  height: 48.h, width: 48.w, fit: BoxFit.cover),
             ],
           ),
-          SizedBox(height: 16.h,),
-             Text("Today",style: TextStyle(
-        fontFamily: "SFPro",
-        fontSize: 34.sp,
-        fontWeight: FontWeight.w500,
-        color: Color(0xff172601)
-      ),),
-      Text(
-             '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
-                        style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w400,color: Color(0xff3E4B2C)),
-        ),
-        SizedBox(height: 16.h,),
-        Container(
-          width: double.infinity,
-          height: 74.h,
-          decoration: BoxDecoration(
-            color: Color(0xffFFFFFF),
-            borderRadius: BorderRadius.circular(12.r)
+          SizedBox(height: 16.h),
+          Text(
+            "Today",
+            style: TextStyle(
+              fontFamily: "SFPro",
+              fontSize: 34.sp,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff172601),
+            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-              Row(
-           
-              )
-            ],
+          Text(
+            '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
+            style: TextStyle(
+              fontSize: 17.sp,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff3E4B2C),
+            ),
           ),
-        )
+          SizedBox(height: 16.h),
+          Container(
+            width: double.infinity,
 
-             
+            decoration: BoxDecoration(
+              color: Color(0xffFFFFFF),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(IconPath.cleanser,
+                          width: 16.w, height: 24.h, fit: BoxFit.cover),
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Cleanser",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff000000),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "6:30 AM",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h,),
+                  Row(
+                    children: [
+                      Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 30.w),
+                        child: Text(
+                          "Basic Hydrating Facial Cleanser",
+                          style: TextStyle(
+                            fontFamily: "SFPro",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff000000),
+                          ),
+                        ),
+                      ),
+                          Spacer(), // Reduced flexibility to avoid overflow
+                                    Obx(() => Transform.scale(
+                                      scale: 1.3,
+                                      child: Checkbox(
+                                                            value: controller.isCleanserCompleted.value,
+                                                            onChanged: (value) {
+                                                              if (value != null) {
+                                                                controller.toggleCleanserCompletion(value);
+                                                              }
+                                                            },
+                                                            activeColor: Color(0xff485908),
+                                                            checkColor: Colors.white,
+                                                            shape: CircleBorder(),
+                                                            side: BorderSide(color: Color(0xffEDE9E6),width: 2),
+                                                          ),
+                                    )),
+                    ],
+                  ),
+               
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
