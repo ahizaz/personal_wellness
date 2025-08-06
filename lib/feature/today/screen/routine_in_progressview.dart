@@ -77,9 +77,10 @@ class RoutineInProgressview extends StatelessWidget {
         color: Color(0xff172601)
       ),),
       Text(
-                        '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+             '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
+                        style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w400,color: Color(0xff3E4B2C)),
                       ),
+                      
              
         ],
       ),
