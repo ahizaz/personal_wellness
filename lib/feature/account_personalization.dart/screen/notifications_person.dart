@@ -25,7 +25,7 @@ class NotificationsPerson extends StatelessWidget {
         ),
         child: Padding(padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
+  mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
               width: double.infinity,
@@ -110,7 +110,8 @@ class NotificationsPerson extends StatelessWidget {
                 
                 ),
 
-            )
+            ),
+            SizedBox(height: 30.h,),
           ],
         ),),
 

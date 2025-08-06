@@ -13,6 +13,9 @@ class IconPath {
   static const String  routineinactive = "assets/icons/routine_inactive.png";
   static const String  progressactive = "assets/icons/progress_active.png";
   static const  String progressinactive = "assets/icons/progress_inactive.png";
+  static const String profileicon = "assets/icons/profile_icon.png";
+  static const notificationhome = "assets/icons/notification_home.png";
+  static const search = "assets/icons/search.png";
 
 
 

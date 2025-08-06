@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -18,32 +17,37 @@ class Password extends StatelessWidget {
     final passwordController = Get.find<PasswordController>();
 
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(ImagePath.accountBackground),
-            fit: BoxFit.cover,
+       // Prevents the entire screen from resizing with the keyboard
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(ImagePath.accountBackground),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: double.infinity,
-              
-                decoration: BoxDecoration(
-                  color: const Color(0xffFFFFFF),
-                  borderRadius: BorderRadius.circular(32.r),
-                ),
-                child: Padding(
+
+          // Bottom Form Fixed
+          Positioned(
+            bottom: 5.h, // Initial position near the bottom
+            left: 16.w,
+            right: 16.w,
+            child: SafeArea(
+              child: SingleChildScrollView( // Allows scrolling if content is covered by keyboard
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xffFFFFFF),
+                    borderRadius: BorderRadius.circular(32.r),
+                  ),
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  // Prevents unnecessary expansion
                     children: [
                       SizedBox(height: 33.h),
                       Row(
@@ -89,8 +93,8 @@ class Password extends StatelessWidget {
                           color: const Color(0xff172601),
                           onTap: () {
                             if (isStrong) {
-                                passwordController.clear();
-                            Get.to(()=>PrivacyPolicyTerms());
+                              passwordController.clear();
+                              Get.to(() => PrivacyPolicyTerms());
                             }
                           },
                           textStyle: TextStyle(
@@ -101,50 +105,44 @@ class Password extends StatelessWidget {
                           ),
                         );
                       }),
-                  
-                      SizedBox(height: 24.h,),
-                         RichText(textAlign: TextAlign.center,
-                      text: TextSpan(
-                    style: TextStyle(
-                      fontFamily: 'SFPro',
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff3E4B2C),
-
-
-                    ),
-
-                    children: [
-                      TextSpan(text: 'By continuing, you agree to our '),
-                      TextSpan(
-                         text: 'Terms of Service',
-                         style: TextStyle(
-                           decoration: TextDecoration.underline,
-                            color: Color(0xff3E4B2C),
-                         )
+                      SizedBox(height: 24.h),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontFamily: 'SFPro',
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xff3E4B2C),
+                          ),
+                          children: [
+                            const TextSpan(text: 'By continuing, you agree to our '),
+                            TextSpan(
+                              text: 'Terms of Service',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: const Color(0xff3E4B2C),
+                              ),
+                            ),
+                            const TextSpan(text: ' and '),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: const Color(0xff3E4B2C),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const TextSpan(text: ' and '),
-                      TextSpan(
-                         text: 'Privacy Policy',
-                         style: TextStyle(
-                           decoration: TextDecoration.underline,
-                            color: Color(0xff3E4B2C),
-                         )
-                      ),
-
-                    ]
-                      )),
-                      SizedBox(height: 24.h,)
-
-
+                      SizedBox(height: 24.h),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 30.h),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

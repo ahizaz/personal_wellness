@@ -24,7 +24,7 @@ class PrivacyPolicyTerms extends StatelessWidget {
         ),
         child: Padding(padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
-         mainAxisAlignment: MainAxisAlignment.center,
+         mainAxisAlignment: MainAxisAlignment.end,
           children: [
           Container(
             width: double.infinity,
@@ -191,7 +191,7 @@ class PrivacyPolicyTerms extends StatelessWidget {
                               onTap:controller.isTermsAgreed.value?(){
                                    Get.to(()=>OtpVerificationDefault());
                               }:(){}
-                           // নিষ্ক্রিয় করা হয়েছে যদি isTermsAgreed মিথ্যা হয়
+                        
                             ),
                           ),
                       SizedBox(height: 24.h,),
@@ -202,7 +202,8 @@ class PrivacyPolicyTerms extends StatelessWidget {
             ),
             
             ),
-          )  
+          ) ,
+          SizedBox(height: 33.h,) 
           ],
         ),
         

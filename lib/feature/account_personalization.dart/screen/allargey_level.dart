@@ -32,7 +32,7 @@ class AllargeyLevel extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
                 width: double.infinity,
@@ -158,7 +158,8 @@ class AllargeyLevel extends StatelessWidget {
                     ],
                   ),
                 ),
-              )
+              ),
+              SizedBox(height: 30.h,),
             ],
           ),
         ),
