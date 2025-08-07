@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
+import 'package:personal_wellness/feature/today/screen/product_details.dart';
 
 class RoutineInProgressview extends StatelessWidget {
   const RoutineInProgressview({super.key});
@@ -96,7 +97,7 @@ class RoutineInProgressview extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 4.h), // Space between containers
                       child: InkWell(
                         onTap:(){
-                          
+                          Get.to(()=>ProductDetails());
                         },
                         child: Container(
                           width: double.infinity,
