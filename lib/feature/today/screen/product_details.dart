@@ -1,39 +1,134 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:personal_wellness/core/utils/constants/icon_path.dart';
+import 'package:personal_wellness/feature/today/controller/product_details_controller.dart';
+import 'package:personal_wellness/feature/today/widget/how_to_use.dart';
+import 'package:personal_wellness/feature/today/widget/product_header.dart';
 
 class ProductDetails extends StatelessWidget {
   const ProductDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final ProductDetailsController controller = Get.put(ProductDetailsController());
     return Scaffold(
       backgroundColor: Color(0xffEDEEE6),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 8.h)
-            ,
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                ProductHeader(),
+                SizedBox(height: 9.h),
+                Stack(
+                  alignment: Alignment.center,
                   children: [
-                    InkWell(onTap: (){
-                      Get.back();
-                    },child: Image.asset(IconPath.backarrow,width: 24.w,height: 24.h,fit: BoxFit.cover,)),
-                    SizedBox(width: 120.w,),
-                    Center(
-                      child: Text("Product",style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff000000)
-                      ),),
-                    )
+                    // Single Obx wrapping the entire reactive Container
+                    Obx(() => Container(
+                          width: double.infinity,
+                          height: 298.h,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(
+                                  controller.imagePath[controller.currentIndex.value]),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 12.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 28.w,
+                                      height: 2.h,
+                                      color: controller.currentIndex.value >= 0
+                                          ? Color(0xffFFFFFF)
+                                          : Color(0xffEDEEE6),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Container(
+                                      width: 28.w,
+                                      height: 2.h,
+                                      color: controller.currentIndex.value >= 1
+                                          ? Color(0xffFFFFFF)
+                                          : Color(0xffEDEEE6),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Container(
+                                      width: 28.w,
+                                      height: 2.h,
+                                      color: controller.currentIndex.value >= 2
+                                          ? Color(0xffFFFFFF)
+                                          : Color(0xffEDEEE6),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                    Positioned(
+                      right: 16.w,
+                      child: InkWell(
+                        onTap: controller.nextImage,
+                        child: Container(
+                          width: 32.w,
+                          height: 182.h,
+                          decoration: BoxDecoration(
+                            color: Color(0xffFFFFFF).withValues(alpha: 0.4),
+                            borderRadius: BorderRadius.circular(11.r),
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 20.r,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 9.h,),
+                SizedBox(height: 16.h),
+                Text(
+                  controller.productData["productName"],
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff172601),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  "Ingredients",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff172601),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  controller.productData["ingredients"],
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff3E4B2C),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                HowToUseSection(),
+                SizedBox(height: 24.h,),
                 
               ],
             ),
