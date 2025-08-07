@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/today/controller/product_details_controller.dart';
 import 'package:personal_wellness/feature/today/widget/how_to_use.dart';
 import 'package:personal_wellness/feature/today/widget/product_header.dart';
@@ -129,7 +130,64 @@ class ProductDetails extends StatelessWidget {
                 SizedBox(height: 16.h),
                 HowToUseSection(),
                 SizedBox(height: 24.h,),
-                
+                Text("Relevant products",style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 28.sp,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xff172601)
+                ),),
+                SizedBox(height: 16.h,),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(ImagePath.product4,width: 177.w,height: 182.h,fit: BoxFit.cover,),
+                        SizedBox(height: 8.h,),
+                        Text("The Ordinary Anti-\naging Serum",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
+                      ],
+                    ),
+                      SizedBox(width: 16.w,),
+                         Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(ImagePath.product3,width: 177.w,height: 182.h,fit: BoxFit.cover,),
+                        SizedBox(height: 8.h,),
+                        Text("Whitening Night\nCream",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
+                      ],
+                    ),
+
+                  ],
+                ),
+                SizedBox(height: 16.h,),
+                    Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(ImagePath.product2,width: 177.w,height: 182.h,fit: BoxFit.cover,),
+                        SizedBox(height: 8.h,),
+                        Text("Vitamin C Serum\n50g",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
+                      ],
+                    ),
+                      SizedBox(width: 16.w,),
+                         Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(ImagePath.product1,width: 177.w,height: 182.h,fit: BoxFit.cover,),
+                        SizedBox(height: 8.h,),
+                        Text("Essence Sun’s\nCream SPF45 ",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
+                      ],
+                    ),
+
+                  ],
+                ),
+                  SizedBox(height: 14.h,),
+
               ],
             ),
           ),
