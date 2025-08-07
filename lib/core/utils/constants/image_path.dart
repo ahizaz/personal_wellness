@@ -10,6 +10,7 @@ class ImagePath {
   static const String oilyface ="assets/images/oily_face.png";
   static const String notification = "assets/images/notification.png";
   static const String homenodata = "assets/images/home_no_data.png";
+  static const String completed = "assets/images/completed.png";
 
 
   

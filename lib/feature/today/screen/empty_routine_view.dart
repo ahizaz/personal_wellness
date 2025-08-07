@@ -68,7 +68,8 @@ class EmptyRoutineView extends StatelessWidget {
         fontSize: 17.sp,
         fontWeight: FontWeight.w600,
         color: Color(0xff121221)
-      ),),)
+      ),),),
+      
       ],
      ),
    );

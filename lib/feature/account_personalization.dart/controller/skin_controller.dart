@@ -9,6 +9,6 @@ class SkinTypeController extends GetxController {
     } else {
       selectedSkinType.value = skinType; // Select the new skin type
     }
-    print('Selected skin type: ${selectedSkinType.value}'); // Debug print to verify selection
+ // Debug print to verify selection
   }
 }

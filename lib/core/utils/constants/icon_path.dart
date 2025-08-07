@@ -19,6 +19,7 @@ class IconPath {
   static const cleanser = "assets/icons/cleanser.png";
   static const night = "assets/icons/night.png";
   static const sun = "assets/icons/sun.png";
+  static const camera = "assets/icons/camera.png";
 
 
 
