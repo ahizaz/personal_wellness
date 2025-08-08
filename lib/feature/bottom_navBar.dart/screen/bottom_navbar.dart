@@ -67,7 +67,7 @@ class BottomNavbar extends StatelessWidget {
           child: NavigationBar(
              indicatorColor: Colors.transparent,
             elevation: 9,
-          height: 60.h,
+          height: 55.h,
             shadowColor: Colors.black,
             backgroundColor:Color(0xffFFFFFF),
             selectedIndex: controller.selectedIndex.value,

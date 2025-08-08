@@ -32,7 +32,7 @@ class OtpVerification extends StatelessWidget {
 
           // Bottom Form Fixed
           Positioned(
-            bottom: 5.h, // Initial position near the bottom
+            bottom: 5.h,
             left: 16.w, // Matches the padding from the original design
             right: 16.w, // Matches the padding from the original design
             child: SafeArea(
@@ -52,14 +52,20 @@ class OtpVerification extends StatelessWidget {
                       title: 'OTP verification',
                     ),
                     SizedBox(height: 33.h),
-                    Text(
-                      "Please enter the 6-digit OTP that was\nsent to st***moss@gmail.com",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff3E4B2C),
-                        fontSize: 17.sp,
-                        fontFamily: 'SFPro',
+                              Center(
+                    child: Image(image: AssetImage(ImagePath.privacypic,),width: 48.w,height: 48.h,fit: BoxFit.cover,),
+                   ),
+                   SizedBox(height: 24.h,),
+                    Center(
+                      child: Text(
+                        "Please enter the 6-digit OTP that was\n     sent to st***moss@gmail.com",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xff3E4B2C),
+                          fontSize: 17.sp,
+                          fontFamily: 'SFPro',
+                        ),
                       ),
                     ),
                     SizedBox(height: 24.h),

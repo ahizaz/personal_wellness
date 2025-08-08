@@ -59,13 +59,15 @@ class OtpVerificationDefault extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 24.h),
-                    Text(
-                      "Please enter the 6 digit OTP that was\n     sent to st***mos@gmail.com.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff3E4B2C),
-                        fontSize: 17.sp,
-                        fontFamily: 'SFPro',
+                    Center(
+                      child: Text(
+                        "Please enter the 6 digit OTP that was\n     sent to st***mos@gmail.com.",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xff3E4B2C),
+                          fontSize: 17.sp,
+                          fontFamily: 'SFPro',
+                        ),
                       ),
                     ),
                     SizedBox(height: 24.h),

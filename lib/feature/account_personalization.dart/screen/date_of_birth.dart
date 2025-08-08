@@ -86,14 +86,15 @@ class DateOfBirth extends StatelessWidget {
                       SizedBox(
                         height: 215.h,
                         child: CupertinoDatePicker(
+                          
                           mode: CupertinoDatePickerMode.date,
                           initialDateTime: DateTime(2000, 1, 1),
                           minimumYear: 1970,
                            maximumYear: 2050,
+                           
       
                           onDateTimeChanged: (DateTime newDate) {
-                            // এখানে চাইলে GetX controller দিয়ে মান স্টোর করতে পারো
-                            print('Selected date: $newDate');
+                       
                           },
                         ),
                       ),

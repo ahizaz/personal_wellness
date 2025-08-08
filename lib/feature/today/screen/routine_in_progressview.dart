@@ -145,7 +145,7 @@ class RoutineInProgressview extends StatelessWidget {
                                 Row(
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 30.w),
+                                      padding: EdgeInsets.symmetric(horizontal: 30.w,),
                                       child: Text(
                                         data['description'],
                                         style: TextStyle(

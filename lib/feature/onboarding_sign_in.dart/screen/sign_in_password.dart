@@ -46,7 +46,7 @@ class SignInPassword extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
-               // Prevents unnecessary expansion
+                  // Prevents unnecessary expansion
                   children: [
                     SizedBox(height: 33.h),
                     Row(
@@ -81,18 +81,19 @@ class SignInPassword extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 33.h),
-                    Container(
+                    Obx(() => Container(
                       width: double.infinity,
-                      height: 56.h,
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: const Color(0xffE8E9E6),
-                          width: 1,
+                          color: controller.hasText.value
+                              ? Color(0xff485908)
+                              : const Color(0xffE8E9E6),
+                         width:controller.hasText.value?3:1,
                         ),
                         borderRadius: BorderRadius.circular(16.r),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3),
                         child: Row(
                           children: [
                             Image.asset(
@@ -140,7 +141,7 @@ class SignInPassword extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
+                    )),
                     SizedBox(height: 20.h),
                     Obx(() => CustomButton(
                       text: 'Continue',

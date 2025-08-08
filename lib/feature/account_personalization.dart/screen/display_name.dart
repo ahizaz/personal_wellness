@@ -78,13 +78,16 @@ class DisplayName extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        "What should we call you?",
-                        style: TextStyle(
-                          fontFamily: 'SFPro',
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xff172601),
+                      Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 12.w),
+                        child: Text(
+                          "What should we call you?",
+                          style: TextStyle(
+                            fontFamily: 'SFPro',
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xff172601),
+                          ),
                         ),
                       ),
                       SizedBox(height: 13.h),

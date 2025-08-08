@@ -180,7 +180,7 @@ class PrivacyPolicyTerms extends StatelessWidget {
                                Obx(
                             () => CustomButton(
                               text: "Continue",
-                              color: Color(0xff172601), // ব্যাকগ্রাউন্ড কালার অপরিবর্তিত
+                              color: Color(0xff172601), 
                               textStyle: TextStyle(
                                 fontFamily: 'SFPro',
                                 fontSize: 17.sp,

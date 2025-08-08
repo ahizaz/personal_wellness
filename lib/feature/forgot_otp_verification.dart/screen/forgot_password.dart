@@ -53,13 +53,19 @@ class ForgotPassword extends StatelessWidget {
                       title: 'Forgot Password',
                     ),
                     SizedBox(height: 33.h),
-                    Text(
-                      "Now worry.We're here to helo you.\nSubmit your registered email address to\nreset your password.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff3E4B2C),
-                        fontSize: 17.sp,
-                        fontFamily: 'SFPro',
+                       Center(
+                    child: Image(image: AssetImage(ImagePath.privacypic,),width: 48.w,height: 48.h,fit: BoxFit.cover,),
+                   ),
+                   SizedBox(height: 24.h,),
+                    Center(
+                      child: Text(
+                        "Please submit your registered email\n    address to reset your password",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xff3E4B2C),
+                          fontSize: 17.sp,
+                          fontFamily: 'SFPro',
+                        ),
                       ),
                     ),
                     SizedBox(height: 24.h),

@@ -31,14 +31,14 @@ class BackButtonWithTitle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(width: 70.w),
+        SizedBox(width: 80.w),
         Center(
           child: Text(
             title,
             style: TextStyle(
               fontFamily: 'SFPro',
               fontSize: 17.sp,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: const Color(0xff172601),
             ),
           ),

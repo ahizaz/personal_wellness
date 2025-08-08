@@ -32,6 +32,7 @@ class CustomEmailTextField extends StatelessWidget {
                   : const Color(0xffE8E9E6),
         width: isFocused.value || controller.text.isNotEmpty ? 3.w : 1.w,
             ),
+            
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: TextField(
