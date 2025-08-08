@@ -53,7 +53,7 @@ class OtpVerification extends StatelessWidget {
                     ),
                     SizedBox(height: 33.h),
                               Center(
-                    child: Image(image: AssetImage(ImagePath.privacypic,),width: 48.w,height: 48.h,fit: BoxFit.cover,),
+                    child: Image(image: AssetImage(ImagePath.otppic,),width: 48.w,height: 48.h,fit: BoxFit.cover,),
                    ),
                    SizedBox(height: 24.h,),
                     Center(
