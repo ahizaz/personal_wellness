@@ -15,7 +15,7 @@ class ImagePath {
   static const String product2 = "assets/images/product_details_2.png";
   static const String product3 = "assets/images/product_details_3.png";
   static const String product4 = "assets/images/product_detail4.png";
-
+  static const String forgotlock = "assets/images/forgotlock.png";
 
   
 }

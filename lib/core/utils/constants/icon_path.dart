@@ -21,6 +21,7 @@ class IconPath {
   static const sun = "assets/icons/sun.png";
   static const camera = "assets/icons/camera.png";
   static const backarrow = "assets/icons/backarrow.png";
+  static const forgtolock = "assets/icons/forgot_lock.png";
 
 
 

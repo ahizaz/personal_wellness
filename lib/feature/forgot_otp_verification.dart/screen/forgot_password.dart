@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
+import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/forgot_otp_verification_controller.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/screen/otp_verification.dart';
@@ -54,7 +55,7 @@ class ForgotPassword extends StatelessWidget {
                     ),
                     SizedBox(height: 33.h),
                        Center(
-                    child: Image(image: AssetImage(ImagePath.privacypic,),width: 48.w,height: 48.h,fit: BoxFit.cover,),
+                    child: Image(image: AssetImage(ImagePath.forgotlock),width: 48.w,height: 48.h,fit: BoxFit.cover,),
                    ),
                    SizedBox(height: 24.h,),
                     Center(
