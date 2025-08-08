@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
-import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/forgot_otp_verification_controller.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/screen/otp_verification.dart';
