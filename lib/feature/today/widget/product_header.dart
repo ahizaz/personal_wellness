@@ -4,7 +4,12 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 
 class ProductHeader extends StatelessWidget {
-  const ProductHeader({super.key});
+  final String title; // Added parameter for dynamic title
+
+  const ProductHeader({
+    super.key,
+    required this.title, // Make it required or provide a default if needed
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +26,10 @@ class ProductHeader extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        SizedBox(width: 120.w),
+        SizedBox(width: 110.w),
         Center(
           child: Text(
-            "Product",
+            title, // Use the dynamic title here
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 17.sp,

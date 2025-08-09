@@ -22,7 +22,7 @@ class ProductDetails extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProductHeader(),
+                ProductHeader(title: 'Product',),
                 SizedBox(height: 9.h),
                 Stack(
                   alignment: Alignment.center,
