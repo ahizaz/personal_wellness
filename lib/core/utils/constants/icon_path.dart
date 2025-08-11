@@ -22,6 +22,9 @@ class IconPath {
   static const camera = "assets/icons/camera.png";
   static const backarrow = "assets/icons/backarrow.png";
   static const forgtolock = "assets/icons/forgot_lock.png";
+  static const rightarrow = "assets/icons/rightarrow.png";
+  static const lotion = "assets/icons/lotion.png";
+  static const serum = "assets/icons/serum.png";
 
 
 
