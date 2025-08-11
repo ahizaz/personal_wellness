@@ -25,6 +25,7 @@ class IconPath {
   static const rightarrow = "assets/icons/rightarrow.png";
   static const lotion = "assets/icons/lotion.png";
   static const serum = "assets/icons/serum.png";
+  static const calendar = "assets/icons/calendar.png";
 
 
 
