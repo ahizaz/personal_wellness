@@ -442,11 +442,22 @@ class AddToRoutine extends StatelessWidget {
 
           }) ),
           SizedBox(width: 8.w,),
-          Expanded(child:CustomButton(text: "Submit", color: Color(0xff172601), onTap: (){
-
-          }) ),
+         Obx(() {
+  final enabled = controller.isFormValid;
+  return Expanded(
+    child: CustomButton(
+      text: "Submit",
+      color: enabled ? const Color(0xff172601) : const Color(0xffA0A09F), // dim color if disabled
+      onTap:enabled ? (){} // Disable button when no selection
+                                      : () {
+                                          // Navigate to next page when selected
+                                        }, // Disable button tap if not enabled
+    ),
+  );
+}),
         ],
-       )
+       ),
+       SizedBox(height: 26.h,)
 
          ],
             ),

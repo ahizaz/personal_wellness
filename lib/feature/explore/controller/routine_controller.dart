@@ -33,4 +33,11 @@ var selectedTimes = <String>[].obs;
     }
   }
   final RxString instructionText = ''.obs;
+  bool get isFormValid {
+  return startDate.value != null &&
+         endDate.value != null &&
+         selectedOrder.value != 0 &&
+         selectedTimes.isNotEmpty &&
+         instructionText.value.trim().isNotEmpty;
+}
 }
