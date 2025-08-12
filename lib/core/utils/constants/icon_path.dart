@@ -26,6 +26,15 @@ class IconPath {
   static const lotion = "assets/icons/lotion.png";
   static const serum = "assets/icons/serum.png";
   static const calendar = "assets/icons/calendar.png";
+  static const notification = "assets/icons/notification.png";
+  static const seetings = "assets/icons/seetings.png";
+  static const account = "assets/icons/account.png";
+  static const securityseetings = "assets/icons/securityseetings.png";
+  static const profilestatus = "assets/icons/profilestatus.png";
+  static const inventory = "assets/icons/inventory.png";
+  static const logout = "assets/icons/logout.png";
+  static const profilearrow = "assets/icons/profilearrow.png";
+
 
 
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
-import 'package:personal_wellness/feature/today/screen/today.dart';
 
 class RoutineController extends GetxController {
   var selectedCategory = ''.obs;

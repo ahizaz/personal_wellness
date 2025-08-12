@@ -22,6 +22,8 @@ class ImagePath {
   static const String skinproduct4 = "assets/images/skincondtion4.png";
   static const String skinprodut5 = "assets/images/skincondtion5.png";
   static const String skinproduct6 = "assets/images/skincondtion6.png";
+  static const String applogo = "assets/images/logo.png";
+  static const String apptitle = "assets/images/titlelogo.png";
 
   
 }
