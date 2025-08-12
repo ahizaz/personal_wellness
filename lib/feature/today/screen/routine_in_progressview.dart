@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
+import 'package:personal_wellness/feature/profile_accountseetings/screen/account.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/today/screen/product_details.dart';
 
@@ -25,7 +26,7 @@ class RoutineInProgressview extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                
+                  Get.to(()=>Account());
                   },
                   child: Obx(() {
                     final imagePath = controller.profileImagePath.value;

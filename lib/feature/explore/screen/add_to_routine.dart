@@ -1,6 +1,4 @@
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,11 +9,10 @@ import 'package:personal_wellness/feature/explore/controller/routine_controller.
 import 'package:personal_wellness/feature/explore/widget/category_bottom_sheet.dart';
 import 'package:personal_wellness/feature/explore/widget/category_icon.dart';
 import 'package:personal_wellness/feature/explore/widget/date_picker_helper.dart';
+import 'package:personal_wellness/feature/explore/widget/progress_dialog.dart';
 import 'package:personal_wellness/feature/explore/widget/time_picker_bottom_sheet.dart';
-
 class AddToRoutine extends StatelessWidget {
   AddToRoutine({super.key});
-
   final RoutineController controller = Get.put(RoutineController());
   final GlobalKey startKey = GlobalKey();
   final GlobalKey endKey = GlobalKey();
@@ -29,98 +26,6 @@ class AddToRoutine extends StatelessWidget {
       },
     );
   }
-
-  void _showProgressDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black54, // Semi-transparent barrier for full-page blur
-      builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () async => false, // Prevent closing with back button
-          child: Dialog(
-            insetPadding: EdgeInsets.zero,
-            backgroundColor: Colors.transparent,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              child: Stack(
-                children: [
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Full-page blur
-                    child: Container(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 287.h,
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                      ),
-                      child: Obx(() => Column(
-                          
-                            children: [
-                              SizedBox(
-                                width: 124.w,
-                                height: 124.h,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    FittedBox(
-                                      child: CircularProgressIndicator(
-                                        value: controller.progress.value / 100,
-                                        strokeWidth: 8.w,
-                                        backgroundColor: Colors.grey[300],
-                                        valueColor:
-                                            const AlwaysStoppedAnimation<Color>(Colors.green),
-                                      ),
-                                    ),
-                                    if (controller.progress.value < 100)
-                                      Text(
-                                        '${controller.progress.value}%',
-                                        style: TextStyle(
-                                            fontSize: 20.sp, fontWeight: FontWeight.bold),
-                                      ),
-                                    if (controller.progress.value == 100)
-                                      Container(
-                                        width: 80.w,
-                                        height: 80.h,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.green,
-                                        ),
-                                        child: Icon(Icons.check, color: Colors.white, size: 40.sp),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 16.h),
-                              Text(
-                                controller.progressMessage.value,
-                                style: TextStyle(
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff172601),
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -547,8 +452,8 @@ class AddToRoutine extends StatelessWidget {
                               : const Color(0xffA0A09F), // dim color if disabled
                           onTap: !enabled
                               ? () {}:(){
-                                 _showProgressDialog(context);
-                                  controller.submitRoutine();
+                               ProgressDialog.show(context, controller); // Replace _showProgressDialog with this
+                             controller.submitRoutine();
                                 }
                               // Disable button tap if not enabled
                         ),
