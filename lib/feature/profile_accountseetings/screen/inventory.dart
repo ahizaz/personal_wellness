@@ -224,9 +224,10 @@ void _showFilterPopup(
                       Text(
                         "Brand",
                         style: TextStyle(
-                          fontSize: 16.sp,
+                            fontFamily: "SFPro",
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Color(0xff172601),
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -249,9 +250,11 @@ void _showFilterPopup(
                                 pressElevation: 0,
                                 backgroundColor: Colors.white,
                                 selectedColor: const Color(0xFFF0F0F0),
-                                labelStyle: const TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500,
+                                labelStyle:  TextStyle(
+                               fontFamily: "SFPro",
+                               fontSize: 17.sp,
+                               fontWeight: FontWeight.w400,
+                               color: Color(0xff172601)
                                 ),
                                 shape: StadiumBorder(
                                   side: BorderSide(
@@ -268,9 +271,10 @@ void _showFilterPopup(
                       Text(
                         "Show more",
                         style: TextStyle(
-                          color: const Color(0xff3E4B2C),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
+                             fontFamily: "SFPro",
+                          color: const Color(0xff172601),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(height: 20.h),
@@ -279,9 +283,10 @@ void _showFilterPopup(
                       Text(
                         "Category",
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Color(0xff172601),
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -304,15 +309,17 @@ void _showFilterPopup(
                                 pressElevation: 0,
                                 backgroundColor: Colors.white,
                                 selectedColor: const Color(0xFFF0F0F0),
-                                labelStyle: const TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500,
+                                labelStyle:  TextStyle(
+                                    fontFamily: "SFPro",
+                               fontSize: 17.sp,
+                               fontWeight: FontWeight.w400,
+                               color: Color(0xff172601)
                                 ),
                                 shape: StadiumBorder(
                                   side: BorderSide(
                                     color: isSelected
-                                        ? Colors.transparent
-                                        : Colors.grey.shade300,
+                                        ?Color(0xffEDEEE6)
+                                        : Color(0xffE8E9E6),
                                   ),
                                 ),
                                 showCheckmark: false,
@@ -323,9 +330,10 @@ void _showFilterPopup(
                       Text(
                         "Show more",
                         style: TextStyle(
-                          color: const Color(0xff3E4B2C),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
+                          fontFamily: "SFPro",
+                          color: const Color(0xff172601),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(height: 24.h),

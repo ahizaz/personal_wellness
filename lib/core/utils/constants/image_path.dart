@@ -24,6 +24,6 @@ class ImagePath {
   static const String skinproduct6 = "assets/images/skincondtion6.png";
   static const String applogo = "assets/images/logo.png";
   static const String apptitle = "assets/images/titlelogo.png";
-
+   static const String logout = "assets/images/logout.png";
   
 }

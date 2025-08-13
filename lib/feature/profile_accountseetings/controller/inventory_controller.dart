@@ -23,6 +23,7 @@ class InventoryController extends GetxController{
       "Foundation",
       "Mascara",
       "Hair Color",
+      
       "Blush",
       "Anti-Aging Serums",
     ];
