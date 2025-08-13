@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/account_seetings.dart';
+import 'package:personal_wellness/feature/profile_accountseetings/screen/inventory.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/update_password.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'dart:io';
@@ -266,7 +267,9 @@ class Account extends StatelessWidget {
                           ],
                          ),
                          Spacer(),
-                         InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,))
+                         InkWell(onTap:(){
+                          Get.to(()=>Inventory());
+                         },child: InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)))
                         ],
                       ),
                         SizedBox(height: 16.h,),
