@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class Routine extends StatelessWidget {
   const Routine({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Color(0xffFFFFFF),
+      body: SafeArea(
+        child: SingleChildScrollView(
+        
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 13.h,),
+                Center(child: Text("Today",style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff172601)
+                ),),),
+                SizedBox(height: 25.h,),
+                     Text(
+              '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
+              style: TextStyle(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff172601),
+                fontFamily: "SFPro"
+              ),
+            ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
