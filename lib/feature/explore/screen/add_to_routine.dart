@@ -28,6 +28,10 @@ class AddToRoutine extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    final String? passedProductName = Get.arguments as String?;
+    if (passedProductName != null && controller.productName.value.isEmpty) {
+      controller.setProductName(passedProductName);
+    }
     return Scaffold(
       backgroundColor: const Color(0xffFFFFFF),
       body: SingleChildScrollView(

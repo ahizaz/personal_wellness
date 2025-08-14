@@ -386,15 +386,18 @@ class ViewProduct extends StatelessWidget {
 ),
 
         SizedBox(height: 16.h,),
-              Text(
+           Text(
                   controller.productDataview["productName"],
                   style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff172601),
-                  ),
+                      fontFamily: "SFPro",
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff172601)),
+                // This keeps the text on one line.
+                  overflow: TextOverflow.ellipsis, // This adds "..." if the text is too long.
                 ),
+       
+           
                    SizedBox(height: 16.h),
                      Text(
                   "Ingredients",
@@ -418,27 +421,27 @@ class ViewProduct extends StatelessWidget {
                 SizedBox(height: 16.h,),
                 Howtouseit(),
                 SizedBox(height: 24.h,),
-                InkWell(
-                  onTap: (){
-                    Get.to(AddToRoutine());
-                  },
-                  child: Container(
-                   width: double.infinity,
-                   height: 48.h,
-                   decoration: BoxDecoration(
-                    color: Color(0xff172601),
-                    borderRadius: BorderRadius.circular(999.r),
-                   ),
-                   child: Center(
-                    child: Text("+   Add to my routine",style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xffFFFFFF)
-                    ),),
-                   ),
-                  ),
-                ),
+               InkWell(
+  onTap: () {
+    Get.to(AddToRoutine(), arguments: controller.productDataview["productName"]);
+  },
+  child: Container(
+    width: double.infinity,
+    height: 48.h,
+    decoration: BoxDecoration(
+      color: Color(0xff172601),
+      borderRadius: BorderRadius.circular(999.r),
+    ),
+    child: Center(
+      child: Text("+   Add to my routine", style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w600,
+        color: Color(0xffFFFFFF)
+      )),
+    ),
+  ),
+),
                 SizedBox(height: 24.h,),
                 Text("Relevant products",style: TextStyle(
                   fontFamily: "SFPro",
