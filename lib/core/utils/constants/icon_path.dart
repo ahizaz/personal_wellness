@@ -34,6 +34,7 @@ class IconPath {
   static const inventory = "assets/icons/inventory.png";
   static const logout = "assets/icons/logout.png";
   static const profilearrow = "assets/icons/profilearrow.png";
+  static const edit = "assets/icons/edit.png";
 
 
 

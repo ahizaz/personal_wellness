@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:personal_wellness/feature/explore/controller/routine_controller.dart';
+import 'package:personal_wellness/feature/routine/screen/view_routing_product.dart';
 
 class Routine extends StatelessWidget {
   const Routine({super.key});
@@ -93,21 +94,26 @@ class Routine extends StatelessWidget {
                       child: Obx(() => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: controller.routines.map((routine) {
-                              return Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.symmetric(vertical: 4.h),
-                                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-                                decoration: BoxDecoration(
-                                  color: routine.backgroundColor,
-                                  borderRadius: BorderRadius.circular(6.r),
-                                ),
-                                child: Text(
-                                  routine.productName,
-                                  style: const TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xff3E4B2C),
+                              return InkWell(
+                                onTap:(){
+                              Get.to(()=>ViewRoutingProduct(productName:routine.productName));
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  margin: EdgeInsets.symmetric(vertical: 4.h),
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    color: routine.backgroundColor,
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                  child: Text(
+                                    routine.productName,
+                                    style: const TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff3E4B2C),
+                                    ),
                                   ),
                                 ),
                               );
