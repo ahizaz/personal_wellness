@@ -1,5 +1,10 @@
+
 // import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
+// import 'package:get/get_core/src/get_main.dart';
+// import 'package:get/get_instance/get_instance.dart';
+// import 'package:get/get_navigation/get_navigation.dart';
+// import 'package:get/get_rx/src/rx_types/rx_types.dart';
+// import 'package:get/get_state_manager/get_state_manager.dart';
 // import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 // import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 
@@ -14,7 +19,8 @@
 //   var selectedAmPm = "AM".obs;
 //   var selectedTimes = <String>[].obs;
 //   final TextEditingController instructionController = TextEditingController();
-   
+//   final RxString productName = ''.obs; // New field to store product name
+  
 //   // Order selection
 //   var selectedOrder = 0.obs; // 0 means nothing selected
 //   final List<String> availableTimes = [
@@ -42,7 +48,9 @@
 //         selectedTimes.isNotEmpty &&
 //         instructionText.value.trim().isNotEmpty;
 //   }
-
+// void setProductName(String name) {
+//     productName.value = name;
+//   }
 //   // Add progress-related fields
 //   var progress = 0.obs;
 //   var progressMessage = 'Setting up your routine...'.obs;
@@ -59,11 +67,21 @@
 //     progressMessage.value = 'Done';
 //     await Future.delayed(const Duration(seconds: 1));
 //     Get.back(); // Close dialog
-//      final BottomNavcontroller controller = Get.find();
-//       Get.off(() => BottomNavbar());
-//        controller.changeIndex(2);
-//  // Navigate to explore page
+//     final BottomNavcontroller navController = Get.find();
+//     Get.off(() => BottomNavbar());
+//     navController.changeIndex(2); // Navigate to explore page
 //   }
+
+//   // Initialize with product name from ViewProduct
+//   @override
+//   void onInit() {
+//     super.onInit();
+//     final passedProductName = Get.arguments as String?;
+//     if (passedProductName != null) {
+//       productName.value = passedProductName;
+//     }
+//   }
+  
 // }
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -132,6 +150,15 @@ void setProductName(String name) {
     progress.value = 100;
     progressMessage.value = 'Done';
     await Future.delayed(const Duration(seconds: 1));
+    // Clear all data
+    selectedCategory.value = '';
+    startDate.value = null;
+    endDate.value = null;
+    selectedOrder.value = 0;
+    selectedTimes.clear();
+    instructionText.value = '';
+    productName.value = '';
+    instructionController.clear();
     Get.back(); // Close dialog
     final BottomNavcontroller navController = Get.find();
     Get.off(() => BottomNavbar());
@@ -147,4 +174,5 @@ void setProductName(String name) {
       productName.value = passedProductName;
     }
   }
+  
 }
