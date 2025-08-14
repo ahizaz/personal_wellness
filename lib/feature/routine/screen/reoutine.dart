@@ -109,7 +109,7 @@ class Routine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RoutineController controller = Get.put(RoutineController());
+    final RoutineController controller = Get.put(RoutineController());///
 
     return Scaffold(
       backgroundColor: Color(0xffFFFFFF),
