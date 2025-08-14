@@ -69,6 +69,9 @@ class ViewProductController extends GetxController {
     "Reapply every 2 hours, especially after sweating, swimming, or towel drying.",
     "Use daily, even on cloudy days, to help prevent sun damage and reduce the risk of hyperpigmentation and premature aging",
   ].obs;
+  final RxList<String>mynote = [
+    "Taking care of your skin isn't just about appearance — it's about feeling confident, healthy, and in tune with yourself. This app is designed to help you understand your skin's unique needs, track your progress, and build a routine that actually works for you. Whether you're managing breakouts, dryness, or just looking to maintain a healthy glow, we’re here to support you every step of the way. Your skin is yours — let’s help it thrive."
+  ].obs;
 
   // Observable for routine details
   final Rx<RoutineDetails> routineDetails = RoutineDetails(
