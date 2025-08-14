@@ -44,24 +44,21 @@ class Routine extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                // Display the added product
-                Obx(() => controller.productName.value.isNotEmpty
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                       
-                          Text(
-                            controller.productName.value,
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff3E4B2C),
-                            ),
+                // Display the added products
+                Obx(() => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: controller.routines.map((routine) {
+                        return Text(
+                          routine.productName,
+                          style: TextStyle(
+                            fontFamily: "SFPro",
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff3E4B2C),
                           ),
-                        ],
-                      )
-                    : SizedBox.shrink()),
+                        );
+                      }).toList(),
+                    )),
               ],
             ),
           ),
