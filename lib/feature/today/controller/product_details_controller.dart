@@ -26,4 +26,10 @@ class ProductDetailsController extends GetxController {
   void nextImage() {
     currentIndex.value = (currentIndex.value + 1) % imagePath.length;
   }
+    final RxList<String> usesdirection = [
+    "Apply generously 15–20 minutes before sun exposure to allow proper absorption and maximum protection.",
+    "Use as the final step in your morning skincare routine, after moisturizer and any treatment products.",
+    "Reapply every 2 hours, especially after sweating, swimming, or towel drying.",
+    "Use daily, even on cloudy days, to help prevent sun damage and reduce the risk of hyperpigmentation and premature aging",
+  ].obs;
 }
