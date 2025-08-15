@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/colors.dart';
+import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
+import 'package:personal_wellness/feature/explore/screen/explore.dart';
+import 'package:personal_wellness/feature/progress/screen/progress.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/today/screen/routine_completed_view.dart';
 import 'package:personal_wellness/feature/today/screen/routine_in_progressview.dart';
@@ -39,7 +42,7 @@ class Today extends StatelessWidget {
         // Helper function to create each menu item
         PopupMenuItem(
           onTap: () {
-            // Your logic for adding a product
+           Get.off(()=>Explore());
           },
           child: Row(
             children: const [
@@ -73,7 +76,7 @@ class Today extends StatelessWidget {
         ),
         PopupMenuItem(
           onTap: () {
-            // Your logic for logging routine
+        Get.off(()=>AddToRoutine());
           },
           child: Row(
             children: const [
@@ -109,7 +112,7 @@ class Today extends StatelessWidget {
         
         PopupMenuItem(
           onTap: () {
-            // Your logic for viewing progress
+           Get.off(()=>ProgressData());
           },
           child: Row(
             children: const [
