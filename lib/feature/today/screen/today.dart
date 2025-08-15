@@ -43,15 +43,31 @@ class Today extends StatelessWidget {
           },
           child: Row(
             children: const [
-              Icon(Icons.add, color: Color(0xFF5f6368)), // Dark grey icon
+              Icon(Icons.add, color: Color(0xFF485908)), // Dark grey icon
               SizedBox(width: 8), // Spacing
-              Text(
+               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text(
                 'Add Product',
                 style: TextStyle(
-                  color: Color(0xFF3c4043), // Dark grey text
-                  fontWeight: FontWeight.w500,
+                fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 17,
+                color: Color(0xff172601)
                 ),
               ),
+               Text(
+                'Add new skincare product',
+                style: TextStyle(
+                       fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: Color(0xff78816C)
+                ),
+              ),
+                ],
+               )
             ],
           ),
         ),
@@ -61,33 +77,68 @@ class Today extends StatelessWidget {
           },
           child: Row(
             children: const [
-              Icon(Icons.calendar_today_outlined, color: Color(0xFF5f6368)),
+              Icon(Icons.calendar_today_outlined, color: Color(0xFF485908)),
               SizedBox(width: 8),
-              Text(
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text(
                 'Log Routine',
                 style: TextStyle(
-                  color: Color(0xFF3c4043),
-                  fontWeight: FontWeight.w500,
+                fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 17,
+                color: Color(0xff172601)
                 ),
               ),
+               Text(
+                'Record your routine',
+                style: TextStyle(
+                       fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: Color(0xff78816C)
+                ),
+              ),
+             
+                ],
+               ),
             ],
           ),
         ),
+        
         PopupMenuItem(
           onTap: () {
             // Your logic for viewing progress
           },
           child: Row(
             children: const [
-              Icon(Icons.show_chart, color: Color(0xFF5f6368)),
+              Icon(Icons.show_chart, color: Color(0xFF485908)),
               SizedBox(width: 8),
-              Text(
+         Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text(
                 'View Progress',
                 style: TextStyle(
-                  color: Color(0xFF3c4043),
-                  fontWeight: FontWeight.w500,
+                fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 17,
+                color: Color(0xff172601)
                 ),
               ),
+               Text(
+                'Check your progress',
+                style: TextStyle(
+                       fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: Color(0xff78816C)
+                ),
+              ),
+          
+                ],
+               ),
             ],
           ),
         ),
@@ -99,13 +150,29 @@ class Today extends StatelessWidget {
             children: const [
               Icon(Icons.notifications_none_outlined, color: Color(0xFF5f6368)),
               SizedBox(width: 8),
-              Text(
+             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 Text(
                 'Reminders',
                 style: TextStyle(
-                  color: Color(0xFF3c4043),
-                  fontWeight: FontWeight.w500,
+                fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 17,
+                color: Color(0xff172601)
                 ),
               ),
+               Text(
+                'Manage notifications',
+                style: TextStyle(
+                       fontFamily: "SFPro",
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: Color(0xff78816C)
+                ),
+              ),
+              ],
+             )
             ],
           ),
         ),
