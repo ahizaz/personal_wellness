@@ -227,24 +227,5 @@ class ExploreController extends GetxController {
     return [...matching, ...others];
   }
 
-  // Future method for API integration
-  Future<void> fetchSkinConditionsFromApi() async {
-    // TODO: Implement API call here
-    // Example: final response = await http.get(...);
-    // skinConditions.value = parsedJsonList;
-  }
-
-  // Future method for skin types API integration
-  Future<void> fetchSkinTypesFromApi() async {
-    // TODO: Implement API call here
-    // Example: final response = await http.get(...);
-    // skinTypes.value = parsedJsonList;
-  }
-
-  // Future method for products API integration
-  Future<void> fetchProductsFromApi() async {
-    // TODO: Implement API call here
-    // Example: final response = await http.get(...);
-    // products.value = parsedJsonList;
-  }
+ 
 }

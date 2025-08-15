@@ -44,7 +44,7 @@ class Routine extends StatelessWidget {
     final currentTimeOffset = _calculateTopOffset(now, hourHeight, startHour24);
 
     return Scaffold(
-      backgroundColor: const Color(0xffFFFFFF),
+     backgroundColor: Color(0xffEDEEE6),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

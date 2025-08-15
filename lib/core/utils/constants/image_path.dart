@@ -25,5 +25,10 @@ class ImagePath {
   static const String applogo = "assets/images/logo.png";
   static const String apptitle = "assets/images/titlelogo.png";
    static const String logout = "assets/images/logout.png";
+   static const String beforeafterimage1 = "assets/images/befor_after_pic1.png";
+   static const String beforeafterimage2 = "assets/images/before_after_pic2.png";
+   static const String beforeafterimage3 = "assets/images/before_after_pic3.png";
+   static const String bamboo = "assets/images/bamboo.png";
+   static const String progressimageback = "assets/images/progressimageback.png";
   
 }
