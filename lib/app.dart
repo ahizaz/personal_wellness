@@ -30,4 +30,4 @@ class PeronalWellNess extends StatelessWidget {
       ),
     );
   }
-}
+} 

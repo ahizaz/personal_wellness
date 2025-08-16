@@ -1,3 +1,4 @@
+  
 // import 'dart:async';
 // import 'dart:io';
 // import 'package:camera/camera.dart';
@@ -89,6 +90,22 @@
 //                       }
 //                     },
 //                   ),
+//            Align(
+//   alignment: Alignment.topCenter,
+//   child: Padding(
+//     padding: const EdgeInsets.all(16.0),
+//     child: SizedBox(
+//       width: 40,   // ekhane width barate parben
+//       height: 80,  // ekhane height barate parben
+//       child: CircularProgressIndicator(
+//         value: currentStage / 3, // 0/3, 1/3, 2/3
+//         backgroundColor: Colors.grey[300],
+//         valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+//       ),
+//     ),
+//   ),
+// ),
+
 //                   // Overlay
 //                   CustomPaint(
 //                     painter: OverlayPainter(screenWidth: screenWidth, screenHeight: screenHeight),
@@ -113,18 +130,7 @@
 //                     ),
 //                   ),
 //                   // Progress Bar
-//                   Align(
-//                     alignment: Alignment.bottomCenter,
-//                     child: Padding(
-//                       padding: const EdgeInsets.all(16.0),
-//                       child: LinearProgressIndicator(
-//                         value: currentStage / 3, // 0/3, 1/3, 2/3
-//                         backgroundColor: Colors.grey[300],
-//                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-//                         minHeight: 10,
-//                       ),
-//                     ),
-//                   ),
+                
 //                 ],
 //               ),
 //               floatingActionButton: FloatingActionButton(
@@ -326,11 +332,13 @@
 //       ),
 //     );
 //   }
-// }  
+// }   
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 
@@ -418,10 +426,16 @@ class GoPicture extends StatelessWidget {
                       }
                     },
                   ),
-                  // Overlay
+
+                  // Overlay with Progress Arc Border
                   CustomPaint(
-                    painter: OverlayPainter(screenWidth: screenWidth, screenHeight: screenHeight),
+                    painter: OverlayPainter(
+                      screenWidth: screenWidth,
+                      screenHeight: screenHeight,
+                      progress: currentStage / 3, // এখানে progress পাঠানো হয়েছে
+                    ),
                   ),
+
                   // Instruction Text
                   Align(
                     alignment: Alignment.center,
@@ -438,19 +452,6 @@ class GoPicture extends StatelessWidget {
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                  ),
-                  // Progress Bar
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: LinearProgressIndicator(
-                        value: currentStage / 3, // 0/3, 1/3, 2/3
-                        backgroundColor: Colors.grey[300],
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-                        minHeight: 10,
                       ),
                     ),
                   ),
@@ -504,52 +505,49 @@ class CameraControllerManager {
   }
 }
 
-// Custom painter for dimmed overlay with circular hole
+// Custom painter for dimmed overlay with circular progress border
 class OverlayPainter extends CustomPainter {
   final double screenWidth;
   final double screenHeight;
+  final double progress; // 0.0 -> 1.0
 
-  OverlayPainter({required this.screenWidth, required this.screenHeight});
+  OverlayPainter({
+    required this.screenWidth,
+    required this.screenHeight,
+    required this.progress,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final ovalSize = screenWidth * 0.85; // Equal width and height for circular shape
-    final strokeWidth = 2.0;
+    final ovalSize = screenWidth * 0.85;
+    final center = Offset(screenWidth / 2, screenHeight / 3);
+    final rect = Rect.fromCenter(center: center, width: ovalSize, height: ovalSize);
 
-    final ovalPath = Path()
-      ..addOval(
-        Rect.fromCenter(
-          center: Offset(screenWidth / 2, screenHeight / 3),
-          width: ovalSize,
-          height: ovalSize, // Set height equal to width for circular shape
-        ),
-      );
-
+    // বাইরের Dim অংশ
+    final ovalPath = Path()..addOval(rect);
     final outerPath = Path()..addRect(Rect.fromLTWH(0, 0, screenWidth, screenHeight));
     final overlayPath = Path.combine(PathOperation.difference, outerPath, ovalPath);
 
-    final paint = Paint()
+    final dimPaint = Paint()
       ..color = Colors.black.withOpacity(0.7)
       ..style = PaintingStyle.fill;
+    canvas.drawPath(overlayPath, dimPaint);
 
+    // Progress Arc Border
     final borderPaint = Paint()
-      ..color = Colors.white
+      ..color = Color(0xff485908)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round;
 
-    canvas.drawPath(overlayPath, paint);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(screenWidth / 2, screenHeight / 3),
-        width: ovalSize,
-        height: ovalSize, // Circular shape
-      ),
-      borderPaint,
-    );
+    final startAngle = -90 * 3.1416 / 180; // Top থেকে শুরু
+    final sweepAngle = 2 * 3.1416 * progress; // Progress অনুযায়ী ঘুরবে
+
+    canvas.drawArc(rect, startAngle, sweepAngle, false, borderPaint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant OverlayPainter oldDelegate) => true;
 }
 
 // Text page after capturing all images
@@ -635,7 +633,7 @@ class TextPage extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => Get.back(),
                     ),
                     const Text(
                       'Capture Complete',
@@ -655,4 +653,5 @@ class TextPage extends StatelessWidget {
       ),
     );
   }
-}                   
+}
+                

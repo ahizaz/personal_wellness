@@ -418,7 +418,7 @@ class Explore extends StatelessWidget {
                               
                               ));
                           },
-                          child: Container(
+                          child: SizedBox(
                             width: 160.h,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,7 +484,7 @@ class Explore extends StatelessWidget {
                       Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       Container(
+                       SizedBox(
                         width: 178.w,
                         height: 182.h,
                         child:  InkWell(onTap:(){
@@ -511,7 +511,7 @@ class Explore extends StatelessWidget {
                      Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       Container(
+                       SizedBox(
                         width: 178.w,
                         height: 182.h,
                         child:  InkWell(onTap: (){

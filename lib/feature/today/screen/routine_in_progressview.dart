@@ -82,7 +82,7 @@ class RoutineInProgressview extends StatelessWidget {
               ),
             ),
             Text(
-              '${DateFormat('MMM d . EEEE').format(DateTime.now())}',
+              DateFormat('MMM d . EEEE').format(DateTime.now()),
               style: TextStyle(
                 fontSize: 17.sp,
                 fontWeight: FontWeight.w400,
@@ -289,8 +289,6 @@ class RoutineInProgressview extends StatelessWidget {
 
 
                 ),
-                 
-
           ],
           
         ),

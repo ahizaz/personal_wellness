@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:personal_wellness/feature/today/screen/go_picture.dart';
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
@@ -453,21 +454,26 @@ class ProgressData extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 16.h),
-                            Container(
-                              width: 141.w,
-                              height: 48.h,
-                              decoration: BoxDecoration(
-                                color: Color(0xff172601),
-                                borderRadius: BorderRadius.circular(999.r),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Take a photo",
-                                  style: TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xffFFFFFF),
+                            InkWell(
+                              onTap: (){
+                                Get.off(()=>GoPicture());
+                              },
+                              child: Container(
+                                width: 141.w,
+                                height: 48.h,
+                                decoration: BoxDecoration(
+                                  color: Color(0xff172601),
+                                  borderRadius: BorderRadius.circular(999.r),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Take a photo",
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xffFFFFFF),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -476,7 +482,7 @@ class ProgressData extends StatelessWidget {
                         ),
                       ),
                       Spacer(),
-                      Container(
+                      SizedBox(
                         width: 110,
                         height: double.infinity,
                         child: Image(
