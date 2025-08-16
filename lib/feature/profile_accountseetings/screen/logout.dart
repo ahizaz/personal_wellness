@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 
 class Logout extends StatelessWidget {
   const Logout({super.key});
@@ -70,20 +71,25 @@ class Logout extends StatelessWidget {
                         SizedBox(height: 53.h,),
                         Row(
                           children: [
-                            Expanded(child: Container(
-                              width: double.infinity,
-                              height: 48.h,
-                              decoration: BoxDecoration(
-                                color: Color(0xffD94E2E),
-                                borderRadius: BorderRadius.circular(999.r)
-                              ),
-                              child: Center(
-                                child: Text("Yes,Log out",style:TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xffFFFFFF)
-                                ),),
+                            Expanded(child: InkWell(
+                              onTap: (){
+                                Get.to(()=>SignInForm());
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                height: 48.h,
+                                decoration: BoxDecoration(
+                                  color: Color(0xffD94E2E),
+                                  borderRadius: BorderRadius.circular(999.r)
+                                ),
+                                child: Center(
+                                  child: Text("Yes,Log out",style:TextStyle(
+                                    fontFamily: "SFPro",
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xffFFFFFF)
+                                  ),),
+                                ),
                               ),
                             )),
                             SizedBox(width: 8.w,),
