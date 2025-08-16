@@ -30,7 +30,7 @@ class AccountSeetings extends StatelessWidget {
             child: Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(
-                  top: 60.h, // এখানে top padding দেওয়া হয়েছে
+                  top: 60.h,
                   left: 16.w,
                   right: 16.w,
                   bottom: 16.h,
