@@ -214,7 +214,7 @@ class Today extends StatelessWidget {
           child: Icon(
             Icons.add,
             color: isFabPressed.value
-                ? Colors.white.withOpacity(0.5)
+                ? Colors.white.withValues(alpha: 0.5)
                 : const Color(0xffFFFFFF),
           ),
         ),

@@ -187,7 +187,7 @@ class OverlayPainter extends CustomPainter {
     final overlayPath = Path.combine(PathOperation.difference, outerPath, ovalPath);
 
     final dimPaint = Paint()
-      ..color = Colors.black.withOpacity(0.7)
+      ..color = Colors.black.withValues(alpha: 0.7)
       ..style = PaintingStyle.fill;
     canvas.drawPath(overlayPath, dimPaint);
 

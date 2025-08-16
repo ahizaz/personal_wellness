@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 
 class Logout extends StatelessWidget {
@@ -18,7 +17,7 @@ class Logout extends StatelessWidget {
         children: [
                BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(color: Colors.black.withOpacity(0.3)),
+            child: Container(color: Colors.black.withValues(alpha: 0.3)),
           ),
           SafeArea(child: Center(
             child: SingleChildScrollView(

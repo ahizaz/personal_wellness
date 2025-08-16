@@ -32,7 +32,7 @@ class SkinCondition extends StatelessWidget {
               children: [
                 const ProductHeader(title: 'Skin conditions'),
                 SizedBox(height: 9.h),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: 298.h,
                   child: Image(image: AssetImage(imagePath), fit: BoxFit.cover),

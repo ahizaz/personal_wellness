@@ -11,12 +11,13 @@ class ProgressDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false, // Prevent closing with back button
       child: Dialog(
         insetPadding: EdgeInsets.zero,
         backgroundColor: Colors.transparent,
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: Stack(
@@ -33,7 +34,7 @@ class ProgressDialog extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   height: 287.h,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
                   ),
                   child: Obx(() => Column(
@@ -41,7 +42,7 @@ class ProgressDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Center(
-                            child: Container(
+                            child: SizedBox(
                               width: 124.w,
                               height: 124.h,
                               child: Stack(
