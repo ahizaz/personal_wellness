@@ -30,5 +30,6 @@ class ImagePath {
    static const String beforeafterimage3 = "assets/images/before_after_pic3.png";
    static const String bamboo = "assets/images/bamboo.png";
    static const String progressimageback = "assets/images/progressimageback.png";
+   static const String takingpicture = "assets/images/taking photo.png";
   
 }

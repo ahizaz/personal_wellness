@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/account.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
+import 'package:personal_wellness/feature/today/screen/go_picture.dart';
 import 'package:personal_wellness/feature/today/screen/product_details.dart';
 
 class RoutineInProgressview extends StatelessWidget {
@@ -258,7 +259,7 @@ class RoutineInProgressview extends StatelessWidget {
                            SizedBox(height: 16.h,),
                            InkWell(
                             onTap: (){
-
+                              Get.off(()=>GoPicture());
                             },
                              child: Container(
                               height: 48.h,
