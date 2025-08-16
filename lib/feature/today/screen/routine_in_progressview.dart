@@ -259,7 +259,7 @@ class RoutineInProgressview extends StatelessWidget {
                            SizedBox(height: 16.h,),
                            InkWell(
                             onTap: (){
-                              Get.off(()=>GoPicture());
+                              Get.to(()=>GoPicture());
                             },
                              child: Container(
                               height: 48.h,

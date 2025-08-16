@@ -456,7 +456,7 @@ class ProgressData extends StatelessWidget {
                             SizedBox(height: 16.h),
                             InkWell(
                               onTap: (){
-                                Get.off(()=>GoPicture());
+                                Get.to(()=>GoPicture());
                               },
                               child: Container(
                                 width: 141.w,
