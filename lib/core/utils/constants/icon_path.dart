@@ -36,7 +36,7 @@ class IconPath {
   static const profilearrow = "assets/icons/profilearrow.png";
   static const edit = "assets/icons/edit.png";
   static const progresshistory = "assets/icons/progresshistory.png";
-
+  static const logroutine = "assets/icons/logroutine.png";
 
 
 
