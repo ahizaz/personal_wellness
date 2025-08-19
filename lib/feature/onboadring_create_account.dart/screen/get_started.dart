@@ -9,7 +9,7 @@ import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/
 class GetStarted extends StatelessWidget {
   const GetStarted({super.key});
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
