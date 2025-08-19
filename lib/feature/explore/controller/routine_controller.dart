@@ -34,14 +34,20 @@ class RoutineController extends GetxController {
   final RxString productName = ''.obs;
 
   var selectedOrder = 0.obs;
+  var selectedEveningOrder = 0.obs;
   final List<String> availableTimes = [
     '6:00 am', '6:15 am', '6:20 am',
     '6:25 am', '6:30 am', '6:45 am',
-    '7:00 pm', '7:15 pm', '7:20 pm',
-    '8:25 pm', '9:30 pm', '10:00 pm',
+   
+  ];
+   final List<String> availableeveningTimes = [
+    '7:00 am', '7:15 am', '7:20 am',
+    '7:25 am', '7:30 am', '7:45 am',
+   
   ];
 
   var visibleOrders = 3.obs;
+  var visibleEvening = 3.obs;
 
   void toggleTimeSelection(String time) {
     if (selectedTimes.contains(time)) {
@@ -57,6 +63,7 @@ class RoutineController extends GetxController {
     return startDate.value != null &&
         endDate.value != null &&
         selectedOrder.value != 0 &&
+        selectedEveningOrder.value!=0&&
         selectedTimes.isNotEmpty &&
         instructionText.value.trim().isNotEmpty;
   }

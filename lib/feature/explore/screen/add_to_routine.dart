@@ -395,7 +395,151 @@ class AddToRoutine extends StatelessWidget {
                     });
                   },
                 ),
-                SizedBox(height: 24.h),
+                SizedBox(height: 16.h),
+                      Row(
+                  children: [
+                      Text(
+                  "Order (Evening)",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff172601),
+                  ),
+                ),
+                Spacer(),
+                Obx(() => controller.visibleEvening.value < 9
+                    ? GestureDetector(
+                        onTap: () {
+                          controller.visibleEvening.value += 3;
+                        },
+                        child: Icon(Icons.add, size: 24.sp, color: Color(0xff3E4B2C),),
+                      )
+                    : SizedBox(),
+                ),
+                  ],
+                 ),
+                 SizedBox(height: 10.h),
+                   Obx(() => SizedBox(
+                      child: GridView.count(
+                        crossAxisCount: 3,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 8.w,
+                        mainAxisSpacing: 8.h,
+                        childAspectRatio: 2.5,
+                        children: List.generate(controller.visibleEvening.value, (index) {
+                          int number = index + 1;
+                          return GestureDetector(
+                            onTap: () {
+                              if (controller.selectedEveningOrder.value == number) {
+                                controller.selectedEveningOrder.value = 0; // Unselect
+                              } else {
+                                controller.selectedEveningOrder.value = number; // Select
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: controller.selectedEveningOrder.value == number
+                                    ? const Color(0xff485908)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(10.r),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '$number',
+                                  style: TextStyle(
+                                    fontSize: 28.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: controller.selectedEveningOrder.value == number
+                                        ? Colors.white
+                                        : const Color(0xff3E4B2C),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    )),
+                    SizedBox(height: 15.h,),
+                       Row(
+                  children: [
+                    Text(
+                      "Time of day",
+                      style: TextStyle(
+                        fontFamily: "SFPro",
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff172601),
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const TimePickerBottomSheet(),
+                        );
+                      },
+                      child: Image.asset(
+                        IconPath.rightarrow,
+                        width: 24.w,
+                        height: 24.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 23.h,),
+                  GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8.w,
+                    mainAxisSpacing: 12.h,
+                    childAspectRatio: 2.8,
+                  ),
+                  itemCount: controller.availableeveningTimes.length,
+                  itemBuilder: (context, index) {
+                    final time = controller.availableeveningTimes[index];
+                    return Obx(() {
+                      final isSelected = controller.selectedTimes.contains(time);
+                      return GestureDetector(
+                        onTap: () {
+                          controller.toggleTimeSelection(time);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xff485908) : Colors.white,
+                            borderRadius: BorderRadius.circular(30.r),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xff485908)
+                                  : const Color(0xffE0E0E0),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              time,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 28.sp,
+                                fontWeight: FontWeight.w400,
+                                color: isSelected ? Colors.white : const Color(0xff3E4B2C),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+                  },
+                ),
+                SizedBox(height: 24.h,),
                 Text(
                   "Additional instruction",
                   style: TextStyle(
