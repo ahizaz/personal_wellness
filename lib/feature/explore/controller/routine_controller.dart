@@ -1,5 +1,4 @@
 
-
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
@@ -41,6 +40,8 @@ class RoutineController extends GetxController {
     '7:00 pm', '7:15 pm', '7:20 pm',
     '8:25 pm', '9:30 pm', '10:00 pm',
   ];
+
+  var visibleOrders = 3.obs;
 
   void toggleTimeSelection(String time) {
     if (selectedTimes.contains(time)) {

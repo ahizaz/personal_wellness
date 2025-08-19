@@ -1,4 +1,5 @@
 
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -263,7 +264,15 @@ class AddToRoutine extends StatelessWidget {
                   ),
                 ),
                 Spacer(),
-                Icon(Icons.add,weight: 24.sp,color: Color(0xff3E4B2C),)
+                Obx(() => controller.visibleOrders.value < 9
+                    ? GestureDetector(
+                        onTap: () {
+                          controller.visibleOrders.value += 3;
+                        },
+                        child: Icon(Icons.add, size: 24.sp, color: Color(0xff3E4B2C),),
+                      )
+                    : SizedBox(),
+                ),
                   ],
                  ),
                 SizedBox(height: 10.h),
@@ -275,7 +284,7 @@ class AddToRoutine extends StatelessWidget {
                         crossAxisSpacing: 8.w,
                         mainAxisSpacing: 8.h,
                         childAspectRatio: 2.5,
-                        children: List.generate(9, (index) {
+                        children: List.generate(controller.visibleOrders.value, (index) {
                           int number = index + 1;
                           return GestureDetector(
                             onTap: () {
