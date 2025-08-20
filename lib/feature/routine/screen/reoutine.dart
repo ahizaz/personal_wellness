@@ -90,36 +90,57 @@ class Routine extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 6.w),
-                    Expanded(
-                      child: Obx(() => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: controller.routines.map((routine) {
-                              return InkWell(
-                                onTap:(){
-                              Get.to(()=>ViewRoutingProduct(productName:routine.productName));
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  margin: EdgeInsets.symmetric(vertical: 4.h),
-                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-                                  decoration: BoxDecoration(
-                                    color: routine.backgroundColor,
-                                    borderRadius: BorderRadius.circular(6.r),
-                                  ),
-                                  child: Text(
-                                    routine.productName,
-                                    style: const TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff3E4B2C),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          )),
+                   Expanded(
+  child: Obx(
+    () => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: controller.routines.map((routine) {
+        return InkWell(
+          onTap: () {
+            Get.to(() => ViewRoutingProduct(productName: routine.productName));
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 2.h), // less gap
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: routine.backgroundColor,
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Optional dot/icon
+                Container(
+                  width: 6,
+                  height: 6,
+                  margin: EdgeInsets.only(right: 4.w),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    routine.productName,
+                    style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontSize: 13.sp, // slightly smaller
+                      fontWeight: FontWeight.w400, // better readability
+                      color: Color(0xff3E4B2C),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  ),
+),
+
                   ],
                 ),
                 SizedBox(height: 16.h),

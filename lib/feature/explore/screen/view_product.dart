@@ -134,16 +134,20 @@ class ViewProduct extends StatelessWidget {
 ),
 
         SizedBox(height: 16.h,),
-           Text(
+ FittedBox(
+  fit: BoxFit.fitWidth,
+  child: Text(
                   controller.productDataview["productName"],
                   style: TextStyle(
                       fontFamily: "SFPro",
                       fontSize: 28.sp,
                       fontWeight: FontWeight.w400,
                       color: Color(0xff172601)),
-                // This keeps the text on one line.
-                  overflow: TextOverflow.ellipsis, // This adds "..." if the text is too long.
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
                 ),
+           ),
        
            
                    SizedBox(height: 16.h),
