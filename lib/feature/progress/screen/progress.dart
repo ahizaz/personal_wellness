@@ -1100,103 +1100,14 @@ class ProgressData extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 4.h),
-                           Text("Right Side",style: TextStyle(
+                           Text("Left Side",style: TextStyle(
                           fontFamily: "SFPro",
                           fontSize: 17.sp,
                           fontWeight: FontWeight.w400,
                           color: Color(0xff172601)
 
-                        ),),
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage2), // Replace with your actual left side before image path
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 14.w,
-                              height: 160.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.bamboo),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage3), 
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ),),  
                         SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "Before",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "After",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "15 Jan 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "15 Mar 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          "Front",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff172601),
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
                         Row(
                           children: [
                             SizedBox(
@@ -1234,6 +1145,13 @@ class ProgressData extends StatelessWidget {
                             ),
                           ],
                         ),
+                              Text("Font",style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff172601)
+
+                        ),),
                         SizedBox(height: 4.h),
                         Row(
                           children: [
@@ -1265,9 +1183,9 @@ class ProgressData extends StatelessWidget {
                               "19 Jan 2025",
                               style: TextStyle(
                                 fontFamily: "SFPro",
-                                fontSize: 17.sp,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
+                                color: Color(0xff3E4B2C),
                               ),
                             ),
                             Spacer(),
@@ -1275,9 +1193,9 @@ class ProgressData extends StatelessWidget {
                               "15 Mar 2025",
                               style: TextStyle(
                                 fontFamily: "SFPro",
-                                fontSize: 17.sp,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
+                                color: Color(0xff3E4B2C),
                               ),
                             ),
                           ],
