@@ -5,6 +5,7 @@ class ProgressController extends GetxController{
   var progressItems = <Map<String,dynamic>>[].obs;
    var janData = <FlSpot>[].obs;
   var febData = <FlSpot>[].obs;
+  var showAll = false.obs;
   @override
   void onInit() {
    
@@ -65,5 +66,7 @@ class ProgressController extends GetxController{
        FlSpot(11, 3.2),
      ];
    }
-
+  void toggleShowAll(){
+    showAll.value = !showAll.value;
+  }
 }

@@ -1,4 +1,5 @@
 
+
 // import 'dart:io';
 // import 'package:fl_chart/fl_chart.dart';
 // import 'package:flutter/material.dart';
@@ -27,9 +28,9 @@
 //       try {
 //         // Load images for Before & After section
 //         final beforeImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
-//         final afterImage = await imageFromAssetBundle(ImagePath.beforeafterimage2);
+//         final afterImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
 //         final bambooImage = await imageFromAssetBundle(ImagePath.bamboo);
-//         final afterImage2 = await imageFromAssetBundle(ImagePath.beforeafterimage3);
+//         final afterImage2 = await imageFromAssetBundle(ImagePath.beforeafterimage1);
 //         final progressImage = await imageFromAssetBundle(ImagePath.progressimageback);
 
 //         // Add a page to the PDF
@@ -299,7 +300,7 @@
 //                 Container(
 //                   width: double.infinity,
 //                   decoration: BoxDecoration(
-//                     color: Colors.white.withValues(alpha: 0.8),
+//                     color: Colors.white.withOpacity(0.8),
 //                     borderRadius: BorderRadius.circular(10.r),
 //                   ),
 //                   child: Padding(
@@ -308,7 +309,9 @@
 //                       mainAxisAlignment: MainAxisAlignment.start,
 //                       crossAxisAlignment: CrossAxisAlignment.start,
 //                       children: [
-//                         Text(
+//                    Row(
+//                     children: [
+//                           Text(
 //                           "Before & After",
 //                           style: TextStyle(
 //                             fontFamily: "SFPro",
@@ -317,6 +320,15 @@
 //                             color: Color(0xff172601),
 //                           ),
 //                         ),
+//                         Spacer(),
+//                         Text("Show all",style: TextStyle(
+//                           fontFamily: "SFPro",
+//                           fontSize: 17.sp,
+//                           fontWeight: FontWeight.w600,
+//                           color: Color(0xff485908)
+//                         ),)
+//                     ],
+//                    ),
 //                         SizedBox(height: 4.h),
 //                         Text(
 //                           "Slide to compare your transformation",
@@ -329,13 +341,15 @@
 //                         ),
 //                         SizedBox(height: 14.h),
 //                         Divider(thickness: 1),
-//                         Row(
+
+//                         ////Right Side
+//                            Row(
 //                           children: [
 //                             SizedBox(
 //                               width: 99.w,
 //                               height: 220.h,
 //                               child: Image(
-//                                 image: AssetImage(ImagePath.beforeafterimage1),
+//                                 image: AssetImage(ImagePath.leftimage1),
 //                                 fit: BoxFit.cover,
 //                               ),
 //                             ),
@@ -344,7 +358,7 @@
 //                               width: 99.w,
 //                               height: 220.h,
 //                               child: Image(
-//                                 image: AssetImage(ImagePath.beforeafterimage2),
+//                                 image: AssetImage(ImagePath.leftimage2),
 //                                 fit: BoxFit.cover,
 //                               ),
 //                             ),
@@ -360,12 +374,113 @@
 //                               width: 125.w,
 //                               height: 220.h,
 //                               child: Image(
-//                                 image: AssetImage(ImagePath.beforeafterimage3),
+//                                 image: AssetImage(ImagePath.leftimage3),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                           ],
+//                         ),////right side
+//                         SizedBox(height: 4.h),
+//                         Text("Right Side",style: TextStyle(
+//                           fontFamily: "SFPro",
+//                           fontSize: 17.sp,
+//                           fontWeight: FontWeight.w400,
+//                           color: Color(0xff172601)
+
+//                         ),),
+//                         SizedBox(height: 16.h),
+                     
+//                     ///leftSIde 
+//                           Row(
+//                           children: [
+//                             SizedBox(
+//                               width: 99.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.rightimage1),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(width: 2.w),
+//                             SizedBox(
+//                               width: 99.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.rightimage2),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(
+//                               width: 14.w,
+//                               height: 230.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.bamboo),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(
+//                               width: 125.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.rightimage3),
 //                                 fit: BoxFit.cover,
 //                               ),
 //                             ),
 //                           ],
 //                         ),
+//                         SizedBox(height: 4.h),
+//                            Text("Left Side",style: TextStyle(
+//                           fontFamily: "SFPro",
+//                           fontSize: 17.sp,
+//                           fontWeight: FontWeight.w400,
+//                           color: Color(0xff172601)
+
+//                         ),),  
+//                         SizedBox(height: 4.h),
+//                         Row(
+//                           children: [
+//                             SizedBox(
+//                               width: 99.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.beforeafterimage1),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(width: 2.w),
+//                             SizedBox(
+//                               width: 99.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.beforeafterimage1),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(
+//                               width: 14.w,
+//                               height: 230.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.bamboo),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                             SizedBox(
+//                               width: 125.w,
+//                               height: 220.h,
+//                               child: Image(
+//                                 image: AssetImage(ImagePath.beforeafterimage1),
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                               Text("Font",style: TextStyle(
+//                           fontFamily: "SFPro",
+//                           fontSize: 17.sp,
+//                           fontWeight: FontWeight.w400,
+//                           color: Color(0xff172601)
+
+//                         ),),
 //                         SizedBox(height: 4.h),
 //                         Row(
 //                           children: [
@@ -394,12 +509,12 @@
 //                         Row(
 //                           children: [
 //                             Text(
-//                               "15 Jan 2025",
+//                               "19 Jan 2025",
 //                               style: TextStyle(
 //                                 fontFamily: "SFPro",
-//                                 fontSize: 17.sp,
+//                                 fontSize: 13.sp,
 //                                 fontWeight: FontWeight.w400,
-//                                 color: Color(0xff172601),
+//                                 color: Color(0xff3E4B2C),
 //                               ),
 //                             ),
 //                             Spacer(),
@@ -407,9 +522,9 @@
 //                               "15 Mar 2025",
 //                               style: TextStyle(
 //                                 fontFamily: "SFPro",
-//                                 fontSize: 17.sp,
+//                                 fontSize: 13.sp,
 //                                 fontWeight: FontWeight.w400,
-//                                 color: Color(0xff172601),
+//                                 color: Color(0xff3E4B2C),
 //                               ),
 //                             ),
 //                           ],
@@ -699,9 +814,9 @@ class ProgressData extends StatelessWidget {
       try {
         // Load images for Before & After section
         final beforeImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
-        final afterImage = await imageFromAssetBundle(ImagePath.beforeafterimage2);
+        final afterImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
         final bambooImage = await imageFromAssetBundle(ImagePath.bamboo);
-        final afterImage2 = await imageFromAssetBundle(ImagePath.beforeafterimage3);
+        final afterImage2 = await imageFromAssetBundle(ImagePath.beforeafterimage1);
         final progressImage = await imageFromAssetBundle(ImagePath.progressimageback);
 
         // Add a page to the PDF
@@ -992,12 +1107,18 @@ class ProgressData extends StatelessWidget {
                           ),
                         ),
                         Spacer(),
-                        Text("Show all",style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff485908)
-                        ),)
+                        GestureDetector(
+                          onTap: controller.toggleShowAll,
+                          child: Obx(() => Text(
+                            controller.showAll.value ? "Show less" : "Show all",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff485908)
+                            ),
+                          )),
+                        ),
                     ],
                    ),
                         SizedBox(height: 4.h),
@@ -1020,7 +1141,7 @@ class ProgressData extends StatelessWidget {
                               width: 99.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage1),
+                                image: AssetImage(ImagePath.leftimage1),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1029,7 +1150,7 @@ class ProgressData extends StatelessWidget {
                               width: 99.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage2),
+                                image: AssetImage(ImagePath.leftimage2),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1045,7 +1166,7 @@ class ProgressData extends StatelessWidget {
                               width: 125.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage3),
+                                image: AssetImage(ImagePath.leftimage3),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1062,13 +1183,15 @@ class ProgressData extends StatelessWidget {
                         SizedBox(height: 16.h),
                      
                     ///leftSIde 
+                    Obx(() => controller.showAll.value ? Column(
+                      children: [
                           Row(
                           children: [
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage1),
+                                image: AssetImage(ImagePath.rightimage1),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1077,7 +1200,7 @@ class ProgressData extends StatelessWidget {
                               width: 99.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage2),
+                                image: AssetImage(ImagePath.rightimage2),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1093,20 +1216,29 @@ class ProgressData extends StatelessWidget {
                               width: 125.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage3),
+                                image: AssetImage(ImagePath.rightimage3),
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ],
                         ),
                         SizedBox(height: 4.h),
-                           Text("Left Side",style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff172601)
+                        
+                      Row(
+  mainAxisAlignment: MainAxisAlignment.start,
+  children: [
+    Text(
+      "Left Side",
+      style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w400,
+        color: Color(0xff172601),
+      ),
+    ),
+  ],
+),
 
-                        ),),  
                         SizedBox(height: 4.h),
                         Row(
                           children: [
@@ -1123,7 +1255,7 @@ class ProgressData extends StatelessWidget {
                               width: 99.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage2),
+                                image: AssetImage(ImagePath.beforeafterimage1),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -1139,19 +1271,27 @@ class ProgressData extends StatelessWidget {
                               width: 125.w,
                               height: 220.h,
                               child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage3),
+                                image: AssetImage(ImagePath.beforeafterimage1),
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ],
                         ),
-                              Text("Font",style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff172601)
+                                             Row(
+  mainAxisAlignment: MainAxisAlignment.start,
+  children: [
+    Text(
+      "Font",
+      style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w400,
+        color: Color(0xff172601),
+      ),
+    ),
+  ],
+),
 
-                        ),),
                         SizedBox(height: 4.h),
                         Row(
                           children: [
@@ -1200,6 +1340,8 @@ class ProgressData extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ],
+                    ) : SizedBox()),
                       ],
                     ),
                   ),
