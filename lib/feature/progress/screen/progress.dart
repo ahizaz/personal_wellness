@@ -980,7 +980,9 @@ class ProgressData extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                   Row(
+                    children: [
+                          Text(
                           "Before & After",
                           style: TextStyle(
                             fontFamily: "SFPro",
@@ -989,6 +991,15 @@ class ProgressData extends StatelessWidget {
                             color: Color(0xff172601),
                           ),
                         ),
+                        Spacer(),
+                        Text("Show all",style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff485908)
+                        ),)
+                    ],
+                   ),
                         SizedBox(height: 4.h),
                         Text(
                           "Slide to compare your transformation",
@@ -1001,193 +1012,101 @@ class ProgressData extends StatelessWidget {
                         ),
                         SizedBox(height: 14.h),
                         Divider(thickness: 1),
-                        Row(
+
+                        ////Right Side
+                           Row(
                           children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage1), // Replace with your actual chin-up before image path
-                                  fit: BoxFit.cover,
-                                ),
+                            SizedBox(
+                              width: 99.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage1),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 2.w),
+                            SizedBox(
+                              width: 99.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage2),
+                                fit: BoxFit.cover,
                               ),
                             ),
                             SizedBox(
                               width: 14.w,
-                              height: 160.h,
+                              height: 230.h,
                               child: Image(
                                 image: AssetImage(ImagePath.bamboo),
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage1), // Replace with your actual chin-up after image path
-                                  fit: BoxFit.cover,
-                                ),
+                            SizedBox(
+                              width: 125.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage3),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ],
-                        ),
+                        ),////right side
                         SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "Before",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "After",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "15 Jan 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "15 Mar 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
+                        Text("Right Side",style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff172601)
+
+                        ),),
                         SizedBox(height: 16.h),
-                        Text(
-                          "Show all",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff172601),
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          "Right side",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff172601),
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Row(
+                     
+                    ///leftSIde 
+                          Row(
                           children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage1), // Replace with your actual right side before image path
-                                  fit: BoxFit.cover,
-                                ),
+                            SizedBox(
+                              width: 99.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage1),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 2.w),
+                            SizedBox(
+                              width: 99.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage2),
+                                fit: BoxFit.cover,
                               ),
                             ),
                             SizedBox(
                               width: 14.w,
-                              height: 160.h,
+                              height: 230.h,
                               child: Image(
                                 image: AssetImage(ImagePath.bamboo),
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            Expanded(
-                              child: SizedBox(
-                                height: 150.h,
-                                child: Image(
-                                  image: AssetImage(ImagePath.beforeafterimage1), // Replace with your actual right side after image path
-                                  fit: BoxFit.cover,
-                                ),
+                            SizedBox(
+                              width: 125.w,
+                              height: 220.h,
+                              child: Image(
+                                image: AssetImage(ImagePath.beforeafterimage3),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ],
                         ),
                         SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "Before",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "After",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            Text(
-                              "15 Jan 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              "15 Mar 2025",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff172601),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          "Left side",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff172601),
-                          ),
-                        ),
+                           Text("Right Side",style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff172601)
+
+                        ),),
                         SizedBox(height: 8.h),
                         Row(
                           children: [
