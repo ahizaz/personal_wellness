@@ -111,12 +111,10 @@ class RoutineController extends GetxController {
     startDate.value = null;
     endDate.value = null;
     selectedOrder.value = 0;
-    selectedEveningOrder.value=0;
     selectedTimes.clear();
     instructionText.value = '';
     productName.value = '';
     instructionController.clear();
- 
 
     Get.back();
     final BottomNavcontroller navController = Get.find();
