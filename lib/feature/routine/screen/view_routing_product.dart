@@ -28,6 +28,8 @@ class ViewRoutingProduct extends StatelessWidget {
               children: [
                 SizedBox(height: 20.h),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     InkWell(
                       onTap: () {
@@ -41,27 +43,32 @@ class ViewRoutingProduct extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 110.w),
-                    Obx(() => Center(
-                          child: editedName.value.isEmpty
-                              ? Text(
-                                  productName,
-                                  style: const TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xff172601),
-                                  ),
-                                )
-                              : Text(
-                                  editedName.value,
-                                  style: const TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xff172601),
-                                  ),
-                                ),
-                        )),
+                    Obx(() => editedName.value.isEmpty
+                        ? FittedBox(
+  fit: BoxFit.fitWidth,
+  child: Text(
+    productName,
+    style: TextStyle(
+      fontFamily: "SFPro",
+      fontSize: 17.sp,
+      fontWeight: FontWeight.w400,
+      color: Color(0xff172601),
+    ),
+    maxLines: 1,
+    softWrap: false,
+    overflow: TextOverflow.ellipsis,
+  ),
+)
+                    
+                        : Text(
+                            editedName.value,
+                            style: const TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff172601),
+                            ),
+                          )),
                     const Spacer(),
                     InkWell(
                       onTap: () {
@@ -217,15 +224,20 @@ class ViewRoutingProduct extends StatelessWidget {
                 SizedBox(
                   height: 16.h,
                 ),
-                Text(
-                  productName,
-                  style: const TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff172601),
-                  ),
+          FittedBox(
+  fit: BoxFit.fitWidth,
+  child: Text(
+                 productName,
+                  style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff172601)),
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
                 ),
+           ),
                 SizedBox(height: 16.h),
                 Text(
                   "Description",
