@@ -77,51 +77,51 @@ class RoutineController extends GetxController {
 
   final RxList<RoutineItem> routines = <RoutineItem>[].obs;
 
-  void submitRoutine() async {
-    final colors = [
-      const Color(0xffFFF8E6),
-      const Color(0xffE6F7F7),
-      const Color(0xffF2E6FF),
-      const Color(0xffE6FFE6),
-    ];
+void submitRoutine() async {
+  final colors = [
+    const Color(0xffFFF8E6),
+    const Color(0xffE6F7F7),
+    const Color(0xffF2E6FF),
+    const Color(0xffE6FFE6),
+  ];
 
-    // ✅ Create a separate routine item for each selected time
-    for (var time in selectedTimes) {
-      final color = colors[routines.length % colors.length];
-      routines.add(
-        RoutineItem(
-          productName: productName.value,
-          backgroundColor: color,
-          time: time, // ✅ Save the specific time
-        ),
-      );
-    }
-
-    progress.value = 0;
-    progressMessage.value = 'Setting up your routine';
-    await Future.delayed(const Duration(seconds: 1));
-    progress.value = 65;
-    progressMessage.value = 'Almost done';
-    await Future.delayed(const Duration(seconds: 2));
-    progress.value = 100;
-    progressMessage.value = 'Done';
-    await Future.delayed(const Duration(seconds: 1));
-
-    selectedCategory.value = '';
-    startDate.value = null;
-    endDate.value = null;
-    selectedOrder.value = 0;
-    selectedTimes.clear();
-    instructionText.value = '';
-    productName.value = '';
-    instructionController.clear();
-
-    Get.back();
-    final BottomNavcontroller navController = Get.find();
-    Get.off(() => BottomNavbar());
-    navController.changeIndex(2);
+  // Add only one RoutineItem using the first selected time (if any)
+  if (selectedTimes.isNotEmpty) {
+    final color = colors[routines.length % colors.length];
+    routines.add(
+      RoutineItem(
+        productName: productName.value,
+        backgroundColor: color,
+        time: selectedTimes.first, // Use the first selected time
+      ),
+    );
   }
 
+  progress.value = 0;
+  progressMessage.value = 'Setting up your routine';
+  await Future.delayed(const Duration(seconds: 1));
+  progress.value = 65;
+  progressMessage.value = 'Almost done';
+  await Future.delayed(const Duration(seconds: 2));
+  progress.value = 100;
+  progressMessage.value = 'Done';
+  await Future.delayed(const Duration(seconds: 1));
+
+  selectedCategory.value = '';
+  startDate.value = null;
+  endDate.value = null;
+  selectedOrder.value = 0;
+  selectedEveningOrder.value = 0;
+  selectedTimes.clear();
+  instructionText.value = '';
+  productName.value = '';
+  instructionController.clear();
+
+  Get.back();
+  final BottomNavcontroller navController = Get.find();
+  Get.off(() => BottomNavbar());
+  navController.changeIndex(2);
+}
   @override
   void onInit() {
     super.onInit();
