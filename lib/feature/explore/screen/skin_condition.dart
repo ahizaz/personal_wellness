@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/explore/controller/explore_controller.dart';
+import 'package:personal_wellness/feature/explore/screen/view_product.dart';
 import 'package:personal_wellness/feature/today/widget/product_header.dart';
 
 class SkinCondition extends StatelessWidget {
@@ -148,7 +150,12 @@ class SkinCondition extends StatelessWidget {
                      SizedBox(
                       width: 177.w,
                       height: 182.h,
-                      child: Image.asset(ImagePath.product2,fit: BoxFit.cover,),
+                      child: InkWell(
+                        onTap: (){
+                          Get.to(()=>ViewProduct(), arguments: exploreController.sortedProducts[0]["title"]!);
+                        },
+                        
+                        child: Image.asset(ImagePath.product2,fit: BoxFit.cover,)),
                       
                      ),
                      SizedBox(height: 8.h,),
@@ -168,7 +175,11 @@ class SkinCondition extends StatelessWidget {
                      SizedBox(
                       width: 177.w,
                       height: 182.h,
-                      child: Image.asset(ImagePath.product1,fit: BoxFit.cover,),
+                      child: InkWell(
+                        onTap: (){
+                            Get.to(()=>ViewProduct(), arguments: exploreController.sortedProducts[2]["title"]!);
+                        },
+                        child: Image.asset(ImagePath.product1,fit: BoxFit.cover,)),
                       
                      ),
                      SizedBox(height: 8.h,),

@@ -464,12 +464,17 @@ class Explore extends StatelessWidget {
                      Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        ///    SizedBox(
+                       // width: 178.w,
+                        //height: 182.h,
+                        //child:  InkWell(onTap:(){
+                         // Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[0]["title"]!);
+                        //},child: Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,)),
+                       //)
                        SizedBox(
                         width: 178.w,
                         height: 182.h,
-                        child:  InkWell(onTap:(){
-                          Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[0]["title"]!);
-                        },child: Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,)),
+                        child:  Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[0]["title"]!,style: TextStyle(
@@ -487,9 +492,7 @@ class Explore extends StatelessWidget {
                        SizedBox(
                         width: 178.w,
                         height: 182.h,
-                        child:  InkWell(onTap:(){
-                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[1]["title"]!);
-                        },child: Image(image: AssetImage(controller.sortedProducts[1]["image"]!),fit: BoxFit.cover,)),
+                        child:  Image(image: AssetImage(controller.sortedProducts[1]["image"]!),fit: BoxFit.cover,),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[1]["title"]!,style: TextStyle(
@@ -514,9 +517,7 @@ class Explore extends StatelessWidget {
                        SizedBox(
                         width: 178.w,
                         height: 182.h,
-                        child:  InkWell(onTap: (){
-                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[2]["title"]!);
-                        },child: Image(image: AssetImage(controller.sortedProducts[2]["image"]!),fit: BoxFit.cover,)),
+                        child:  Image(image: AssetImage(controller.sortedProducts[2]["image"]!),fit: BoxFit.cover,),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[2]["title"]!,style: TextStyle(
@@ -534,9 +535,7 @@ class Explore extends StatelessWidget {
                        SizedBox(
                         width: 178.w,
                         height: 182.h,
-                        child:  InkWell(onTap: (){
-                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[3]["title"]!);
-                        },child: Image(image: AssetImage(controller.sortedProducts[3]["image"]!),fit: BoxFit.cover,)),
+                        child:  Image(image: AssetImage(controller.sortedProducts[3]["image"]!),fit: BoxFit.cover,),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[3]["title"]!,style: TextStyle(
