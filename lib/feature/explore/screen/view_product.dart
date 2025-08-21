@@ -231,7 +231,7 @@ class ViewProduct extends StatelessWidget {
                         Row(
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,//
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Image.asset(ImagePath.product2,width: 177.w,height: 182.h,fit: BoxFit.cover,),
