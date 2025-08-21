@@ -232,7 +232,7 @@ class ViewProduct extends StatelessWidget {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,//
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,//
                       children: [
                         Image.asset(ImagePath.product2,width: 177.w,height: 182.h,fit: BoxFit.cover,),
                         SizedBox(height: 8.h,),
@@ -246,7 +246,7 @@ class ViewProduct extends StatelessWidget {
                       children: [
                         Image.asset(ImagePath.product1,width: 177.w,height: 182.h,fit: BoxFit.cover,),
                         SizedBox(height: 8.h,),
-                        Text("Essence Sun’s\nCream SPF45 ",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
+                        Text("Essence Sun’s\nCream SPF45 ",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)///sedseesdsd
                       ],
                     ),
 
