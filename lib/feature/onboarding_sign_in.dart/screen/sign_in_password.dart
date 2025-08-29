@@ -26,7 +26,7 @@ class SignInPassword extends StatelessWidget {
             height: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(ImagePath.accountBackground),
+                image: AssetImage(ImagePath.accountBackground),//dsjldks
                 fit: BoxFit.cover,
               ),
             ),
