@@ -102,7 +102,7 @@ class SignInForm extends StatelessWidget {
                                 : const Color(0xFF999999),
                           ),
                           onTap: () {
-                            controller.clearEmail();
+                          
                             Get.to(() => SignInPassword());
                           },
                         )),
