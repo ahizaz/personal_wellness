@@ -14,6 +14,8 @@ class SignInController extends GetxController {
   final hasRegisterText = false.obs;
   var email = ''.obs;
   
+  
+  
 
   @override
   void onInit() {
@@ -24,6 +26,7 @@ class SignInController extends GetxController {
     });
     registerController.addListener((){
      hasRegisterText.value=registerController.text.isNotEmpty;
+     email.value = registerController.text;
     });
   }
 

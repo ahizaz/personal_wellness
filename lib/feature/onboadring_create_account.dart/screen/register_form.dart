@@ -95,8 +95,10 @@ class RegisterForm extends StatelessWidget {
                                 : const Color(0xFF999999),
                           ),
                           onTap: () {
-                            controller.clearEmail();
+                            
                             Get.to(() => Password());
+                         
+                            
                           },
                         )),
                     SizedBox(height: 12.h),

@@ -106,8 +106,7 @@ class OtpVerificationDefault extends StatelessWidget {
                           ),
                           onTap: controller.isOtpValid.value
                               ? () {
-                                  controller.clearOtp();
-                                  Get.to(() => DisplayName());
+                             controller.verifyOtp();
                                 }
                               : () {},
                         )),
