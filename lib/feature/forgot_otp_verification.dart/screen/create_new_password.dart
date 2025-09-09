@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -5,9 +6,9 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/controller/create_new_password_controller.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/custom_create_newPass_field.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 
 class CreateNewPassword extends StatelessWidget {
   const CreateNewPassword({super.key});
@@ -18,7 +19,6 @@ class CreateNewPassword extends StatelessWidget {
     final createNewPasswordController = Get.find<CreateNewPasswordController>();
 
     return Scaffold(
-
       body: Stack(
         children: [
           // Background Image
@@ -35,9 +35,9 @@ class CreateNewPassword extends StatelessWidget {
 
           // Bottom Form Fixed
           Positioned(
-            bottom: 5.h, // Initial position near the bottom
-            left: 16.w, // Matches the padding from the original design
-            right: 16.w, // Matches the padding from the original design
+            bottom: 5.h,
+            left: 16.w,
+            right: 16.w,
             child: SafeArea(
               child: Container(
                 width: double.infinity,
@@ -47,7 +47,7 @@ class CreateNewPassword extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // Prevents unnecessary expansion
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(height: 33.h),
                     Row(
@@ -81,24 +81,30 @@ class CreateNewPassword extends StatelessWidget {
                     SizedBox(height: 33.h),
                     CustomCreateNewpassField(),
                     SizedBox(height: 12.h),
-                    Obx(() {
+                     Obx(() {
                       final strength = createNewPasswordController.passwordStrength.value;
                       final bool isStrong = strength == 'strong';
-              
+                      final bool isMatch = createNewPasswordController.passwordsMatch.value;
+                      final bool isConfirmNotEmpty = createNewPasswordController.confirmPasswordController.text.isNotEmpty;
+                      final bool isButtonEnabled = isStrong && isMatch && isConfirmNotEmpty;
+
                       return CustomButton(
-                        text: 'Continue',
+                        text: createNewPasswordController.isLoading.value ? 'Loading...' : 'Continue',
                         color: const Color(0xff172601),
-                        onTap: () {
-                          if (isStrong) {
-                            createNewPasswordController.clearPassword();
-                            Get.off(() => BottomNavbar());
-                          }
-                        },
+                        onTap: isButtonEnabled && !createNewPasswordController.isLoading.value
+                            ? () async {
+                                final success = await createNewPasswordController.resetPasswordApiCall();
+                                if (success) {
+                                  createNewPasswordController.clearPassword();
+                                  Get.to(() => SignInForm());
+                                }
+                              }
+                            : (){},
                         textStyle: TextStyle(
                           fontSize: 17.sp,
                           fontFamily: 'SFPro',
                           fontWeight: FontWeight.w600,
-                          color: Colors.white.withOpacity(isStrong ? 1.0 : 0.5),
+                          color: Colors.white.withOpacity(isButtonEnabled ? 1.0 : 0.5),
                         ),
                       );
                     }),

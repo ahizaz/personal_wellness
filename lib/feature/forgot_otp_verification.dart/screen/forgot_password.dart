@@ -74,24 +74,29 @@ class ForgotPassword extends StatelessWidget {
                       isFocused: controller.isForgotEmailFocused,
                     ),
                     SizedBox(height: 12.h),
-                    Obx(() => CustomButton(
-                          text: 'Submit',
-                          color: const Color(0xff172601),
-                          textStyle: TextStyle(
-                            fontSize: 17.sp,
-                            fontFamily: 'SFPro',
-                            fontWeight: FontWeight.w600,
-                            color: controller.hasForgotEmailText.value
-                                ? const Color(0xFFFFFFFF)
-                                : const Color(0xFF999999),
-                          ),
-                          onTap: controller.hasForgotEmailText.value
-                              ? () {
-                                  controller.clearForgotEmail();
-                                  Get.to(() => OtpVerification());
-                                }
-                              : () {}, // Disable tap when no text
-                        )),
+                  Obx(() => CustomButton(
+  text: 'Submit',
+  color: const Color(0xff172601),
+  textStyle: TextStyle(
+    fontSize: 17.sp,
+    fontFamily: 'SFPro',
+    fontWeight: FontWeight.w600,
+    color: controller.hasForgotEmailText.value
+        ? const Color(0xFFFFFFFF)
+        : const Color(0xFF999999),
+  ),
+  onTap: controller.hasForgotEmailText.value
+      ? () async {
+          bool success = await controller.sendForgotPasswordEmail();
+          if (success) {
+               final email = controller.forgotEmailController.text.trim();
+            controller.clearForgotEmail();
+           Get.to(() => OtpVerification(email: email));
+          }
+          // EasyLoading will show errors automatically
+        }
+      : () {},
+)),
                     SizedBox(height: 24.h),
                   ],
                 ),

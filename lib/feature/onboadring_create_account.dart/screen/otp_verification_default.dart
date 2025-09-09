@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/account_personalization.dart/screen/display_name.dart';
 import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/back_butoon_title.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/otp_verification_default_controller.dart';
 import 'package:pinput/pinput.dart';

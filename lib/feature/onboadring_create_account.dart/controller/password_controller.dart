@@ -8,7 +8,7 @@ import 'package:personal_wellness/core/urls/urls.dart';
 
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/privacy_policy_terms.dart';
-
+//regester
 class PasswordController extends GetxController {
   RxBool isPasswordVisible = false.obs;
   final TextEditingController passwordController = TextEditingController();

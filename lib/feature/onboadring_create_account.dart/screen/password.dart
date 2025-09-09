@@ -6,7 +6,7 @@ import 'package:personal_wellness/core/common/widgets/custom_password_field.dart
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/password_controller.dart';
-
+//password
 class Password extends StatelessWidget {
   const Password({super.key});
 

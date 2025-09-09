@@ -9,11 +9,13 @@ import 'package:personal_wellness/feature/forgot_otp_verification.dart/widget/ba
 import 'package:pinput/pinput.dart';
 
 class OtpVerification extends StatelessWidget {
-  const OtpVerification({super.key});
+   final String email;
+  const OtpVerification({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(OtpVerificationController());
+    final controller = Get.put(OtpVerificationController(email: email));
+    print('OTPVerification email: ${controller.email}');
     return Scaffold(
      
       body: Stack(
@@ -103,9 +105,12 @@ class OtpVerification extends StatelessWidget {
                                 : Colors.white.withValues(alpha: 0.5), // Text opacity
                           ),
                           onTap: controller.isOtpValid.value
-                              ? () {
-                                  controller.clearOtp();
-                                  Get.to(() => CreateNewPassword());
+                              ? ()async {
+                                 bool success = await controller.verifyOtpAndSaveToken();
+                                     if (success) {
+                  controller.clearOtp();
+                  Get.to(() => CreateNewPassword());
+                }
                                 }
                               : () {}, // Disable tap when invalid
                         )),
