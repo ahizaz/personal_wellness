@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import 'package:personal_wellness/core/urls/urls.dart';
  // Urls class import
+import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 
 class SignInController extends GetxController {
   final emailController = TextEditingController();
@@ -57,7 +58,7 @@ class SignInController extends GetxController {
       // Use only google_sign_in (no Firebase). Optionally set serverClientId if you want reliable idToken.
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile', 'openid'],
-        // serverClientId: 'YOUR_SERVER_CLIENT_ID.apps.googleusercontent.com', // optional but recommended
+        serverClientId: '567436284141-plinshpprggiftcdutu6oa1tndshdi2k.apps.googleusercontent.com',
       );
 
       // Clear any stale session to avoid silent failures
@@ -82,6 +83,10 @@ class SignInController extends GetxController {
       final name = account.displayName ?? '';
       final photo = account.photoUrl ?? '';
 
+      // Debug prints for Google account and tokens
+      print('[GoogleSignIn] accountId=$id email=$email name=$name photo=$photo');
+      print('[GoogleSignIn] idTokenPresent=${idToken != null} accessTokenPresent=${accessToken != null}');
+
       // Backend request body
       final body = {
         "email": email,
@@ -94,6 +99,8 @@ class SignInController extends GetxController {
         "accessToken": accessToken,
       };
 
+      print('[GoogleSignIn] request body => ' + jsonEncode(body));
+
       final response = await http.post(
         Uri.parse(Urls.googlesignin),
         headers: {'Content-Type': 'application/json'},
@@ -103,21 +110,21 @@ class SignInController extends GetxController {
       isLoading.value = false;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
+        print('[GoogleSignIn] success response (${response.statusCode}) => ${response.body}');
         Get.snackbar('Success', 'Logged in as $email');
-        print('Backend response: $data');
-        // TODO: Save token or navigate
+        // Navigate to app home
+        Get.offAll(() => BottomNavbar());
       } else {
-        print('Error: ${response.statusCode}, ${response.body}');
+        print('[GoogleSignIn] error status=${response.statusCode} body=${response.body}');
         Get.snackbar('Error', 'Failed to login with Google');
       }
     } on PlatformException catch (e) {
       isLoading.value = false;
-      print('Google sign-in platform error: code=${e.code}, message=${e.message}');
+      print('[GoogleSignIn] platform error: code=${e.code}, message=${e.message}');
       Get.snackbar('Error', e.message ?? 'Google sign-in failed');
     } catch (e) {
       isLoading.value = false;
-      print('Google sign-in error: $e');
+      print('[GoogleSignIn] exception: $e');
       Get.snackbar('Error', 'Something went wrong');
     }
   }
