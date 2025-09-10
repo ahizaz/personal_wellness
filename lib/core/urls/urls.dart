@@ -4,5 +4,9 @@ class Urls{
   static const String forgetpassword = "$baseUrl/auth/forgot-password";
   static const String resetpassword = "$baseUrl/auth/reset-password";
   static const String verifyemail = "$baseUrl/auth/verify-email";
+  static const String googlesignin = "$baseUrl/auth/google-login";
+  
+  
+ 
   
 }

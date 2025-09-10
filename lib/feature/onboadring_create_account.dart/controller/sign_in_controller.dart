@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class SignInController extends GetxController {
   final emailController = TextEditingController();
-  final registerController = TextEditingController();
+  final registerController = TextEditingController();//regester
 
 
   final isRegisterEmailFocused = false.obs;
