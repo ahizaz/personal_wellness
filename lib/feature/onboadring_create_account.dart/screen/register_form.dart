@@ -167,7 +167,7 @@ class RegisterForm extends StatelessWidget {
                               fit: BoxFit.cover,
                             ),
                             onTap: () {
-                              // Placeholder for Google sign-in logic
+                          controller.signInWithGoogle();
                             },
                           ),
                         ),

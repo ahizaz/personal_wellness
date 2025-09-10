@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -11,11 +10,7 @@ class PeronalWellNess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Lock orientation to portrait only
-    WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    // Initialization moved to main.dart
 
     return ScreenUtilInit(
       designSize: const Size(402, 874), // Portrait design size
