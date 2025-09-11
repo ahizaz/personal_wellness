@@ -175,7 +175,7 @@ class SignInForm extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                       onTap: () {
-                        controller.signInWithGoogle();
+                
                       },
                     ),
               
