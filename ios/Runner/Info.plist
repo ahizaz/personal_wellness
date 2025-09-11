@@ -8,6 +8,18 @@
 	<string>Personal Wellness</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+    <string>954043915554-ras90mdrj6qd46fg50re8s0fjl21uicj.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+	    <dict>
+		    <key>CFBundleTypeRole</key>
+			<String>Editor</String>
+			<key>CFBundleURLSchemes</key>
+	        <array>
+			     <string>com.googleusercontent.apps.954043915554-ras90mdrj6qd46fg50re8s0fjl21uicj</string>
+			</array>
+		</dict>
+
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
