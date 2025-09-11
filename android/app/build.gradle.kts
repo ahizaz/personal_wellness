@@ -1,39 +1,35 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android") // Kotlin DSL recommended
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.personal_wellness"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.lauren.personal_wellness"
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.example.personal_wellness"
+        applicationId = "com.lauren.personal_wellness"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildTypes {
         release {
-            // Using debug signing for now
             signingConfig = signingConfigs.getByName("debug")
-
-            // ✅ Fix resource shrinking error
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -49,5 +45,9 @@ flutter {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("androidx.concurrent:concurrent-futures:1.2.0")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
 }
