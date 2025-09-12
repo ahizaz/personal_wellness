@@ -34,8 +34,10 @@ class ImagePath {
    static const String leftimage1 = "assets/images/leftimage1.png";
    static const String leftimage2 = "assets/images/leftimage2.png";
    static const String leftimage3 = "assets/images/leftimage3.png";
-   static const String rightimage1 = "assets/images/rightimage1.png";
+   static const String rightimage1 = "assets/images/rightimage1.png"; 
    static const String rightimage2 = "assets/images/rightimage2.png";
    static const String rightimage3 = "assets/images/rightimage3.png";
+
+   
   
 }

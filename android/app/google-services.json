@@ -1,41 +1,42 @@
 {
   "project_info": {
-    "project_number": "954043915554",
-    "project_id": "wellnessapp-4bee1",
-    "storage_bucket": "wellnessapp-4bee1.firebasestorage.app"
+    "project_number": "971700125899",
+    "project_id": "personalwellness-192da",
+    "storage_bucket": "personalwellness-192da.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:954043915554:android:506b2d98f57b527239d97b",
+        "mobilesdk_app_id": "1:971700125899:android:4f804311c5e9dd7d0f9b4e",
         "android_client_info": {
           "package_name": "com.lauren.personal_wellness"
         }
       },
       "oauth_client": [
         {
-          "client_id": "954043915554-5a819pb2s1g5jdci52j89lnh49e8p2l7.apps.googleusercontent.com",
+          "client_id": "971700125899-dn6cire1j35gkjptber69427trcrte0b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lauren.personal_wellness",
+            "certificate_hash": "3aa1e045844e7f1fe5d54317bc77122e6037a33e"
+          }
+        },
+        {
+          "client_id": "971700125899-6io1libfpl6pposl6s18g0j7ejki1pbk.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBlvlkckDamT9u0A7H_Tj5Go7-GV5YyjC4"
+          "current_key": "AIzaSyC4_uE-tPOTdLlaA33EoYm_clwzedWbSjk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "954043915554-5a819pb2s1g5jdci52j89lnh49e8p2l7.apps.googleusercontent.com",
+              "client_id": "971700125899-6io1libfpl6pposl6s18g0j7ejki1pbk.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "954043915554-ras90mdrj6qd46fg50re8s0fjl21uicj.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.personalWellness"
-              }
             }
           ]
         }

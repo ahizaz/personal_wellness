@@ -23,6 +23,11 @@ class SignInController extends GetxController {
   var email = ''.obs;
 
   final isLoading = false.obs;
+  
+  // Google Sign-In instance (Firebase only, no web client ID)
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   @override
   void onInit() {
@@ -50,93 +55,94 @@ class SignInController extends GetxController {
     registerController.dispose();
     super.onClose();
   }
+Future<void> signInWithGoogle() async {
+  try {
+    isLoading.value = true;
 
-  /// ✅ Google Sign-In + Backend
-  /// ✅ Google Sign-In + Backend (with debug prints)
-  Future<void> signInWithGoogle() async {
+    print('Starting Google sign-in...');
     try {
-      isLoading.value = true;
-      print("🚀 Starting Google Sign-In...");
-
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile', 'openid'],
-        serverClientId: '954043915554-5a819pb2s1g5jdci52j89lnh49e8p2l7.apps.googleusercontent.com',
-      );
-
-      try {
-        await googleSignIn.signOut();
-        print("🔄 Previous Google session signed out");
-      } catch (e) {
-        print("⚠️ Error signing out previous session: $e");
-      }
-
-      final GoogleSignInAccount? account = await googleSignIn.signIn();
-
-      if (account == null) {
-        isLoading.value = false;
-        print("❌ Google sign-in cancelled by user");
-        Get.snackbar('Cancelled', 'Google sign-in cancelled');
-        return;
-      }
-
-      print("✅ Google account selected: ${account.email}");
-
-      final GoogleSignInAuthentication googleAuth = await account.authentication;
-      print("🔑 AccessToken: ${googleAuth.accessToken}");
-      print("🔑 IdToken: ${googleAuth.idToken}");
-
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? user = userCredential.user;
-
-      print("👤 Firebase User: ${user?.uid}, Email: ${user?.email}");
-
-      final String id = user?.uid ?? account.id;
-      final String email = user?.email ?? account.email;
-      final String name = user?.displayName ?? account.displayName ?? '';
-      final String photo = user?.photoURL ?? account.photoUrl ?? '';
-
-      final Map<String, dynamic> body = {
-        "email": email,
-        "firstName": name,
-        "image": photo,
-        "uid": "google_$id",
-      };
-
-      print("📦 Sending data to backend: $body");
-
-      final response = await http.post(
-        Uri.parse(Urls.googlesignin),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-
-      print("🌍 Backend Response: ${response.statusCode}");
-      print("📨 Response Body: ${response.body}");
-
+      await _googleSignIn.signOut();
+    } catch (_) {}
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    print('Result account: ' + (googleUser?.email ?? 'null'));
+    if (googleUser == null) {
+      print('User cancelled Google sign-in');
       isLoading.value = false;
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("✅ Google Sign-In successful, navigating to BottomNavbar");
-        Get.offAll(() => BottomNavbar());
-      } else {
-        print("❌ Backend login failed");
-        Get.snackbar('Error', 'Failed to login with Google');
-      }
-    } on PlatformException catch (e) {
-      isLoading.value = false;
-      print("⚠️ PlatformException: ${e.message}");
-      Get.snackbar('Error', e.message ?? 'Google sign-in failed');
-    } catch (e) {
-      isLoading.value = false;
-      print("🔥 Exception: $e");
-      Get.snackbar('Error', 'Something went wrong');
+      return; // user cancelled
     }
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    print('Got tokens. idToken: ' + (googleAuth.idToken != null).toString());
+
+    // Sign in to Firebase with Google credential
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+      accessToken: googleAuth.accessToken,
+    );
+
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    final User? user = userCredential.user;
+    print('Firebase user: ' + (user?.uid ?? 'null'));
+
+    // Prepare minimal payload for backend
+    final body = {
+      "email": googleUser.email,
+      "firstName": googleUser.displayName ?? "",
+      "image": googleUser.photoUrl ??
+          "https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg",
+      "uid": "google_${googleUser.id}",
+    };
+
+    final response = await http.post(
+      Uri.parse("${Urls.baseUrl}/auth/google-login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data["success"] == true) {
+        final accessToken = data["data"]["accessToken"];
+        final refreshToken = data["data"]["refreshToken"];
+
+        /// 🔥 Debug print tokens
+        print("Access Token: $accessToken");
+        print("Refresh Token: $refreshToken");
+
+        // ✅ Save tokens in local storage
+        // final prefs = await SharedPreferences.getInstance();
+        // await prefs.setString("accessToken", accessToken);
+        // await prefs.setString("refreshToken", refreshToken);
+
+        // Navigate to BottomNavBar
+        Get.offAll(() => BottomNavbar());
+
+        Get.snackbar("Success", "User login successfully",
+            snackPosition: SnackPosition.BOTTOM);
+      } else {
+        print("Backend error: ${data["message"]}");
+        Get.snackbar("Error", data["message"] ?? "Login failed");
+      }
+    } else {
+      print("Server error: ${response.statusCode}");
+      Get.snackbar("Error", "Server error: ${response.statusCode}");
+    }
+  } on PlatformException catch (e) {
+    print('PlatformException code: ' + (e.code.toString()));
+    print('PlatformException message: ' + (e.message ?? ''));
+    print('PlatformException details: ' + (e.details?.toString() ?? ''));
+    Get.snackbar('Error', '${e.code}: ${e.message ?? 'Google sign-in failed'}');
+  } catch (e) {
+    print('Generic sign-in error: ' + e.toString());
+    Get.snackbar('Error', e.toString());
+  } finally {
+    isLoading.value = false;
   }
+}
+
+ 
 
 }
