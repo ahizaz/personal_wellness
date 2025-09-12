@@ -6,6 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:personal_wellness/core/urls/urls.dart';
  // Urls class import
@@ -58,6 +60,7 @@ class SignInController extends GetxController {
 Future<void> signInWithGoogle() async {
   try {
     isLoading.value = true;
+    EasyLoading.show(status: 'Signing in...');
 
     print('Starting Google sign-in...');
     try {
@@ -106,40 +109,40 @@ Future<void> signInWithGoogle() async {
 
       if (data["success"] == true) {
         final accessToken = data["data"]["accessToken"];
-        final refreshToken = data["data"]["refreshToken"];
+        final userData = data["data"]["user"] ?? {};
+        final userId = userData["_id"] ?? userData["id"];
+        
 
         /// 🔥 Debug print tokens
         print("Access Token: $accessToken");
-        print("Refresh Token: $refreshToken");
+        print("User ID: ${userId ?? 'null'}");
 
-        // ✅ Save tokens in local storage
-        // final prefs = await SharedPreferences.getInstance();
-        // await prefs.setString("accessToken", accessToken);
-        // await prefs.setString("refreshToken", refreshToken);
+        // ✅ Save only accessToken and userId in local storage
+        final prefs = await SharedPreferences.getInstance();
+        if (accessToken is String) {
+          await prefs.setString("accessToken", accessToken);
+        }
+        if (userId is String) {
+          await prefs.setString("userId", userId);
+        }
 
         // Navigate to BottomNavBar
         Get.offAll(() => BottomNavbar());
-
-        Get.snackbar("Success", "User login successfully",
-            snackPosition: SnackPosition.BOTTOM);
       } else {
         print("Backend error: ${data["message"]}");
-        Get.snackbar("Error", data["message"] ?? "Login failed");
       }
     } else {
       print("Server error: ${response.statusCode}");
-      Get.snackbar("Error", "Server error: ${response.statusCode}");
     }
   } on PlatformException catch (e) {
     print('PlatformException code: ' + (e.code.toString()));
     print('PlatformException message: ' + (e.message ?? ''));
     print('PlatformException details: ' + (e.details?.toString() ?? ''));
-    Get.snackbar('Error', '${e.code}: ${e.message ?? 'Google sign-in failed'}');
   } catch (e) {
     print('Generic sign-in error: ' + e.toString());
-    Get.snackbar('Error', e.toString());
   } finally {
     isLoading.value = false;
+    EasyLoading.dismiss();
   }
 }
 
