@@ -29,15 +29,69 @@ class ExploreController extends GetxController {
   void onInit() {
     super.onInit();
     fetchSkinData();
+    fetchProducts();
     
     // Keep static data for products only
-    products.addAll([
-      {"image": ImagePath.product2, "title": "Vitamin C Serum \n50mg"},
-      {"image": ImagePath.product3, "title": "Whitening night\ncream"},
-      {"image": ImagePath.product1, "title": "Essence Sun's\nCream SPF45"},
-      {"image": ImagePath.product4, "title": "The Ordinary Anti-\n aging serum "},
-    ]);
+    // products.addAll([
+    //   {"image": ImagePath.product2, "title": "Vitamin C Serum \n50mg"},
+    //   {"image": ImagePath.product3, "title": "Whitening night\ncream"},
+    //   {"image": ImagePath.product1, "title": "Essence Sun's\nCream SPF45"},
+    //   {"image": ImagePath.product4, "title": "The Ordinary Anti-\n aging serum "},
+    // ]);
   }
+  
+  Future<void> fetchProducts() async {
+    try {
+      EasyLoading.show(status: "Loading products...", maskType: EasyLoadingMaskType.black);
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse("${Urls.baseUrl}/product/get-all"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"]["result"] != null) {
+          products.clear();
+
+          for (var item in data["data"]["result"]) {
+            products.add({
+              "id": item["_id"] ?? "",
+              "title": item["productName"] ?? "Unknown Product",
+              // প্রথম image থাকলে সেটা নিব, নাহলে ফাঁকা string
+              "image": item["image"].isNotEmpty
+                  ? "${Urls.imageurl}${item["image"][0]}"
+                  : "",
+            });
+          }
+
+          EasyLoading.showSuccess("Products loaded");
+        } else {
+          EasyLoading.showError("Failed to load products");
+        }
+      } else {
+        EasyLoading.showError("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      EasyLoading.showError("Error loading products");
+      print("Error fetching products: $e");
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
 
   Future<Map<String, dynamic>?> fetchSkinConditionDetails(String id) async {
     try {

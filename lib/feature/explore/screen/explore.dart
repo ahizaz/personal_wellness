@@ -227,114 +227,156 @@ class Explore extends StatelessWidget {
                 color: Color(0xff000000)
               ),),
               SizedBox(height: 12.h,),
-              Obx(() => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                  
-                       InkWell(
-                        onTap: (){
-                               Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[0]["title"]!);
-                        },
-                         child: SizedBox(
-                          width: 178.w,
-                          height: 182.h,
-                          child:  Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,),
-                         ),
-                       ),
-                       SizedBox(height: 8.h,),
-                       Text(controller.sortedProducts[0]["title"]!,style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w500
-                     
-                       ),)
-                      ],
-                     ),
-                     SizedBox(width: 8.w,),
-                      Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                       InkWell(
-                        onTap: (){
-                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[1]["title"]!);
-                        },
-                         child: SizedBox(
-                          width: 178.w,
-                          height: 182.h,
-                          child:  Image(image: AssetImage(controller.sortedProducts[1]["image"]!),fit: BoxFit.cover,),
-                         ),
-                       ),
-                       SizedBox(height: 8.h,),
-                       Text(controller.sortedProducts[1]["title"]!,style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w500
 
-                       ),)
-                      ],
-                     ),
-                    ],
+            //products
+
+              //products
+Obx(() {
+  final products = controller.sortedProducts;
+
+  if (products.length < 4) {
+    // ৪টা না এলে loader / empty দেখাও
+    return const Center(child: Text("Not enough products"));
+  }
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.to(() => ViewProduct(),
+                      arguments: products[0]["title"]);
+                },
+                child: SizedBox(
+                  width: 178.w,
+                  height: 182.h,
+                  child: Image.network(
+                    products[0]["image"] ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
                   ),
-
-
-
-                  SizedBox(height: 16.h,),
-                   Row(
-                    children: [
-                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                       InkWell(
-                        onTap: (){
-                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[2]["title"]!);
-                        },
-                         child: SizedBox(
-                          width: 178.w,
-                          height: 182.h,
-                          child:  Image(image: AssetImage(controller.sortedProducts[2]["image"]!),fit: BoxFit.cover,),
-                         ),
-                       ),
-                       SizedBox(height: 8.h,),
-                       Text(controller.sortedProducts[2]["title"]!,style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w500
-
-                       ),)
-                      ],
-                     ),
-                     SizedBox(width: 8.w,),
-                      Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                       InkWell(
-                        onTap: (){
-                                                      Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[3]["title"]!);
-                        },
-                         child: SizedBox(
-                          width: 178.w,
-                          height: 182.h,
-                          child:  Image(image: AssetImage(controller.sortedProducts[3]["image"]!),fit: BoxFit.cover,),
-                         ),
-                       ),
-                       SizedBox(height: 8.h,),
-                       Text(controller.sortedProducts[3]["title"]!,style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w500
-
-                       ),)
-                      ],
-                     ),
-                    ],
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                products[0]["title"] ?? "",
+                style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: 8.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.to(() => ViewProduct(),
+                      arguments: products[1]["title"]);
+                },
+                child: SizedBox(
+                  width: 178.w,
+                  height: 182.h,
+                  child: Image.network(
+                    products[1]["image"] ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
                   ),
-                ],
-              )),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                products[1]["title"] ?? "",
+                style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      SizedBox(height: 16.h),
+      Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.to(() => ViewProduct(),
+                      arguments: products[2]["title"]);
+                },
+                child: SizedBox(
+                  width: 178.w,
+                  height: 182.h,
+                  child: Image.network(
+                    products[2]["image"] ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                products[2]["title"] ?? "",
+                style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: 8.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.to(() => ViewProduct(),
+                      arguments: products[3]["title"]);
+                },
+                child: SizedBox(
+                  width: 178.w,
+                  height: 182.h,
+                  child: Image.network(
+                    products[3]["image"] ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                products[3]["title"] ?? "",
+                style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+}),
+
             ],
           ),
         ),
