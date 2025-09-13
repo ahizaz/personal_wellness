@@ -8,6 +8,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import 'package:personal_wellness/feature/explore/controller/explore_controller.dart';
 import 'package:personal_wellness/feature/explore/screen/skin_condition.dart';
+import 'package:personal_wellness/feature/explore/screen/view_product.dart';
 
 class Explore extends StatelessWidget {
   const Explore({super.key});
@@ -235,10 +236,15 @@ class Explore extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                   
-                       SizedBox(
-                        width: 178.w,
-                        height: 182.h,
-                        child:  Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,),
+                       InkWell(
+                        onTap: (){
+                               Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[0]["title"]!);
+                        },
+                         child: SizedBox(
+                          width: 178.w,
+                          height: 182.h,
+                          child:  Image(image: AssetImage(controller.sortedProducts[0]["image"]!),fit: BoxFit.cover,),
+                         ),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[0]["title"]!,style: TextStyle(
@@ -253,10 +259,15 @@ class Explore extends StatelessWidget {
                       Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       SizedBox(
-                        width: 178.w,
-                        height: 182.h,
-                        child:  Image(image: AssetImage(controller.sortedProducts[1]["image"]!),fit: BoxFit.cover,),
+                       InkWell(
+                        onTap: (){
+                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[1]["title"]!);
+                        },
+                         child: SizedBox(
+                          width: 178.w,
+                          height: 182.h,
+                          child:  Image(image: AssetImage(controller.sortedProducts[1]["image"]!),fit: BoxFit.cover,),
+                         ),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[1]["title"]!,style: TextStyle(
@@ -278,10 +289,15 @@ class Explore extends StatelessWidget {
                      Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       SizedBox(
-                        width: 178.w,
-                        height: 182.h,
-                        child:  Image(image: AssetImage(controller.sortedProducts[2]["image"]!),fit: BoxFit.cover,),
+                       InkWell(
+                        onTap: (){
+                            Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[2]["title"]!);
+                        },
+                         child: SizedBox(
+                          width: 178.w,
+                          height: 182.h,
+                          child:  Image(image: AssetImage(controller.sortedProducts[2]["image"]!),fit: BoxFit.cover,),
+                         ),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[2]["title"]!,style: TextStyle(
@@ -296,10 +312,15 @@ class Explore extends StatelessWidget {
                       Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       SizedBox(
-                        width: 178.w,
-                        height: 182.h,
-                        child:  Image(image: AssetImage(controller.sortedProducts[3]["image"]!),fit: BoxFit.cover,),
+                       InkWell(
+                        onTap: (){
+                                                      Get.to(()=>ViewProduct(), arguments: controller.sortedProducts[3]["title"]!);
+                        },
+                         child: SizedBox(
+                          width: 178.w,
+                          height: 182.h,
+                          child:  Image(image: AssetImage(controller.sortedProducts[3]["image"]!),fit: BoxFit.cover,),
+                         ),
                        ),
                        SizedBox(height: 8.h,),
                        Text(controller.sortedProducts[3]["title"]!,style: TextStyle(
