@@ -86,11 +86,11 @@ class Explore extends StatelessWidget {
                         final item = controller.sortedSkinConditions[index];
                         return InkWell(
                           onTap:(){
-                              Get.to(()=>SkinCondition(imagePath: item['image']!,
-                               title: item['title']!,
-                              ),
-                              
-                              );
+                              Get.to(()=>SkinCondition(
+                                imagePath: item['image']!,
+                                title: item['title']!,
+                                id: item['id'],
+                              ));
                           },
                           child: SizedBox(
                             width: 160.h,
@@ -100,9 +100,34 @@ class Explore extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   height: 160.h,
-                                  child: Image(
-                                      image: AssetImage(item["image"]!),
-                                      fit: BoxFit.cover),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.network(
+                                      item["image"]!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.error, color: Colors.grey[600]),
+                                        );
+                                      },
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          color: Colors.grey[200],
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded /
+                                                      loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
                                 SizedBox(height: 8.h),
                                 Text(
@@ -132,10 +157,10 @@ class Explore extends StatelessWidget {
                         final item = controller.sortedSkinTypes[index];
                         return InkWell(
                           onTap: (){
-                              Get.to(()=>SkinCondition(imagePath: item['image']!,
-                               title: item['title']!,
-                              
-                              
+                              Get.to(()=>SkinCondition(
+                                imagePath: item['image']!,
+                                title: item['title']!,
+                                id: item['id'],
                               ));
                           },
                           child: SizedBox(
@@ -146,9 +171,34 @@ class Explore extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   height: 160.h,
-                                  child: Image(
-                                      image: AssetImage(item["image"]!),
-                                      fit: BoxFit.cover),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.network(
+                                      item["image"]!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.error, color: Colors.grey[600]),
+                                        );
+                                      },
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          color: Colors.grey[200],
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded /
+                                                      loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
                                 SizedBox(height: 8.h),
                                 Text(

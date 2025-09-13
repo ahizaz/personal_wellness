@@ -12,11 +12,13 @@ import 'package:personal_wellness/feature/today/widget/product_header.dart';
 class SkinCondition extends StatelessWidget {
   final String imagePath;
   final String title;
+  final String? id;
 
   const SkinCondition({
     super.key,
     required this.imagePath,
     required this.title,
+    this.id,
   });
 
   @override
@@ -37,7 +39,34 @@ class SkinCondition extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   height: 298.h,
-                  child: Image(image: AssetImage(imagePath), fit: BoxFit.cover),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Image.network(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.error, color: Colors.grey[600]),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
                 SizedBox(height: 16.h),
                 Text(
@@ -60,15 +89,28 @@ class SkinCondition extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                Obx(() => Text(
-                      exploreController.skinDetails["symptoms"],
-                      style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff3E4B2C),
-                      ),
-                    )),
+                Obx(() {
+                  // Find the current skin condition data from API
+                  Map<String, dynamic>? currentSkinData;
+                  try {
+                    currentSkinData = exploreController.skinConditions.firstWhere(
+                      (item) => item['title'] == title && item['image'] == imagePath,
+                    );
+                  } catch (e) {
+                    currentSkinData = null;
+                  }
+                  
+                  return Text(
+                    currentSkinData?['symptoms']?.toString() ?? 
+                    exploreController.skinDetails["symptoms"],
+                    style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff3E4B2C),
+                    ),
+                  );
+                }),
                 SizedBox(height: 16.h),
                 Container(
                   width: double.infinity,
@@ -92,47 +134,57 @@ class SkinCondition extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 12.h),
-                        Obx(() => Column(
-                              children: List.generate(
-                                (exploreController.skinDetails["treatments"]
-                                        as List)
-                                    .length,
-                                (index) => Padding(
-                                  padding: EdgeInsets.only(bottom: 8.h),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 9),
-                                        child: Container(
-                                          width: 6.w,
-                                          height: 6.h,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(0xff78816C),
-                                          ),
+                        Obx(() {
+                          // Find the current skin condition data from API
+                          Map<String, dynamic>? currentSkinData;
+                          try {
+                            currentSkinData = exploreController.skinConditions.firstWhere(
+                              (item) => item['title'] == title && item['image'] == imagePath,
+                            );
+                          } catch (e) {
+                            currentSkinData = null;
+                          }
+                          
+                          final treatments = currentSkinData?['treatment'] as List? ?? 
+                                           exploreController.skinDetails["treatments"] as List;
+                          
+                          return Column(
+                            children: List.generate(
+                              treatments.length,
+                              (index) => Padding(
+                                padding: EdgeInsets.only(bottom: 8.h),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 9),
+                                      child: Container(
+                                        width: 6.w,
+                                        height: 6.h,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Color(0xff78816C),
                                         ),
                                       ),
-                                      SizedBox(width: 18.w),
-                                      Expanded(
-                                        child: Text(
-                                          exploreController
-                                                  .skinDetails["treatments"]
-                                              [index],
-                                          style: TextStyle(
-                                            fontFamily: "SFPro",
-                                            fontSize: 17.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: const Color(0xff3E4B2C),
-                                          ),
+                                    ),
+                                    SizedBox(width: 18.w),
+                                    Expanded(
+                                      child: Text(
+                                        treatments[index].toString(),
+                                        style: TextStyle(
+                                          fontFamily: "SFPro",
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: const Color(0xff3E4B2C),
                                         ),
-                                      )
-                                    ],
-                                  ),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
-                            )),
+                            ),
+                          );
+                        }),
                          
                       ],
                     ),

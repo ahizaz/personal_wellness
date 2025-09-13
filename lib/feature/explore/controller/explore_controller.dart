@@ -3,12 +3,18 @@
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class ExploreController extends GetxController {
-  final RxList<Map<String, String>> skinConditions = <Map<String, String>>[].obs;
-  final RxList<Map<String, String>> skinTypes = <Map<String, String>>[].obs;
+  final RxList<Map<String, dynamic>> skinConditions = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> skinTypes = <Map<String, dynamic>>[].obs;
   final RxList<Map<String, String>> products = <Map<String, String>>[].obs;
   final RxString searchTerm = ''.obs;
+  final RxBool isLoading = false.obs;
   final RxMap<String, dynamic> skinDetails = <String, dynamic>{
     "symptoms": "Consists of pimples, blackheads, and cysts,\n"
         "often caused by blocked pores, bacteria, and\n"
@@ -22,39 +28,133 @@ class ExploreController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Populate with static data for now (JSON-like structure)
-    skinConditions.addAll([
-      {"image": "assets/images/skincondition1.png", "title": "Hyperpigmentation"},
-      {"image": "assets/images/skincondition2.png", "title": "Aging graceful skin"},
-      {"image": "assets/images/skincondition3.png", "title": "Acne"},
-
-    ]);
-
-    skinTypes.addAll([
-      {"image": "assets/images/skincondtion4.png", "title": "Dry skin"},
-      {"image": "assets/images/skincondtion5.png", "title": "Combination skin"},
-      {"image": "assets/images/skincondtion6.png", "title": "Oily"},
-      // Add more if needed in the future
-    ]);
-
+    fetchSkinData();
+    
+    // Keep static data for products only
     products.addAll([
       {"image": ImagePath.product2, "title": "Vitamin C Serum \n50mg"},
       {"image": ImagePath.product3, "title": "Whitening night\ncream"},
-      {"image": ImagePath.product1, "title": "Essence Sun’s\nCream SPF45"},
+      {"image": ImagePath.product1, "title": "Essence Sun's\nCream SPF45"},
       {"image": ImagePath.product4, "title": "The Ordinary Anti-\n aging serum "},
     ]);
   }
 
-  List<Map<String, String>> get sortedSkinConditions {
+  Future<Map<String, dynamic>?> fetchSkinConditionDetails(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      
+      if (accessToken == null) {
+        print('No access token found');
+        return null;
+      }
+
+      final response = await http.get(
+        Uri.parse('${Urls.baseUrl}/skin-condition/details/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        if (data['success'] == true && data['data'] != null) {
+          return data['data'];
+        }
+      } else {
+        print('Failed to fetch skin condition details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching skin condition details: $e');
+    }
+    return null;
+  }
+
+  Future<void> fetchSkinData() async {
+    try {
+      isLoading.value = true;
+      EasyLoading.show(
+        status: 'Loading skin data...',
+        maskType: EasyLoadingMaskType.black,
+      );
+      
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      
+      if (accessToken == null) {
+        print('No access token found');
+        EasyLoading.showError('Please login again');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.getallskinconditon),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        if (data['success'] == true && data['data']['result'] != null) {
+          skinConditions.clear();
+          skinTypes.clear();
+          
+          for (var item in data['data']['result']) {
+            final skinData = {
+              'id': item['_id'],
+              'image': '${Urls.imageurl}${item['image']}',
+              'title': item['skinType'],
+              'symptoms': item['symptmos'],
+              'treatment': item['treatment'],
+            };
+            
+            // Add to both skinConditions and skinTypes since they use the same API
+            skinConditions.add(skinData);
+            skinTypes.add(skinData);
+          }
+          
+          print('Loaded ${skinConditions.length} skin items from API');
+          EasyLoading.showSuccess('Skin data loaded successfully!');
+        } else {
+          EasyLoading.showError('Failed to load skin data');
+        }
+      } else if (response.statusCode == 401) {
+        EasyLoading.showError('Session expired. Please login again');
+      } else {
+        print('Failed to fetch skin data: ${response.statusCode}');
+        EasyLoading.showError('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching skin data: $e');
+      EasyLoading.showError('Network error. Please check your connection');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  List<Map<String, dynamic>> get sortedSkinConditions {
+    // Return empty list if still loading or no data
+    if (isLoading.value || skinConditions.isEmpty) {
+      return searchTerm.value.isEmpty ? skinConditions : [];
+    }
+    
     if (searchTerm.value.isEmpty) return skinConditions;
     
-    final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
-    final List<Map<String, String>> matching = [];
-    final List<Map<String, String>> others = [];
+    final String searchQuery = searchTerm.value.trim().toLowerCase();
+    final List<Map<String, dynamic>> matching = [];
+    final List<Map<String, dynamic>> others = [];
     
     for (var condition in skinConditions) {
-      final String titleFirstWord = condition['title']!.trim().split(' ').first.toLowerCase();
-      if (titleFirstWord.startsWith(firstWord)) {
+      final String title = condition['title']?.toString().toLowerCase() ?? '';
+      final String symptoms = condition['symptoms']?.toString().toLowerCase() ?? '';
+      
+      // Search in title and symptoms
+      if (title.contains(searchQuery) || symptoms.contains(searchQuery)) {
         matching.add(condition);
       } else {
         others.add(condition);
@@ -64,16 +164,24 @@ class ExploreController extends GetxController {
     return [...matching, ...others];
   }
 
-  List<Map<String, String>> get sortedSkinTypes {
+  List<Map<String, dynamic>> get sortedSkinTypes {
+    // Return empty list if still loading or no data
+    if (isLoading.value || skinTypes.isEmpty) {
+      return searchTerm.value.isEmpty ? skinTypes : [];
+    }
+    
     if (searchTerm.value.isEmpty) return skinTypes;
     
-    final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
-    final List<Map<String, String>> matching = [];
-    final List<Map<String, String>> others = [];
+    final String searchQuery = searchTerm.value.trim().toLowerCase();
+    final List<Map<String, dynamic>> matching = [];
+    final List<Map<String, dynamic>> others = [];
     
     for (var type in skinTypes) {
-      final String titleFirstWord = type['title']!.trim().split(' ').first.toLowerCase();
-      if (titleFirstWord.startsWith(firstWord)) {
+      final String title = type['title']?.toString().toLowerCase() ?? '';
+      final String symptoms = type['symptoms']?.toString().toLowerCase() ?? '';
+      
+      // Search in title and symptoms
+      if (title.contains(searchQuery) || symptoms.contains(searchQuery)) {
         matching.add(type);
       } else {
         others.add(type);
