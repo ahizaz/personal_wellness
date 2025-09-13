@@ -276,7 +276,7 @@ Obx(() {
           ),
           SizedBox(width: 8.w),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,///
             children: [
               InkWell(
                 onTap: () {
