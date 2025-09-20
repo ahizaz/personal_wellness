@@ -24,6 +24,11 @@ class SkinCondition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exploreController = Get.find<ExploreController>();
+    
+    if (id != null && exploreController.currentSkinId.value != id) {
+      exploreController.currentSkinId.value = id!;
+      exploreController.fetchRecommendedProducts(id!);
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xffEDEEE6),
@@ -193,62 +198,119 @@ class SkinCondition extends StatelessWidget {
                 SizedBox(height: 24.h,),
                 Text("Recommended products",style: TextStyle(fontFamily: "SFPro",fontSize: 28.sp,fontWeight: FontWeight.w400,color: Color(0xff172601)),),
                 SizedBox(height: 16.h,),
-                Row(
-                  children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Obx(() {
+                  final recProducts = exploreController.recommendedProducts;
+                  if (recProducts.isEmpty) {
+                    return const Text("No recommended products available");
+                  }
+                  return Row(
                     children: [
-                     SizedBox(
-                      width: 177.w,
-                      height: 182.h,
-                      child: InkWell(
-                        onTap: (){
-                          Get.to(()=>ViewProduct(), arguments: exploreController.sortedProducts[0]["title"]!);
-                        },
-                        
-                        child: Image.asset(ImagePath.product2,fit: BoxFit.cover,)),
-                      
-                     ),
-                     SizedBox(height: 8.h,),
-                     Text("Vitamin C Serum\n50g",style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff000000)
-                     ),)
+                      if (recProducts.length > 0)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 177.w,
+                            height: 182.h,
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(() => ViewProduct(), arguments: recProducts[0]["title"]!);
+                              },
+                              child: Image.network(
+                                recProducts[0]["image"]!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: Icon(Icons.error, color: Colors.grey[600]),
+                                  );
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8.h,),
+                          Text(
+                            recProducts[0]["title"]!,
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000)
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(width: 16.w,),
+                      if (recProducts.length > 1)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 177.w,
+                            height: 182.h,
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(() => ViewProduct(), arguments: recProducts[1]["title"]!);
+                              },
+                              child: Image.network(
+                                recProducts[1]["image"]!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: Icon(Icons.error, color: Colors.grey[600]),
+                                  );
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8.h,),
+                          Text(
+                            recProducts[1]["title"]!,
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000)
+                            ),
+                          )
+                        ],
+                      ),
                     ],
-                  ),
-                  SizedBox(width: 16.w,),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                     SizedBox(
-                      width: 177.w,
-                      height: 182.h,
-                      child: InkWell(
-                        onTap: (){
-                            Get.to(()=>ViewProduct(), arguments: exploreController.sortedProducts[2]["title"]!);
-                        },
-                        child: Image.asset(ImagePath.product1,fit: BoxFit.cover,)),
-                      
-                     ),
-                     SizedBox(height: 8.h,),
-                     Text("Essence Sun’s\nCream SPF45",style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff000000)
-                     ),)
-                    ],
-                  ),
-                  
-                  ],
-                ),
-   
-                 
-                
+                  );
+                }),
               ],
             ),
           ),

@@ -1,8 +1,5 @@
-
-
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +10,8 @@ class ExploreController extends GetxController {
   final RxList<Map<String, dynamic>> skinConditions = <Map<String, dynamic>>[].obs;
   final RxList<Map<String, dynamic>> skinTypes = <Map<String, dynamic>>[].obs;
   final RxList<Map<String, String>> products = <Map<String, String>>[].obs;
+  final RxList<Map<String, dynamic>> recommendedProducts = <Map<String, dynamic>>[].obs;
+  final RxString currentSkinId = ''.obs;
   final RxString searchTerm = ''.obs;
   final RxBool isLoading = false.obs;
   final RxMap<String, dynamic> skinDetails = <String, dynamic>{
@@ -30,14 +29,6 @@ class ExploreController extends GetxController {
     super.onInit();
     fetchSkinData();
     fetchProducts();
-    
-    // Keep static data for products only
-    // products.addAll([
-    //   {"image": ImagePath.product2, "title": "Vitamin C Serum \n50mg"},
-    //   {"image": ImagePath.product3, "title": "Whitening night\ncream"},
-    //   {"image": ImagePath.product1, "title": "Essence Sun's\nCream SPF45"},
-    //   {"image": ImagePath.product4, "title": "The Ordinary Anti-\n aging serum "},
-    // ]);
   }
   
   Future<void> fetchProducts() async {
@@ -87,6 +78,57 @@ class ExploreController extends GetxController {
     } catch (e) {
       EasyLoading.showError("Error loading products");
       print("Error fetching products: $e");
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> fetchRecommendedProducts(String id) async {
+    try {
+      EasyLoading.show(status: "Loading recommended products...", maskType: EasyLoadingMaskType.black);
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse("${Urls.baseUrl}/product/get-recommended/$id"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"]["result"] != null) {
+          recommendedProducts.clear();
+
+          for (var item in data["data"]["result"]) {
+            recommendedProducts.add({
+              "id": item["_id"] ?? "",
+              "title": item["productName"] ?? "Unknown Product",
+              "image": item["image"].isNotEmpty
+                  ? "${Urls.imageurl}${item["image"][0]}"
+                  : "",
+            });
+          }
+
+          EasyLoading.showSuccess("Recommended products loaded");
+        } else {
+          EasyLoading.showError("Failed to load recommended products");
+        }
+      } else {
+        EasyLoading.showError("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      EasyLoading.showError("Error loading recommended products");
+      print("Error fetching recommended products: $e");
     } finally {
       EasyLoading.dismiss();
     }
