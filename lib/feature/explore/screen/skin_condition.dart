@@ -214,7 +214,7 @@ class SkinCondition extends StatelessWidget {
                             height: 182.h,
                             child: InkWell(
                               onTap: () {
-                                Get.to(() => ViewProduct(), arguments: recProducts[0]["title"]!);
+                                Get.to(() => ViewProduct(), arguments: recProducts[0]["id"]!);
                               },
                               child: Image.network(
                                 recProducts[0]["image"]!,
@@ -266,7 +266,7 @@ class SkinCondition extends StatelessWidget {
                             height: 182.h,
                             child: InkWell(
                               onTap: () {
-                                Get.to(() => ViewProduct(), arguments: recProducts[1]["title"]!);
+                                Get.to(() => ViewProduct(), arguments: recProducts[1]["id"]!);
                               },
                               child: Image.network(
                                 recProducts[1]["image"]!,
