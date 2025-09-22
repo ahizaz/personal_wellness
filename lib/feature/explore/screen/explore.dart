@@ -250,7 +250,8 @@ Obx(() {
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(), arguments: products[0]["title"]);
+                  //Get.to(() => ViewProduct(), arguments: products[0]["title"]);
+                  Get.to(() => ViewProduct(), arguments: products[0]["id"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -280,7 +281,8 @@ Obx(() {
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(), arguments: products[1]["title"]);
+                  // Get.to(() => ViewProduct(), arguments: products[1]["title"]);
+                     Get.to(() => ViewProduct(), arguments: products[1]["id"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -314,7 +316,9 @@ Obx(() {
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(), arguments: products[2]["title"]);
+               //   Get.to(() => ViewProduct(), arguments: products[2]["title"]);
+                 Get.to(() => ViewProduct(), arguments: products[2]["id"]);
+               
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -344,7 +348,7 @@ Obx(() {
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(), arguments: products[3]["title"]);
+              Get.to(() => ViewProduct(), arguments: products[3]["id"]);
                 },
                 child: SizedBox(
                   width: 178.w,
