@@ -44,7 +44,7 @@ class ExploreController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse("${Urls.baseUrl}/product/get-all"),
+        Uri.parse(Urls.getallproduct),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $accessToken",
@@ -58,11 +58,13 @@ class ExploreController extends GetxController {
           products.clear();
 
           for (var item in data["data"]["result"]) {
+            // Save product id to shared preferences
+            prefs.setString('lastProductId', item["_id"] ?? "");
+
             products.add({
               "id": item["_id"] ?? "",
               "title": item["productName"] ?? "Unknown Product",
-              // প্রথম image থাকলে সেটা নিব, নাহলে ফাঁকা string
-              "image": item["image"].isNotEmpty
+              "image": (item["image"] != null && item["image"].isNotEmpty)
                   ? "${Urls.imageurl}${item["image"][0]}"
                   : "",
             });
@@ -209,7 +211,6 @@ class ExploreController extends GetxController {
               'treatment': item['treatment'],
             };
             
-            // Add to both skinConditions and skinTypes since they use the same API
             skinConditions.add(skinData);
             skinTypes.add(skinData);
           }
@@ -234,7 +235,6 @@ class ExploreController extends GetxController {
   }
 
   List<Map<String, dynamic>> get sortedSkinConditions {
-    // Return empty list if still loading or no data
     if (isLoading.value || skinConditions.isEmpty) {
       return searchTerm.value.isEmpty ? skinConditions : [];
     }
@@ -248,8 +248,6 @@ class ExploreController extends GetxController {
     for (var condition in skinConditions) {
       final String title = condition['title']?.toString().toLowerCase() ?? '';
       final String symptoms = condition['symptoms']?.toString().toLowerCase() ?? '';
-      
-      // Search in title and symptoms
       if (title.contains(searchQuery) || symptoms.contains(searchQuery)) {
         matching.add(condition);
       } else {
@@ -261,39 +259,30 @@ class ExploreController extends GetxController {
   }
 
   List<Map<String, dynamic>> get sortedSkinTypes {
-    // Return empty list if still loading or no data
     if (isLoading.value || skinTypes.isEmpty) {
       return searchTerm.value.isEmpty ? skinTypes : [];
     }
-    
     if (searchTerm.value.isEmpty) return skinTypes;
-    
     final String searchQuery = searchTerm.value.trim().toLowerCase();
     final List<Map<String, dynamic>> matching = [];
     final List<Map<String, dynamic>> others = [];
-    
     for (var type in skinTypes) {
       final String title = type['title']?.toString().toLowerCase() ?? '';
       final String symptoms = type['symptoms']?.toString().toLowerCase() ?? '';
-      
-      // Search in title and symptoms
       if (title.contains(searchQuery) || symptoms.contains(searchQuery)) {
         matching.add(type);
       } else {
         others.add(type);
       }
     }
-    
     return [...matching, ...others];
   }
 
   List<Map<String, String>> get sortedProducts {
     if (searchTerm.value.isEmpty) return products;
-    
     final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
     final List<Map<String, String>> matching = [];
     final List<Map<String, String>> others = [];
-    
     for (var product in products) {
       final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
       if (titleFirstWord.startsWith(firstWord)) {
@@ -302,9 +291,6 @@ class ExploreController extends GetxController {
         others.add(product);
       }
     }
-    
     return [...matching, ...others];
   }
-
- 
 }

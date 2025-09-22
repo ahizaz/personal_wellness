@@ -235,7 +235,7 @@ Obx(() {
   final products = controller.sortedProducts;
 
   if (products.length < 4) {
-    // ৪টা না এলে loader / empty দেখাও
+    // Show loader or empty state if less than 4 products
     return const Center(child: Text("Not enough products"));
   }
 
@@ -244,13 +244,13 @@ Obx(() {
     children: [
       Row(
         children: [
+          // Product 1
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(),
-                      arguments: products[0]["title"]);
+                  Get.to(() => ViewProduct(), arguments: products[0]["title"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -258,8 +258,7 @@ Obx(() {
                   child: Image.network(
                     products[0]["image"] ?? "",
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                   ),
                 ),
               ),
@@ -275,13 +274,13 @@ Obx(() {
             ],
           ),
           SizedBox(width: 8.w),
+          // Product 2
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,///
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(),
-                      arguments: products[1]["title"]);
+                  Get.to(() => ViewProduct(), arguments: products[1]["title"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -289,8 +288,7 @@ Obx(() {
                   child: Image.network(
                     products[1]["image"] ?? "",
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                   ),
                 ),
               ),
@@ -310,13 +308,13 @@ Obx(() {
       SizedBox(height: 16.h),
       Row(
         children: [
+          // Product 3
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(),
-                      arguments: products[2]["title"]);
+                  Get.to(() => ViewProduct(), arguments: products[2]["title"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -324,8 +322,7 @@ Obx(() {
                   child: Image.network(
                     products[2]["image"] ?? "",
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                   ),
                 ),
               ),
@@ -341,13 +338,13 @@ Obx(() {
             ],
           ),
           SizedBox(width: 8.w),
+          // Product 4
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => ViewProduct(),
-                      arguments: products[3]["title"]);
+                  Get.to(() => ViewProduct(), arguments: products[3]["title"]);
                 },
                 child: SizedBox(
                   width: 178.w,
@@ -355,8 +352,7 @@ Obx(() {
                   child: Image.network(
                     products[3]["image"] ?? "",
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                   ),
                 ),
               ),

@@ -7,6 +7,7 @@ class Urls{
   static const String googlesignin = "$baseUrl/auth/google-login";
   static const String getallskinconditon = "$baseUrl/skin-condition/get-all";
   static const String imageurl = "http://10.10.12.25:5005";
+  static const String getallproduct = "$baseUrl/product/get-all";
  
   
 }
