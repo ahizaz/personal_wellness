@@ -40,7 +40,7 @@ class OtpVerificationController extends GetxController {
     if (email.isEmpty || otp.isEmpty) return false;
     EasyLoading.show(status: 'Verifying...');
     try {
-      print('Verifying URL: ${Urls.verifyemail}');
+     
       final response = await http.post(
         Uri.parse(Urls.verifyemail),
         headers: {"Content-Type": "application/json"},
@@ -54,7 +54,7 @@ class OtpVerificationController extends GetxController {
       EasyLoading.dismiss();
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('Decoded data: $data');
+      
         final accessToken = data['accessToken'] ?? data['data']?['accessToken'];
         print('AccessToken (direct): ${data['accessToken']}');
         print('AccessToken (nested): ${data['data']?['accessToken']}');

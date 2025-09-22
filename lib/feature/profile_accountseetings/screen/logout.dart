@@ -4,124 +4,147 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
 
 class Logout extends StatelessWidget {
   const Logout({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Find the SignInController (should be already initialized elsewhere)
+    final signInController = Get.put(SignInController());
+
     return Scaffold(
-           backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-               BackdropFilter(
+          BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(color: Colors.black.withValues(alpha: 0.3)),
+            child: Container(color: Colors.black.withOpacity(0.3)),
           ),
-          SafeArea(child: Center(
-            child: SingleChildScrollView(
-               padding: EdgeInsets.only(
-                  top: 60.h, // এখানে top padding দেওয়া হয়েছে
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  top: 60.h,
                   left: 16.w,
                   right: 16.w,
                   bottom: 16.h,
                 ),
                 child: Material(
-                   borderRadius: BorderRadius.circular(32.r),
+                  borderRadius: BorderRadius.circular(32.r),
                   clipBehavior: Clip.antiAlias,
                   child: Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                     ),
-                      padding: EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 20.w,
                       vertical: 25.h,
                     ),
                     child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
-                          child: Image(image: AssetImage(ImagePath.logout),
-                          width: 48.w,height: 48.h,fit: BoxFit.cover,),
+                          child: Image(
+                            image: AssetImage(ImagePath.logout),
+                            width: 48.w,
+                            height: 48.h,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        SizedBox(height: 24.h,),
+                        SizedBox(height: 24.h),
                         Center(
-                          child: Text("Log out",style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff172601)
-
-                          ),),
+                          child: Text(
+                            "Log out",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff172601),
+                            ),
+                          ),
                         ),
-                               SizedBox(height: 8.h,),
-                               Center(
-                          child: Text("Do you want to log out?",style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff3E4B2C)
-
-                          ),),
+                        SizedBox(height: 8.h),
+                        Center(
+                          child: Text(
+                            "Do you want to log out?",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff3E4B2C),
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 53.h,),
+                        SizedBox(height: 53.h),
                         Row(
                           children: [
-                            Expanded(child: InkWell(
-                              onTap: (){
-                                Get.to(()=>SignInForm());
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                height: 48.h,
-                                decoration: BoxDecoration(
-                                  color: Color(0xffD94E2E),
-                                  borderRadius: BorderRadius.circular(999.r)
-                                ),
-                                child: Center(
-                                  child: Text("Yes,Log out",style:TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xffFFFFFF)
-                                  ),),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  await signInController.signOut();
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 48.h,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffD94E2E),
+                                    borderRadius: BorderRadius.circular(999.r),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "Yes, Log out",
+                                      style: TextStyle(
+                                        fontFamily: "SFPro",
+                                        fontSize: 17.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xffFFFFFF),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            )),
-                            SizedBox(width: 8.w,),
-                                  Expanded(child: InkWell(
-                                    onTap: (){
-                                      Get.back();
-                                    },
-                                    child: Container(
-                                                                  width: double.infinity,
-                                                                  height: 48.h,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Color(0xffEDEEE6),
-                                                                    borderRadius: BorderRadius.circular(999.r)
-                                                                  ),
-                                                                  child: Center(
-                                                                    child: Text("No, keep me loggin",style:TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xff172601),
-                                                                    ),),
-                                                                  ),
-                                                                ),
-                                  ))
+                            ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  Get.back();
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 48.h,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffEDEEE6),
+                                    borderRadius: BorderRadius.circular(999.r),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "No, keep me logged in",
+                                      style: TextStyle(
+                                        fontFamily: "SFPro",
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xff172601),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         )
                       ],
                     ),
                   ),
                 ),
+              ),
             ),
-          ))
+          )
         ],
       ),
     );
