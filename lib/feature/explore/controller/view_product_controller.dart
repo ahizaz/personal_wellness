@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -125,7 +124,7 @@ class ViewProductController extends GetxController {
       }
     } catch (e) {
       EasyLoading.showError("Error loading product details");
-      debugPrint("Error fetching product details: $e");
+      print("Error fetching product details: $e");
     } finally {
       EasyLoading.dismiss();
     }
