@@ -22,7 +22,7 @@ class BottomNavbar extends StatelessWidget {
   ];
 
   final List<String> activeIcons = [
-    IconPath.todayactive,
+    IconPath.todayactive,//
     IconPath.exploreactive,
     IconPath.routineactive,
     IconPath.progressactive,
