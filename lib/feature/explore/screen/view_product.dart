@@ -185,54 +185,53 @@ class ViewProduct extends StatelessWidget {
                     color: Color(0xff172601)
                   )),
                   SizedBox(height: 16.h),
-                  // Static relevant products section (if you want to make it dynamic, update here)
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(ImagePath.product4, width: 177.w, height: 182.h, fit: BoxFit.cover),
-                          SizedBox(height: 8.h),
-                          Text("The Ordinary Anti-\naging Serum", style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                        ],
-                      ),
-                      SizedBox(width: 16.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(ImagePath.product3, width: 177.w, height: 182.h, fit: BoxFit.cover),
-                          SizedBox(height: 8.h),
-                          Text("Whitening Night\nCream", style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(ImagePath.product2, width: 177.w, height: 182.h, fit: BoxFit.cover),
-                          SizedBox(height: 8.h),
-                          Text("Vitamin C Serum\n50g", style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                        ],
-                      ),
-                      SizedBox(width: 16.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(ImagePath.product1, width: 177.w, height: 182.h, fit: BoxFit.cover),
-                          SizedBox(height: 8.h),
-                          Text("Essence Sun’s\nCream SPF45 ", style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                        ],
-                      ),
-                    ],
-                  ),
+                  Obx(() {
+                    if (controller.relevantProducts.isEmpty) {
+                      return Text(
+                        "No relevant products found.",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff3E4B2C),
+                        ),
+                      );
+                    }
+                    // Show relevant products dynamically from API
+                    return Wrap(
+                      spacing: 16.w,
+                      runSpacing: 16.h,
+                      children: controller.relevantProducts.map((prod) {
+                        return SizedBox(
+                          width: 177.w,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              prod["image"] != ""
+                                ? Image.network(prod["image"], width: 177.w, height: 182.h, fit: BoxFit.cover)
+                                : Container(
+                                    width: 177.w,
+                                    height: 182.h,
+                                    color: Colors.grey[300],
+                                    child: Icon(Icons.image_not_supported, size: 40),
+                                  ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                prod["productName"] ?? "",
+                                style: TextStyle(
+                                  fontFamily: "SFPro",
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xff000000)
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }),
                   SizedBox(height: 14.h),
                 ],
               );

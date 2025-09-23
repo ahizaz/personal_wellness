@@ -72,6 +72,9 @@ class ViewProductController extends GetxController {
     frequency: "2 times",
   ).obs;
 
+  // Relevant products list
+  final RxList<Map<String, dynamic>> relevantProducts = <Map<String, dynamic>>[].obs;
+
   Future<void> fetchProductDetails(String id) async {
     try {
       EasyLoading.show(status: "Loading product...", maskType: EasyLoadingMaskType.black);
@@ -109,6 +112,9 @@ class ViewProductController extends GetxController {
           // Reset the current image index
           currentIndex.value = 0;
 
+          // Fetch relevant products using product name
+          await fetchRelevantProducts(data["data"]["productName"] ?? "");
+
           EasyLoading.dismiss();
         } else {
           EasyLoading.showError("Failed to load product details");
@@ -121,6 +127,45 @@ class ViewProductController extends GetxController {
       print("Error fetching product details: $e");
     } finally {
       EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> fetchRelevantProducts(String productName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      if (accessToken == null) {
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse("${Urls.baseUrl}/product/get-relevant?searchTerm=$productName"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"]?["result"] != null) {
+          relevantProducts.value = List<Map<String, dynamic>>.from(data["data"]["result"].map((item) {
+            return {
+              "productName": item["productName"],
+              "image": item["image"] != null && item["image"].isNotEmpty
+                  ? "${Urls.imageurl}${item["image"][0]}"
+                  : "",
+            };
+          }));
+        } else {
+          relevantProducts.value = [];
+        }
+      } else {
+        relevantProducts.value = [];
+      }
+    } catch (e) {
+      relevantProducts.value = [];
     }
   }
 }
