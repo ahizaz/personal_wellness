@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:http/http.dart' as http;
@@ -79,7 +80,7 @@ class ExploreController extends GetxController {
       }
     } catch (e) {
       EasyLoading.showError("Error loading products");
-      print("Error fetching products: $e");
+      debugPrint("Error fetching products: $e");
     } finally {
       EasyLoading.dismiss();
     }
@@ -130,7 +131,7 @@ class ExploreController extends GetxController {
       }
     } catch (e) {
       EasyLoading.showError("Error loading recommended products");
-      print("Error fetching recommended products: $e");
+      debugPrint("Error fetching recommended products: $e");
     } finally {
       EasyLoading.dismiss();
     }
@@ -143,7 +144,7 @@ class ExploreController extends GetxController {
       final accessToken = prefs.getString('accessToken');
       
       if (accessToken == null) {
-        print('No access token found');
+        debugPrint('No access token found');
         return null;
       }
 
@@ -162,10 +163,10 @@ class ExploreController extends GetxController {
           return data['data'];
         }
       } else {
-        print('Failed to fetch skin condition details: ${response.statusCode}');
+        debugPrint('Failed to fetch skin condition details: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching skin condition details: $e');
+      debugPrint('Error fetching skin condition details: $e');
     }
     return null;
   }
@@ -182,7 +183,7 @@ class ExploreController extends GetxController {
       final accessToken = prefs.getString('accessToken');
       
       if (accessToken == null) {
-        print('No access token found');
+        debugPrint('No access token found');
         EasyLoading.showError('Please login again');
         return;
       }
@@ -215,7 +216,7 @@ class ExploreController extends GetxController {
             skinTypes.add(skinData);
           }
           
-          print('Loaded ${skinConditions.length} skin items from API');
+          debugPrint('Loaded ${skinConditions.length} skin items from API');
           EasyLoading.showSuccess('Skin data loaded successfully!');
         } else {
           EasyLoading.showError('Failed to load skin data');
@@ -223,11 +224,11 @@ class ExploreController extends GetxController {
       } else if (response.statusCode == 401) {
         EasyLoading.showError('Session expired. Please login again');
       } else {
-        print('Failed to fetch skin data: ${response.statusCode}');
+        debugPrint('Failed to fetch skin data: ${response.statusCode}');
         EasyLoading.showError('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching skin data: $e');
+      debugPrint('Error fetching skin data: $e');
       EasyLoading.showError('Network error. Please check your connection');
     } finally {
       isLoading.value = false;

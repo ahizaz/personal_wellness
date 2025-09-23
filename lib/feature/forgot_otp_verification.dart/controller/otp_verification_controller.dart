@@ -36,7 +36,7 @@ class OtpVerificationController extends GetxController {
 
   Future<bool> verifyOtpAndSaveToken() async {
     final otp = otpController.text.trim();
-    print('OTP: $otp, Email: $email');
+    debugPrint('OTP: $otp, Email: $email');
     if (email.isEmpty || otp.isEmpty) return false;
     EasyLoading.show(status: 'Verifying...');
     try {
@@ -49,15 +49,15 @@ class OtpVerificationController extends GetxController {
           "oneTimeCode": int.tryParse(otp) ?? otp,
         }),
       );
-      print('Response Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('Response Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
       EasyLoading.dismiss();
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
       
         final accessToken = data['accessToken'] ?? data['data']?['accessToken'];
-        print('AccessToken (direct): ${data['accessToken']}');
-        print('AccessToken (nested): ${data['data']?['accessToken']}');
+        debugPrint('AccessToken (direct): ${data['accessToken']}');
+        debugPrint('AccessToken (nested): ${data['data']?['accessToken']}');
         // Use nested accessToken (your response structure)
         final actualToken = data['data']?['accessToken'];
         if (actualToken != null) {
@@ -67,19 +67,19 @@ class OtpVerificationController extends GetxController {
           return true;
         } else {
           EasyLoading.showError("No token received");
-          print('No token received!');
+          debugPrint('No token received!');
           return false;
         }
       } else {
         final data = jsonDecode(response.body);
         final message = data['message'] ?? "Verification failed";
         EasyLoading.showError(message);
-        print('Verification failed. Message: $message');
+        debugPrint('Verification failed. Message: $message');
         return false;
       }
     } catch (e) {
       EasyLoading.dismiss();
-      print('Error: $e');
+      debugPrint('Error: $e');
       EasyLoading.showError("Network Error");
       return false;
     }

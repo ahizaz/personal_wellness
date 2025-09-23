@@ -15,7 +15,7 @@ class OtpVerification extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OtpVerificationController(email: email));
-    print('OTPVerification email: ${controller.email}');
+    debugPrint('OTPVerification email: ${controller.email}');
     return Scaffold(
      
       body: Stack(

@@ -115,17 +115,17 @@ class SignInController extends GetxController {
 
           Get.offAll(() => BottomNavbar());
         } else {
-          print("Backend error: ${data["message"]}");
+          debugPrint("Backend error: ${data["message"]}");
         }
       } else {
-        print("Server error: ${response.statusCode}");
+        debugPrint("Server error: ${response.statusCode}");
       }
     } on PlatformException catch (e) {
-      print('PlatformException code: ' + (e.code.toString()));
-      print('PlatformException message: ' + (e.message ?? ''));
-      print('PlatformException details: ' + (e.details?.toString() ?? ''));
+      debugPrint('PlatformException code: ${e.code}');
+      debugPrint('PlatformException message: ${e.message ?? ''}');
+      debugPrint('PlatformException details: ${e.details?.toString() ?? ''}');
     } catch (e) {
-      print('Generic sign-in error: ' + e.toString());
+      debugPrint('Generic sign-in error: $e');
     } finally {
       isLoading.value = false;
       EasyLoading.dismiss();

@@ -172,7 +172,7 @@ class CreateNewPasswordController extends GetxController {
         isLoading.value = false;
         EasyLoading.dismiss();
         EasyLoading.showError("No access token found");
-        print('No access token found in SharedPreferences');
+        debugPrint('No access token found in SharedPreferences');
         return false;
       }
 
@@ -189,27 +189,27 @@ class CreateNewPasswordController extends GetxController {
         }),
       );
 
-      print('Reset Password Response Code: ${response.statusCode}');
-      print('Reset Password Response Body: ${response.body}');
+      debugPrint('Reset Password Response Code: ${response.statusCode}');
+      debugPrint('Reset Password Response Body: ${response.body}');
 
       isLoading.value = false;
       EasyLoading.dismiss();
 
       if (response.statusCode == 200) {
-        print('Password reset successful');
+        debugPrint('Password reset successful');
         EasyLoading.showSuccess("Password reset successful");
         return true;
       } else {
         final data = jsonDecode(response.body);
         final message = data['message'] ?? "Reset failed";
         EasyLoading.showError(message);
-        print('Reset failed: $message');
+        debugPrint('Reset failed: $message');
         return false;
       }
     } catch (e) {
       isLoading.value = false;
       EasyLoading.dismiss();
-      print('Error: $e');
+     
       EasyLoading.showError("Network error: $e");
       return false;
     }

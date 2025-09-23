@@ -20,6 +20,7 @@ class GoPicture extends StatelessWidget {
     Future<CameraControllerManager?> initializeCamera() async {
       final status = await Permission.camera.request();
       if (status.isDenied || status.isPermanentlyDenied) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Camera permission is required to proceed')),
         );
