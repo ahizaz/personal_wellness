@@ -157,6 +157,7 @@ class ViewProduct extends StatelessWidget {
                   SizedBox(height: 24.h),
                   InkWell(
                     onTap: () {
+                      // Pass the product name directly from the API response
                       Get.to(AddToRoutine(), arguments: controller.productDataview["productName"]);
                     },
                     child: Container(

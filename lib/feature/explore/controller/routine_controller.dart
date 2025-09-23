@@ -85,7 +85,7 @@ void submitRoutine() async {
   ];
 
   // Add only one RoutineItem using the first selected time (if any)
-  if (selectedTimes.isNotEmpty) {
+  if (selectedTimes.isNotEmpty && productName.value.isNotEmpty) {
     final color = colors[routines.length % colors.length];
     routines.add(
       RoutineItem(
@@ -124,9 +124,7 @@ void submitRoutine() async {
   @override
   void onInit() {
     super.onInit();
-    final passedProductName = Get.arguments as String?;
-    if (passedProductName != null) {
-      productName.value = passedProductName;
-    }
+    // Don't use Get.arguments here as it can conflict with AddToRoutine's arguments handling
+    // Product name will be set via setProductName() from AddToRoutine
   }
 }

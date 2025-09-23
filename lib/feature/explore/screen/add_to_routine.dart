@@ -26,6 +26,7 @@ class AddToRoutine extends StatelessWidget {
       },
     );
   }
+  
   @override
   Widget build(BuildContext context) {
     final String? passedProductName = Get.arguments as String?;
