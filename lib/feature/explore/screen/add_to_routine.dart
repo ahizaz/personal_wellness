@@ -29,9 +29,24 @@ class AddToRoutine extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final String? passedProductName = Get.arguments as String?;
-    if (passedProductName != null && controller.productName.value.isEmpty) {
-      controller.setProductName(passedProductName);
+    // Handle both string and map arguments for backward compatibility
+    final dynamic arguments = Get.arguments;
+    
+    if (arguments != null) {
+      if (arguments is String) {
+        // Old format - just product name
+        if (controller.productName.value.isEmpty) {
+          controller.setProductName(arguments);
+        }
+      } else if (arguments is Map<String, dynamic>) {
+        // New format - product name and ID
+        if (controller.productName.value.isEmpty) {
+          controller.setProductData(
+            arguments["productName"] ?? "",
+            arguments["productId"] ?? "",
+          );
+        }
+      }
     }
     return Scaffold(
       backgroundColor: const Color(0xffFFFFFF),

@@ -85,6 +85,7 @@ class ProgressDialog extends StatelessWidget {
                           SizedBox(height: 16.h),
                           Text(
                             controller.progressMessage.value,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: "SFPro",
                               fontSize: 34.sp,
