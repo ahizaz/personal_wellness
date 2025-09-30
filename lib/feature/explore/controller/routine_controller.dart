@@ -12,11 +12,13 @@ class RoutineItem {
   final String productName;
   final Color backgroundColor;
   final String time; // ✅ Field to store the time
+  final String productId; // ✅ Field to store the product ID
 
   RoutineItem({
     required this.productName,
     required this.backgroundColor,
     required this.time, // ✅ Updated constructor
+    required this.productId, // ✅ Added product ID
   });
 }
 
@@ -141,6 +143,7 @@ void submitRoutine() async {
             productName: productName.value,
             backgroundColor: color,
             time: selectedTimes.first,
+            productId: productId.value,
           ),
         );
       }

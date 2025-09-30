@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -166,6 +167,95 @@ class ViewProductController extends GetxController {
       }
     } catch (e) {
       relevantProducts.value = [];
+    }
+  }
+
+  // New method for fetching routine product details
+  Future<void> fetchRoutineProductDetails(String id) async {
+    try {
+      debugPrint('=== Fetching Routine Product Details ===');
+      debugPrint('Product ID: $id');
+      debugPrint('API URL: ${Urls.baseUrl}/product/details/$id');
+      
+      EasyLoading.show(status: "Loading product details...", maskType: EasyLoadingMaskType.black);
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null) {
+        debugPrint('No access token found');
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      debugPrint('Access Token: $accessToken');
+
+      final response = await http.get(
+        Uri.parse("${Urls.baseUrl}/product/details/$id"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"] != null) {
+          debugPrint('=== Success - Updating Product Data ===');
+          
+          // Update productDataview with API response
+          productDataview.value = data["data"];
+
+          // Update images
+          if (data["data"]["image"] != null) {
+            imagePath.value = List<String>.from(
+              data["data"]["image"].map((img) => "${Urls.imageurl}$img")
+            );
+            debugPrint('Images: ${imagePath.toString()}');
+          }
+
+          // Update how to use instructions
+          if (data["data"]["howToUse"] != null) {
+            howToUseIt.value = List<String>.from(data["data"]["howToUse"]);
+            usesdirection.value = List<String>.from(data["data"]["howToUse"]);
+            debugPrint('How to use: ${howToUseIt.toString()}');
+          }
+
+          // Update description and note
+          if (data["data"]["description"] != null) {
+            viewRoutingProductView["Description"] = data["data"]["description"];
+            debugPrint('Description: ${data["data"]["description"]}');
+          }
+
+          if (data["data"]["note"] != null) {
+            mynote.value = [data["data"]["note"]];
+            debugPrint('Note: ${data["data"]["note"]}');
+          }
+
+          // Reset current image index
+          currentIndex.value = 0;
+
+          debugPrint('=== Product Data Successfully Updated ===');
+          EasyLoading.showSuccess("Product details loaded successfully");
+        } else {
+          debugPrint('API returned success=false or no data');
+          EasyLoading.showError("Failed to load product details");
+        }
+      } else {
+        debugPrint('API Error - Status: ${response.statusCode}');
+        EasyLoading.showError("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint('=== Exception ===');
+      debugPrint('Error fetching routine product details: $e');
+      EasyLoading.showError("Error loading product details");
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 }

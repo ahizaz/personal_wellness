@@ -1,5 +1,6 @@
 
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,12 +11,22 @@ import 'package:personal_wellness/feature/routine/widget/usage_direction.dart';
 
 class ViewRoutingProduct extends StatelessWidget {
   final String productName;
-  const ViewRoutingProduct({super.key, required this.productName});
+  final String? productId;
+  const ViewRoutingProduct({super.key, required this.productName, this.productId});
+  
   @override
   Widget build(BuildContext context) {
     final ViewProductController controller = Get.put(ViewProductController());
     var editedName = productName.obs; // Observable to track the edited name
     final RxBool isDescriptionExpanded = false.obs;
+    
+    // Fetch product details if productId is provided
+    if (productId != null && productId!.isNotEmpty) {
+      debugPrint('ViewRoutingProduct: Fetching details for productId: $productId');
+      controller.fetchRoutineProductDetails(productId!);
+    } else {
+      debugPrint('ViewRoutingProduct: No productId provided, using: $productName');
+    }
     return Scaffold(
       backgroundColor: const Color(0xffEDEEE6),
       body: SafeArea(
@@ -128,11 +139,13 @@ class ViewRoutingProduct extends StatelessWidget {
                           width: double.infinity,
                           height: 298.h,
                           decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(controller
-                                  .imagePath[controller.currentIndex.value]),
-                              fit: BoxFit.cover,
-                            ),
+                            image: controller.imagePath.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(controller
+                                        .imagePath[controller.currentIndex.value]),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Column(
@@ -142,31 +155,16 @@ class ViewRoutingProduct extends StatelessWidget {
                                 padding: EdgeInsets.only(bottom: 12.h),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
+                                  children: List.generate(controller.imagePath.length, (i) {
+                                    return Container(
                                       width: 28.w,
                                       height: 2.h,
-                                      color: controller.currentIndex.value >= 0
-                                          ? const Color(0xffFFFFFF)
+                                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                      color: controller.currentIndex.value == i 
+                                          ? const Color(0xffFFFFFF) 
                                           : const Color(0xffEDEEE6),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Container(
-                                      width: 28.w,
-                                      height: 2.h,
-                                      color: controller.currentIndex.value >= 1
-                                          ? const Color(0xffFFFFFF)
-                                          : const Color(0xffEDEEE6),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Container(
-                                      width: 28.w,
-                                      height: 2.h,
-                                      color: controller.currentIndex.value >= 2
-                                          ? const Color(0xffFFFFFF)
-                                          : const Color(0xffEDEEE6),
-                                    ),
-                                  ],
+                                    );
+                                  }),
                                 ),
                               ),
                             ],
@@ -224,10 +222,10 @@ class ViewRoutingProduct extends StatelessWidget {
                 SizedBox(
                   height: 16.h,
                 ),
-          FittedBox(
-  fit: BoxFit.fitWidth,
-  child: Text(
-                 productName,
+          Obx(() => FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  controller.productDataview["productName"] ?? productName,
                   style: TextStyle(
                       fontFamily: "SFPro",
                       fontSize: 28.sp,
@@ -237,7 +235,7 @@ class ViewRoutingProduct extends StatelessWidget {
                   softWrap: false,
                   overflow: TextOverflow.clip,
                 ),
-           ),
+              )),
                 SizedBox(height: 16.h),
                 Text(
                   "Description",
@@ -253,7 +251,7 @@ class ViewRoutingProduct extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          controller.viewRoutingProductView["Description"],
+                          controller.productDataview["description"] ?? controller.viewRoutingProductView["Description"] ?? "No description available",
                           style: TextStyle(
                             fontFamily: "SFPro",
                             fontSize: 17.sp,
