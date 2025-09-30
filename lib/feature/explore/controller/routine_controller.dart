@@ -13,12 +13,16 @@ class RoutineItem {
   final Color backgroundColor;
   final String time; // ✅ Field to store the time
   final String productId; // ✅ Field to store the product ID
+  final DateTime startDate; // ✅ Field to store start date
+  final DateTime endDate; // ✅ Field to store end date
 
   RoutineItem({
     required this.productName,
     required this.backgroundColor,
     required this.time, // ✅ Updated constructor
     required this.productId, // ✅ Added product ID
+    required this.startDate, // ✅ Added start date
+    required this.endDate, // ✅ Added end date
   });
 }
 
@@ -144,6 +148,8 @@ void submitRoutine() async {
             backgroundColor: color,
             time: selectedTimes.first,
             productId: productId.value,
+            startDate: startDate.value!,
+            endDate: endDate.value!,
           ),
         );
       }

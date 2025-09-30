@@ -97,7 +97,12 @@ class Routine extends StatelessWidget {
                           children: controller.routines.map((routine) {
                             return InkWell(
                               onTap: () {
-                                Get.to(() => ViewRoutingProduct(productName: routine.productName, productId: routine.productId));
+                                Get.to(() => ViewRoutingProduct(
+                                  productName: routine.productName, 
+                                  productId: routine.productId,
+                                  startDate: routine.startDate,
+                                  endDate: routine.endDate,
+                                ));
                               },
                               child: Container(
                                 margin: EdgeInsets.symmetric(vertical: 2.h), // less gap

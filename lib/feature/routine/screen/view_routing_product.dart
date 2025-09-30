@@ -1,24 +1,39 @@
 
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/explore/controller/view_product_controller.dart';
 import 'package:personal_wellness/feature/routine/widget/my_note.dart';
 import 'package:personal_wellness/feature/routine/widget/usage_direction.dart';
 
 class ViewRoutingProduct extends StatelessWidget {
-  final String productName;
+  final String productName;//
   final String? productId;
-  const ViewRoutingProduct({super.key, required this.productName, this.productId});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  const ViewRoutingProduct({
+    super.key, 
+    required this.productName, 
+    this.productId,
+    this.startDate,
+    this.endDate,
+  });
   
   @override
   Widget build(BuildContext context) {
     final ViewProductController controller = Get.put(ViewProductController());
     var editedName = productName.obs; // Observable to track the edited name
     final RxBool isDescriptionExpanded = false.obs;
+    
+    // Debug print the received data
+    debugPrint('ViewRoutingProduct initialized with:');
+    debugPrint('Product Name: $productName');
+    debugPrint('Product ID: $productId');
+    debugPrint('Start Date: $startDate');
+    debugPrint('End Date: $endDate');
     
     // Fetch product details if productId is provided
     if (productId != null && productId!.isNotEmpty) {
@@ -314,15 +329,17 @@ class ViewRoutingProduct extends StatelessWidget {
                               color: const Color(0xff172601),
                             ),
                           ),
-                          Obx(() => Text(
-                                controller.routineDetails.value.startDate,
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff3E4B2C),
-                                ),
-                              )),
+                          Text(
+                            startDate != null 
+                                ? DateFormat('MMM d, yyyy').format(startDate!)
+                                : controller.routineDetails.value.startDate,
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff3E4B2C),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(height: 12.h),
@@ -338,15 +355,17 @@ class ViewRoutingProduct extends StatelessWidget {
                               color: const Color(0xff172601),
                             ),
                           ),
-                          Obx(() => Text(
-                                controller.routineDetails.value.endDate,
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff3E4B2C),
-                                ),
-                              )),
+                          Text(
+                            endDate != null 
+                                ? DateFormat('MMM d, yyyy').format(endDate!)
+                                : controller.routineDetails.value.endDate,
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff3E4B2C),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(height: 12.h),
