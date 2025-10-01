@@ -96,6 +96,7 @@ class TodayController extends GetxController {
               'description': item.product.productName,
               'time': _getActualSelectedTime(item),
               'isCompleted': RxBool(false),
+              'productId': item.product.id, // Add product ID for navigation
             };
           }).toList();
           

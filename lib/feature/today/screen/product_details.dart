@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/today/controller/product_details_controller.dart';
+import 'package:personal_wellness/feature/today/controller/product_details_controller_new.dart';
 import 'package:personal_wellness/feature/today/widget/how_to_use.dart';
 import 'package:personal_wellness/feature/today/widget/product_header.dart';
 
@@ -32,11 +32,16 @@ class ProductDetails extends StatelessWidget {
                           width: double.infinity,
                           height: 298.h,
                           decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  controller.imagePath[controller.currentIndex.value]),
-                              fit: BoxFit.cover,
-                            ),
+                            image: controller.productImages.isNotEmpty 
+                              ? DecorationImage(
+                                  image: NetworkImage(
+                                      controller.productImages[controller.currentIndex.value]),
+                                  fit: BoxFit.cover,
+                                ) 
+                              : DecorationImage(
+                                  image: AssetImage("assets/images/produt_details_1.png"),
+                                  fit: BoxFit.cover,
+                                ),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Column(
@@ -46,31 +51,19 @@ class ProductDetails extends StatelessWidget {
                                 padding: EdgeInsets.only(bottom: 12.h),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
+                                  children: List.generate(
+                                    controller.productImages.isNotEmpty 
+                                      ? controller.productImages.length 
+                                      : 3,
+                                    (index) => Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 4.w),
                                       width: 28.w,
                                       height: 2.h,
-                                      color: controller.currentIndex.value >= 0
+                                      color: controller.currentIndex.value == index
                                           ? Color(0xffFFFFFF)
                                           : Color(0xffEDEEE6),
                                     ),
-                                    SizedBox(width: 8.w),
-                                    Container(
-                                      width: 28.w,
-                                      height: 2.h,
-                                      color: controller.currentIndex.value >= 1
-                                          ? Color(0xffFFFFFF)
-                                          : Color(0xffEDEEE6),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Container(
-                                      width: 28.w,
-                                      height: 2.h,
-                                      color: controller.currentIndex.value >= 2
-                                          ? Color(0xffFFFFFF)
-                                          : Color(0xffEDEEE6),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -98,15 +91,17 @@ class ProductDetails extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 16.h),
-                Text(
-                  controller.productData["productName"],
+                Obx(() => Text(
+                  controller.productName.value.isNotEmpty 
+                    ? controller.productName.value 
+                    : "Loading...",
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 28.sp,
                     fontWeight: FontWeight.w400,
                     color: Color(0xff172601),
                   ),
-                ),
+                )),
                 SizedBox(height: 16.h),
                 Text(
                   "Ingredients",
@@ -118,15 +113,17 @@ class ProductDetails extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                Text(
-                  controller.productData["ingredients"],
+                Obx(() => Text(
+                  controller.ingredients.value.isNotEmpty 
+                    ? controller.ingredients.value 
+                    : "Loading ingredients...",
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w400,
                     color: Color(0xff3E4B2C),
                   ),
-                ),
+                )),
                 SizedBox(height: 16.h),
                 HowToUseSection(),
                 SizedBox(height: 24.h,),

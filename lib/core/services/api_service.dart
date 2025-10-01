@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/core/models/routine_home_model.dart';
+import 'package:personal_wellness/core/models/product_details_model.dart';
 import 'package:flutter/material.dart';
 
 class ApiService {
@@ -138,6 +139,51 @@ class ApiService {
     } catch (e) {
       debugPrint('=== Exception ===');
       debugPrint('Error fetching home routine data: $e');
+      return null;
+    }
+  }
+
+  // Product Details API
+  static Future<ProductDetailsModel?> getProductDetails(String productId) async {
+    try {
+      final accessToken = await getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for product details');
+        return null;
+      }
+
+      final url = '${Urls.getProductDetails}/$productId';
+
+      debugPrint('=== GET Product Details API Call ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: {Content-Type: application/json, Authorization: Bearer $accessToken}');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('=== Success ===');
+        debugPrint('Response Data: $data');
+        return ProductDetailsModel.fromJson(data);
+      } else {
+        debugPrint('=== Error ===');
+        debugPrint('Failed with status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('=== Exception ===');
+      debugPrint('Error fetching product details: $e');
       return null;
     }
   }

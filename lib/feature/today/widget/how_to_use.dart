@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:personal_wellness/feature/today/controller/product_details_controller.dart';
+import 'package:personal_wellness/feature/today/controller/product_details_controller_new.dart';
 
 class HowToUseSection extends StatelessWidget {
   const HowToUseSection({super.key});

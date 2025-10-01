@@ -105,7 +105,12 @@ class RoutineInProgressview extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 4.h), // Space between containers
                       child: InkWell(
                         onTap:(){
-                          Get.to(()=>ProductDetails());
+                          final productId = data['productId'] as String?;
+                          if (productId != null && productId.isNotEmpty) {
+                            Get.to(()=>ProductDetails(), arguments: productId);
+                          } else {
+                            Get.to(()=>ProductDetails());
+                          }
                         },
                         child: Container(
                           width: double.infinity,
