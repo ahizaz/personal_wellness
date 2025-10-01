@@ -12,7 +12,7 @@ import 'package:personal_wellness/feature/today/screen/empty_routine_view.dart';
 final RxBool isFabPressed = false.obs;
 
 class Today extends StatefulWidget {
-  Today({super.key});
+  const Today({super.key});
 
   @override
   State<Today> createState() => _TodayState();

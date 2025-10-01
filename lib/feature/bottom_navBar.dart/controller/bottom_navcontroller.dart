@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 
@@ -11,10 +12,10 @@ class BottomNavcontroller extends GetxController{
     if (index == 0) {
       try {
         final todayController = Get.find<TodayController>();
-        print('User navigated to Today tab - refreshing routine data');
+        debugPrint('User navigated to Today tab - refreshing routine data');
         await todayController.refreshRoutineData();
       } catch (e) {
-        print('Today controller not found or error refreshing: $e');
+        debugPrint('Today controller not found or error refreshing: $e');
         // This is normal if Today controller hasn't been initialized yet
       }
     }

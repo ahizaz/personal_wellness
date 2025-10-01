@@ -16,7 +16,7 @@ class CustomDisplayNameTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final personalizationController =Get.put(AccountPersonlizationController());
+    Get.put(AccountPersonlizationController());
 
     return Focus(
       onFocusChange: (focus) {

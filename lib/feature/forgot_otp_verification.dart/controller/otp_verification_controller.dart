@@ -63,7 +63,7 @@ class OtpVerificationController extends GetxController {
         if (actualToken != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('accessToken', actualToken);
-          print('Token saved in SharedPreferences: $actualToken');
+          debugPrint('Token saved in SharedPreferences: $actualToken');
           return true;
         } else {
           EasyLoading.showError("No token received");

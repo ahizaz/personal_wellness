@@ -204,7 +204,7 @@ class SkinCondition extends StatelessWidget {
                   }
                   return Row(
                     children: [
-                      if (recProducts.length > 0)
+                      if (recProducts.isNotEmpty)
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -81,7 +81,7 @@ class ViewProduct extends StatelessWidget {
                                   width: 32.w,
                                   height: 182.h,
                                   decoration: BoxDecoration(
-                                    color: Color(0xffFFFFFF).withOpacity(0.4),
+                                    color: Color(0xffFFFFFF).withValues(alpha: 0.4),
                                     borderRadius: BorderRadius.circular(11.r),
                                   ),
                                   child: Icon(
@@ -103,7 +103,7 @@ class ViewProduct extends StatelessWidget {
                                   width: 32.w,
                                   height: 182.h,
                                   decoration: BoxDecoration(
-                                    color: Color(0xffFFFFFF).withOpacity(0.4),
+                                    color: Color(0xffFFFFFF).withValues(alpha: 0.4),
                                     borderRadius: BorderRadius.circular(11.r),
                                   ),
                                   child: Icon(

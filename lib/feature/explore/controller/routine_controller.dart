@@ -7,7 +7,6 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
-import 'package:personal_wellness/core/models/routine_home_model.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
 

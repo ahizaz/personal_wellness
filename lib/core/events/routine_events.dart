@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RoutineEvents extends GetxController {
@@ -9,7 +10,7 @@ class RoutineEvents extends GetxController {
   void notifyRoutineAdded() {
     lastRoutineAddedTime.value = DateTime.now();
     routineAdded.value = !routineAdded.value; // Toggle to trigger observers
-    print('=== Routine Added Event Triggered ===');
+    debugPrint('=== Routine Added Event Triggered ===');
   }
   
   // Get singleton instance

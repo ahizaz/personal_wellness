@@ -125,7 +125,7 @@ class ViewProductController extends GetxController {
       }
     } catch (e) {
       EasyLoading.showError("Error loading product details");
-      print("Error fetching product details: $e");
+      debugPrint("Error fetching product details: $e");
     } finally {
       EasyLoading.dismiss();
     }
