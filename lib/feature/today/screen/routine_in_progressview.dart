@@ -16,10 +16,16 @@ class RoutineInProgressview extends StatelessWidget {
   Widget build(BuildContext context) {
     final TodayController controller = Get.find<TodayController>();
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 30.h),
-        child: Column(
+    return RefreshIndicator(
+      color: Color(0xff485908),
+      onRefresh: () async {
+        await controller.refreshRoutineData();
+      },
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 30.h),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 30.h),
@@ -198,7 +204,7 @@ class RoutineInProgressview extends StatelessWidget {
                     child: Row(
                       children: [
                     Obx(() => Text(
-              "Today: ${controller.routineData.where((data) => data['isCompleted'].value).length}/3 completed",
+              "Today: ${controller.routineData.where((data) => data['isCompleted'].value).length}/${controller.routineData.length} completed",
               style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 17.sp,
@@ -209,7 +215,7 @@ class RoutineInProgressview extends StatelessWidget {
                         SizedBox(width: 12.w,),
                         Expanded(
                           child: Obx(() => LinearProgressIndicator(
-                            value: controller.routineData.where((data) => data['isCompleted'].value).length / 3,
+                            value: controller.routineData.isEmpty ? 0 : controller.routineData.where((data) => data['isCompleted'].value).length / controller.routineData.length,
                             backgroundColor: Color(0xff04BF7B).withValues(alpha: 0.25),
                             valueColor: AlwaysStoppedAnimation<Color>(Color(0xff04BF7B)),
                             borderRadius: BorderRadius.circular(999.r),
@@ -293,6 +299,7 @@ class RoutineInProgressview extends StatelessWidget {
           
         ),
         
+      ),
       ),
     );
   }

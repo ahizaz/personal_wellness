@@ -11,10 +11,37 @@ import 'package:personal_wellness/feature/today/screen/empty_routine_view.dart';
 
 final RxBool isFabPressed = false.obs;
 
-class Today extends StatelessWidget {
+class Today extends StatefulWidget {
   Today({super.key});
+
+  @override
+  State<Today> createState() => _TodayState();
+}
+
+class _TodayState extends State<Today> with WidgetsBindingObserver {
   final TodayController controller = Get.put(TodayController());
   final GlobalKey _fabKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Refresh routine data when app becomes active
+      controller.refreshRoutineData();
+    }
+  }
 
   void _showMenu(BuildContext context) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -182,6 +209,8 @@ class Today extends StatelessWidget {
     ).then((_) {
       // This is called when the menu is closed
       isFabPressed.value = false;
+      // Refresh routine data in case user added new routine
+      controller.refreshRoutineData();
     });
   }
 
@@ -190,6 +219,13 @@ class Today extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: Color(0xff485908),
+            ),
+          );
+        }
         if (controller.routineData.isEmpty) {
           return const EmptyRoutineView();
         }
