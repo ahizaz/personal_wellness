@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/models/routine_home_model.dart';
+import 'package:personal_wellness/core/events/routine_events.dart';
 
 class TodayController extends GetxController {
   var userName = "Liana".obs; // Default username
@@ -18,6 +19,30 @@ class TodayController extends GetxController {
     Future.delayed(Duration(milliseconds: 500), () {
       fetchHomeRoutineData();
     });
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    // This is called after the widget is rendered
+    // Refresh data to ensure we have the latest
+    refreshRoutineData();
+    
+    // Listen to routine events
+    _listenToRoutineEvents();
+  }
+
+  void _listenToRoutineEvents() {
+    try {
+      final routineEvents = RoutineEvents.instance;
+      // Listen to routine added events
+      ever(routineEvents.routineAdded, (_) {
+        print('Routine event received in Today controller - refreshing data');
+        refreshRoutineData();
+      });
+    } catch (e) {
+      print('Error setting up routine event listener: $e');
+    }
   }
 
   Future<void> fetchHomeRoutineData() async {

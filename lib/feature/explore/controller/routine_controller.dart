@@ -8,6 +8,8 @@ import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_n
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/models/routine_home_model.dart';
+import 'package:personal_wellness/feature/today/controller/today_controller.dart';
+import 'package:personal_wellness/core/events/routine_events.dart';
 
 class RoutineItem {
   final String productName;
@@ -140,6 +142,19 @@ void submitRoutine() async {
       
       // Refresh routines from API to get the latest data
       await fetchRoutines();
+      
+      // Trigger global event to notify all listeners
+      RoutineEvents.instance.notifyRoutineAdded();
+      
+      // Refresh Today controller to show new routine immediately
+      try {
+        final todayController = Get.find<TodayController>();
+        debugPrint('Refreshing Today controller after routine added');
+        await todayController.refreshRoutineData();
+      } catch (e) {
+        debugPrint('Today controller not found or error refreshing: $e');
+        // This is normal if Today tab hasn't been visited yet
+      }
     } else {
       progress.value = 100;
       progressMessage.value = 'Failed to add routine';
