@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:personal_wellness/core/models/routine_home_model.dart';
 
 class TodayController extends GetxController {
   var userName = "Liana".obs; // Default username
@@ -93,7 +94,7 @@ class TodayController extends GetxController {
               'icon': _getCategoryIcon(item.category),
               'title': item.category,
               'description': item.product.productName,
-              'time': _getTimeForCategory(item.category),
+              'time': _getActualSelectedTime(item),
               'isCompleted': RxBool(false),
             };
           }).toList();
@@ -133,20 +134,44 @@ class TodayController extends GetxController {
     }
   }
 
-  String _getTimeForCategory(String category) {
-    switch (category.toLowerCase()) {
-      case 'skin':
-      case 'skincare':
-        return '6:30 AM';
-      case 'sun cream':
-        return '7:00 AM';
-      case 'lotion':
-        return '6:45 AM';
-      case 'serum':
-        return '6:35 AM';
-      default:
-        return '6:30 AM';
+  String _getActualSelectedTime(RoutineItem item) {
+    debugPrint('Getting time for item: ${item.category}');
+    debugPrint('Morning times: ${item.morningTimeOfDay}');
+    debugPrint('Evening times: ${item.eveningTimeOfDay}');
+    
+    // Combine all available times (morning and evening)
+    List<String> allTimes = [];
+    
+    if (item.morningTimeOfDay != null && item.morningTimeOfDay!.isNotEmpty) {
+      allTimes.addAll(item.morningTimeOfDay!);
     }
+    
+    if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
+      allTimes.addAll(item.eveningTimeOfDay!);
+    }
+    
+    // If we have any selected times, show the first one
+    if (allTimes.isNotEmpty) {
+      debugPrint('Using selected time: ${allTimes.first}');
+      return allTimes.first;
+    }
+    
+    // If no times found, show current time as fallback
+    debugPrint('No selected times found, using current time');
+    return _getCurrentTime();
+  }
+
+  String _getCurrentTime() {
+    final now = DateTime.now();
+    final hour = now.hour;
+    final minute = now.minute;
+    
+    // Convert to 12-hour format
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final amPm = hour >= 12 ? 'PM' : 'AM';
+    final displayMinute = minute.toString().padLeft(2, '0');
+    
+    return '$displayHour:$displayMinute $amPm';
   }
 
   void setUserName(String name) {

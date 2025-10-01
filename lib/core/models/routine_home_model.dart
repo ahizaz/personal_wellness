@@ -43,12 +43,16 @@ class RoutineItem {
   final String category;
   final Product product;
   final DateTime? createdAt;
+  final List<String>? morningTimeOfDay;
+  final List<String>? eveningTimeOfDay;
 
   RoutineItem({
     required this.id,
     required this.category,
     required this.product,
     this.createdAt,
+    this.morningTimeOfDay,
+    this.eveningTimeOfDay,
   });
 
   factory RoutineItem.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,12 @@ class RoutineItem {
       createdAt: json['createdAt'] != null 
           ? DateTime.tryParse(json['createdAt'].toString())
           : _extractDateFromObjectId(json['_id'] ?? ''),
+      morningTimeOfDay: json['morningTimeOfDay'] != null 
+          ? List<String>.from(json['morningTimeOfDay']) 
+          : null,
+      eveningTimeOfDay: json['eveningTimeOfDay'] != null 
+          ? List<String>.from(json['eveningTimeOfDay']) 
+          : null,
     );
   }
 
