@@ -6,6 +6,33 @@ import 'package:personal_wellness/core/models/routine_home_model.dart';
 import 'package:flutter/material.dart';
 
 class ApiService {
+  // Helper method to check if access token exists
+  static Future<String?> getAccessToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+      final userId = prefs.getString('userId');
+      debugPrint('=== Authentication Check ===');
+      debugPrint('Access Token exists: ${token != null}');
+      debugPrint('Access Token length: ${token?.length ?? 0}');
+      debugPrint('User ID exists: ${userId != null}');
+      debugPrint('User ID: $userId');
+      debugPrint('Token preview: ${token != null ? '${token.substring(0, token.length > 20 ? 20 : token.length)}...' : 'null'}');
+      
+      // Check if both token and userId exist (as required by splash screen)
+      if (token != null && userId != null) {
+        debugPrint('User is fully authenticated');
+        return token;
+      } else {
+        debugPrint('User authentication incomplete - missing ${token == null ? 'token' : ''} ${userId == null ? 'userId' : ''}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error getting access token: $e');
+      return null;
+    }
+  }
+
   static Future<bool> addProductToRoutine({
     required String productId,
     required String category,
@@ -18,11 +45,10 @@ class ApiService {
     required String additionalIntroduction,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final accessToken = prefs.getString('accessToken');
+      final accessToken = await getAccessToken();
 
-      if (accessToken == null) {
-        debugPrint('No access token found');
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for add routine');
         return false;
       }
 
@@ -75,17 +101,12 @@ class ApiService {
 
   static Future<RoutineHomeModel?> getHomeRoutineData() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final accessToken = prefs.getString('accessToken');
+      final accessToken = await getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
-        debugPrint('No access token found - user not logged in');
-        // Return empty response instead of null to indicate no routines
-        return RoutineHomeModel(
-          success: true,
-          message: 'No access token',
-          data: RoutineData(result: [], meta: Meta(page: 1, limit: 10, total: 0)),
-        );
+        debugPrint('No access token found - user not logged in for get home routine');
+        // Return null to indicate authentication issue
+        return null;
       }
 
       debugPrint('=== GET API Call ===');

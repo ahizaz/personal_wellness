@@ -46,8 +46,22 @@ class Routine extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffFFFFFF),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
+        child: Obx(() {
+          if (controller.isLoadingRoutines.value) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Color(0xff485908),
+              ),
+            );
+          }
+          return RefreshIndicator(
+            color: Color(0xff485908),
+            onRefresh: () async {
+              await controller.refreshRoutines();
+            },
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,9 +309,12 @@ class Routine extends StatelessWidget {
                 // --- End of new timeline implementation ---
               ],
             ),
-          ),
-        ),
-      ),
+            ),
+          )
+          );
+        }
+      )
+      )
     );
   }
 }

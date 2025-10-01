@@ -7,6 +7,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
+import 'package:personal_wellness/core/models/routine_home_model.dart';
 
 class RoutineItem {
   final String productName;
@@ -92,6 +93,7 @@ class RoutineController extends GetxController {
   var progressMessage = 'Setting up your routine...'.obs;
 
   final RxList<RoutineItem> routines = <RoutineItem>[].obs;
+  var isLoadingRoutines = false.obs;
 
 void submitRoutine() async {
   try {
@@ -132,31 +134,12 @@ void submitRoutine() async {
     progressMessage.value = 'Almost done';
 
     if (success) {
-      // Add to local routine list for immediate UI update
-      final colors = [
-        const Color(0xffFFF8E6),
-        const Color(0xffE6F7F7),
-        const Color(0xffF2E6FF),
-        const Color(0xffE6FFE6),
-      ];
-
-      if (selectedTimes.isNotEmpty && productName.value.isNotEmpty) {
-        final color = colors[routines.length % colors.length];
-        routines.add(
-          RoutineItem(
-            productName: productName.value,
-            backgroundColor: color,
-            time: selectedTimes.first,
-            productId: productId.value,
-            startDate: startDate.value!,
-            endDate: endDate.value!,
-          ),
-        );
-      }
-
       await Future.delayed(const Duration(seconds: 1));
       progress.value = 100;
       progressMessage.value = 'Routine added successfully!';
+      
+      // Refresh routines from API to get the latest data
+      await fetchRoutines();
     } else {
       progress.value = 100;
       progressMessage.value = 'Failed to add routine';
@@ -186,10 +169,88 @@ void submitRoutine() async {
     progressMessage.value = 'Error occurred';
   }
 }
+  // Fetch routines from API
+  Future<void> fetchRoutines() async {
+    try {
+      isLoadingRoutines.value = true;
+      debugPrint('=== Fetching Routines for Routine Tab ===');
+      
+      final response = await ApiService.getHomeRoutineData();
+      
+      if (response != null && response.success && response.data.result.isNotEmpty) {
+        debugPrint('Found ${response.data.result.length} routines for routine tab');
+        
+        // Sort routines by creation date (most recent first)
+        var sortedRoutines = response.data.result.toList();
+        sortedRoutines.sort((a, b) {
+          final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return dateB.compareTo(dateA); // Most recent first
+        });
+        
+        // Convert API data to RoutineItem format
+        final colors = [
+          const Color(0xffFFF8E6),
+          const Color(0xffE6F7F7),
+          const Color(0xffF2E6FF),
+          const Color(0xffE6FFE6),
+        ];
+        
+        final convertedRoutines = sortedRoutines.map((item) {
+          final color = colors[sortedRoutines.indexOf(item) % colors.length];
+          return RoutineItem(
+            productName: item.product.productName,
+            backgroundColor: color,
+            time: _getTimeForCategory(item.category),
+            productId: item.product.id,
+            startDate: DateTime.now(), // Default start date
+            endDate: DateTime.now().add(Duration(days: 30)), // Default end date
+          );
+        }).toList();
+        
+        routines.assignAll(convertedRoutines);
+        debugPrint('Routine tab updated with ${routines.length} items');
+      } else {
+        debugPrint('No routines found for routine tab');
+        routines.clear();
+      }
+    } catch (e) {
+      debugPrint('Error fetching routines for routine tab: $e');
+      routines.clear();
+    } finally {
+      isLoadingRoutines.value = false;
+    }
+  }
+
+  // Helper method to get time based on category
+  String _getTimeForCategory(String category) {
+    switch (category.toLowerCase()) {
+      case 'skin':
+      case 'skincare':
+        return '6:30 am';
+      case 'sun cream':
+        return '7:00 am';
+      case 'lotion':
+        return '6:45 am';
+      case 'serum':
+        return '6:35 am';
+      default:
+        return '6:30 am';
+    }
+  }
+
+  // Refresh routines method
+  Future<void> refreshRoutines() async {
+    await fetchRoutines();
+  }
+
   @override
   void onInit() {
     super.onInit();
     // Don't use Get.arguments here as it can conflict with AddToRoutine's arguments handling
     // Product name will be set via setProductName() from AddToRoutine
+    
+    // Fetch routines when controller initializes
+    fetchRoutines();
   }
 }

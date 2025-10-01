@@ -201,6 +201,41 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
             ],
           ),
         ),
+        PopupMenuItem(
+          onTap: () {
+            // Debug authentication and routine data
+            controller.debugAuthenticationState();
+          },
+          child: Row(
+            children: const [
+              Icon(Icons.bug_report, color: Color(0xFF485908)),
+              SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Debug',
+                    style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontWeight: FontWeight.w400,
+                      fontSize: 17,
+                      color: Color(0xff172601),
+                    ),
+                  ),
+                  Text(
+                    'Check routine data',
+                    style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontWeight: FontWeight.w400,
+                      fontSize: 13,
+                      color: Color(0xff78816C),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ],
       elevation: 8.0,
       shape: const RoundedRectangleBorder(

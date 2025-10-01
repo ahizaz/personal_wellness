@@ -14,7 +14,10 @@ class TodayController extends GetxController {
     super.onInit();
     // Initialize with empty data
     routineData.clear();
-    fetchHomeRoutineData();
+    // Add a small delay to ensure SharedPreferences is ready
+    Future.delayed(Duration(milliseconds: 500), () {
+      fetchHomeRoutineData();
+    });
   }
 
   Future<void> fetchHomeRoutineData() async {
@@ -22,13 +25,24 @@ class TodayController extends GetxController {
       isLoading.value = true;
       print('=== Fetching Home Routine Data ===');
       
+      // Check authentication first
+      final isAuthenticated = await checkAuthentication();
+      if (!isAuthenticated) {
+        print('User not authenticated - clearing routine data');
+        routineData.clear();
+        return;
+      }
+      
       final response = await ApiService.getHomeRoutineData();
       
       print('API Response: $response');
       print('Response success: ${response?.success}');
       print('Response data result length: ${response?.data.result.length}');
       
-      if (response != null && response.success) {
+      if (response == null) {
+        print('API response is null - likely authentication issue');
+        routineData.clear();
+      } else if (response.success) {
         if (response.data.result.isEmpty) {
           print('No routines found in response - showing empty view');
           routineData.clear();
@@ -63,8 +77,7 @@ class TodayController extends GetxController {
           print('Routine data updated with ${routineData.length} items');
         }
       } else {
-        print('No routines found or API failed - clearing routine data');
-        // Clear routine data if no routines found or API fails
+        print('API request failed - response success: ${response.success}');
         routineData.clear();
       }
     } catch (e) {
@@ -138,5 +151,25 @@ class TodayController extends GetxController {
   void clearRoutineData() {
     routineData.clear();
     print('Routine data cleared');
+  }
+
+  // Method to check if user is authenticated
+  Future<bool> checkAuthentication() async {
+    final token = await ApiService.getAccessToken();
+    final isAuthenticated = token != null && token.isNotEmpty;
+    print('User authenticated: $isAuthenticated');
+    return isAuthenticated;
+  }
+
+  // Debug method to check full authentication state
+  Future<void> debugAuthenticationState() async {
+    print('=== DEBUG: Full Authentication State ===');
+    await checkAuthentication();
+    print('Current routine data length: ${routineData.length}');
+    print('Is loading: ${isLoading.value}');
+    
+    // Try to fetch data again
+    print('Attempting to fetch routine data...');
+    await fetchHomeRoutineData();
   }
 }
