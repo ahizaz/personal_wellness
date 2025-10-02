@@ -351,7 +351,7 @@ class AddToRoutine extends StatelessWidget {
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.transparent,
-                          builder: (_) => const TimePickerBottomSheet(),
+                          builder: (_) => const TimePickerBottomSheet(isEvening: false),
                         );
                       },
                       child: Image.asset(
@@ -495,7 +495,7 @@ class AddToRoutine extends StatelessWidget {
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.transparent,
-                          builder: (_) => const TimePickerBottomSheet(),
+                          builder: (_) => const TimePickerBottomSheet(isEvening: true),
                         );
                       },
                       child: Image.asset(
@@ -521,10 +521,10 @@ class AddToRoutine extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final time = controller.availableeveningTimes[index];
                     return Obx(() {
-                      final isSelected = controller.selectedTimes.contains(time);
+                      final isSelected = controller.selectedEveningTimes.contains(time);
                       return GestureDetector(
                         onTap: () {
-                          controller.toggleTimeSelection(time);
+                          controller.toggleEveningTimeSelection(time);
                         },
                         child: Container(
                           decoration: BoxDecoration(

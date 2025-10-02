@@ -37,6 +37,7 @@ class RoutineController extends GetxController {
   var selectedMinute = 0.obs;
   var selectedSecond = 0.obs;
   var selectedAmPm = "AM".obs;
+  var selectedHour = 1.obs;
   var selectedTimes = <String>[].obs;
   final TextEditingController instructionController = TextEditingController();
   final RxString productName = ''.obs;
@@ -55,6 +56,8 @@ class RoutineController extends GetxController {
    
   ];
 
+  var selectedEveningTimes = <String>[].obs;
+
   var visibleOrders = 3.obs;
   var visibleEvening = 3.obs;
 
@@ -66,14 +69,25 @@ class RoutineController extends GetxController {
     }
   }
 
+  void toggleEveningTimeSelection(String time) {
+    if (selectedEveningTimes.contains(time)) {
+      selectedEveningTimes.remove(time);
+    } else {
+      selectedEveningTimes.add(time);
+    }
+  }
+
   final RxString instructionText = ''.obs;
 
+  bool get hasMorningRoutine => selectedOrder.value != 0 && selectedTimes.isNotEmpty;
+  
+  bool get hasEveningRoutine => selectedEveningOrder.value != 0 && selectedEveningTimes.isNotEmpty;
+
   bool get isFormValid {
+    // Check if at least one routine is selected (morning OR evening)
     return startDate.value != null &&
         endDate.value != null &&
-        selectedOrder.value != 0 &&
-        selectedEveningOrder.value!=0&&
-        selectedTimes.isNotEmpty &&
+        (hasMorningRoutine || hasEveningRoutine) &&
         instructionText.value.trim().isNotEmpty;
   }
 
@@ -109,8 +123,9 @@ void submitRoutine() async {
     debugPrint('Start Date: ${startDate.value}');
     debugPrint('End Date: ${endDate.value}');
     debugPrint('Morning Order: ${selectedOrder.value}');
+    debugPrint('Morning Times: ${selectedTimes.toList()}');
     debugPrint('Evening Order: ${selectedEveningOrder.value}');
-    debugPrint('Selected Times: ${selectedTimes.toList()}');
+    debugPrint('Evening Times: ${selectedEveningTimes.toList()}');
     debugPrint('Instructions: ${instructionText.value}');
 
     await Future.delayed(const Duration(seconds: 1));
@@ -123,10 +138,10 @@ void submitRoutine() async {
       category: selectedCategory.value.isNotEmpty ? selectedCategory.value : "Skincare",
       startDate: startDate.value!,
       endDate: endDate.value!,
-      morningOrder: selectedOrder.value,
-      morningTimeOfDay: selectedTimes.toList(),
-      eveningOrder: selectedEveningOrder.value,
-      eveningTimeOfDay: selectedTimes.toList(), // Using same times for now
+      morningOrder: selectedOrder.value != 0 ? selectedOrder.value : null,
+      morningTimeOfDay: selectedTimes.isNotEmpty ? selectedTimes.toList() : null,
+      eveningOrder: selectedEveningOrder.value != 0 ? selectedEveningOrder.value : null,
+      eveningTimeOfDay: selectedEveningTimes.isNotEmpty ? selectedEveningTimes.toList() : null,
       additionalIntroduction: instructionText.value,
     );
 
@@ -168,6 +183,7 @@ void submitRoutine() async {
     selectedOrder.value = 0;
     selectedEveningOrder.value = 0;
     selectedTimes.clear();
+    selectedEveningTimes.clear();
     instructionText.value = '';
     productName.value = '';
     productId.value = '';

@@ -39,10 +39,10 @@ class ApiService {
     required String category,
     required DateTime startDate,
     required DateTime endDate,
-    required int morningOrder,
-    required List<String> morningTimeOfDay,
-    required int eveningOrder,
-    required List<String> eveningTimeOfDay,
+    int? morningOrder,
+    List<String>? morningTimeOfDay,
+    int? eveningOrder,
+    List<String>? eveningTimeOfDay,
     required String additionalIntroduction,
   }) async {
     try {
@@ -53,17 +53,25 @@ class ApiService {
         return false;
       }
 
-      final body = {
+      final body = <String, dynamic>{
         "product": productId,
         "category": category,
         "startDate": startDate.toIso8601String(),
         "endDate": endDate.toIso8601String(),
-        "morningOrder": morningOrder,
-        "morningTimeOfDay": morningTimeOfDay,
-        "eveningOrder": eveningOrder,
-        "eveningTimeOfDay": eveningTimeOfDay,
         "additionalIntroduction": additionalIntroduction,
       };
+
+      // Add morning data only if provided
+      if (morningOrder != null && morningTimeOfDay != null && morningTimeOfDay.isNotEmpty) {
+        body["morningOrder"] = morningOrder;
+        body["morningTimeOfDay"] = morningTimeOfDay;
+      }
+
+      // Add evening data only if provided
+      if (eveningOrder != null && eveningTimeOfDay != null && eveningTimeOfDay.isNotEmpty) {
+        body["eveningOrder"] = eveningOrder;
+        body["eveningTimeOfDay"] = eveningTimeOfDay;
+      }
 
       debugPrint('=== POST API Call ===');
       debugPrint('URL: ${Urls.baseUrl}/add-routine/add');

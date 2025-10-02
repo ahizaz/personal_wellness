@@ -6,11 +6,18 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/feature/explore/controller/routine_controller.dart';
 
 class TimePickerBottomSheet extends StatelessWidget {
-  const TimePickerBottomSheet({super.key});
+  final bool isEvening;
+  
+  const TimePickerBottomSheet({super.key, this.isEvening = false});
 
   @override
   Widget build(BuildContext context) {
     final RoutineController controller = Get.find<RoutineController>();
+    
+    // Local variables to track the selected values
+    int selectedHour = 1;
+    int selectedMinute = 0;
+    String selectedAmPm = "AM";
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
@@ -33,14 +40,17 @@ class TimePickerBottomSheet extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-              Text("Choose a time when you want to start using the\nproduct",style: TextStyle(
+            Text(
+              "Choose a time when you want to start using the\nproduct",
+              style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 color: Color(0xff78816C),
               ),
               textAlign: TextAlign.center,
-              ),
+            ),
+            SizedBox(height: 16.h),
             SizedBox(
               height: 200.h,
               child: Row(
@@ -50,16 +60,22 @@ class TimePickerBottomSheet extends StatelessWidget {
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
-                        initialItem: controller.selectedMinute.value - 1,
+                        initialItem: 0,
                       ),
                       itemExtent: 40,
                       onSelectedItemChanged: (index) {
-                        controller.selectedSecond.value = index + 1;
+                        selectedHour = index + 1;
                       },
                       children: List.generate(
                         12,
                         (i) => Center(
-                          child: Text((i + 1).toString()),
+                          child: Text(
+                            (i + 1).toString(),
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -68,16 +84,22 @@ class TimePickerBottomSheet extends StatelessWidget {
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
-                        initialItem: controller.selectedMinute.value,
+                        initialItem: 0,
                       ),
                       itemExtent: 40,
                       onSelectedItemChanged: (index) {
-                        controller.selectedMinute.value = index;
+                        selectedMinute = index;
                       },
                       children: List.generate(
                         60,
                         (i) => Center(
-                          child: Text(i.toString().padLeft(2, '0')),
+                          child: Text(
+                            i.toString().padLeft(2, '0'),
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -86,32 +108,54 @@ class TimePickerBottomSheet extends StatelessWidget {
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
-                        initialItem: controller.selectedAmPm.value == "AM" ? 0 : 1,
+                        initialItem: 0,
                       ),
                       itemExtent: 40,
                       onSelectedItemChanged: (index) {
-                        controller.selectedAmPm.value =
-                            index == 0 ? "AM" : "PM";
+                        selectedAmPm = index == 0 ? "AM" : "PM";
                       },
-                      children: const [
-                        Center(child: Text("AM")),
-                        Center(child: Text("PM")),
+                      children: [
+                        Center(
+                          child: Text(
+                            "AM",
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Text(
+                            "PM",
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-
-           
             Divider(
               color: Color(0xffE8E9E6),
               thickness: 2.h,
             ),
-             SizedBox(height: 16.h),
-
+            SizedBox(height: 16.h),
             InkWell(
               onTap: () {
+                // Format the selected time
+                String formattedTime = "$selectedHour:${selectedMinute.toString().padLeft(2, '0')} ${selectedAmPm.toLowerCase()}";
+                
+                // Add to appropriate time list
+                if (isEvening) {
+                  controller.toggleEveningTimeSelection(formattedTime);
+                } else {
+                  controller.toggleTimeSelection(formattedTime);
+                }
+                
                 Navigator.pop(context);
               },
               child: Container(
