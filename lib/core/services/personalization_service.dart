@@ -114,6 +114,33 @@ class PersonalizationService {
           debugPrint('Full Response: $responseData');
           debugPrint('============================');
           
+          // Save personalization data to SharedPreferences
+          if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+            final personalizationData = responseData['data'];
+            if (personalizationData is Map<String, dynamic>) {
+              final prefs = await SharedPreferences.getInstance();
+              
+              // Save firstName from response
+              if (personalizationData.containsKey('firstName')) {
+                await prefs.setString('personalization_firstName', personalizationData['firstName']);
+                debugPrint('=== SAVED PERSONALIZATION DATA ===');
+                debugPrint('First Name: ${personalizationData['firstName']}');
+                debugPrint('=================================');
+              }
+              
+              // Save other personalization data if needed
+              if (personalizationData.containsKey('lastName')) {
+                await prefs.setString('personalization_lastName', personalizationData['lastName']);
+              }
+              if (personalizationData.containsKey('skinLevel')) {
+                await prefs.setString('personalization_skinLevel', personalizationData['skinLevel']);
+              }
+              if (personalizationData.containsKey('type')) {
+                await prefs.setString('personalization_type', personalizationData['type']);
+              }
+            }
+          }
+          
           return true;
         } catch (e) {
           debugPrint('=== JSON PARSE ERROR ===');

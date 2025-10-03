@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/services/personalization_service.dart';
+import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 
 class PersonalizationController extends GetxController {
   // Form controllers (matching old controller property names)
@@ -159,6 +160,20 @@ class PersonalizationController extends GetxController {
 
       if (success) {
         EasyLoading.showSuccess('Personalization completed successfully!');
+        
+        // Refresh TodayController to load new firstName
+        try {
+          if (Get.isRegistered<TodayController>()) {
+            final todayController = Get.find<TodayController>();
+            await todayController.refreshPersonalizationData();
+            debugPrint('=== REFRESHED TODAY CONTROLLER ===');
+            debugPrint('Updated userName: ${todayController.userName.value}');
+            debugPrint('=================================');
+          }
+        } catch (e) {
+          debugPrint('Error refreshing TodayController: $e');
+        }
+        
         return true;
       } else {
         EasyLoading.showError('Failed to save personalization. Please try again.');

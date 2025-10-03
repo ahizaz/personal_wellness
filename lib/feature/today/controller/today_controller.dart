@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
@@ -16,6 +17,8 @@ class TodayController extends GetxController {
     super.onInit();
     // Initialize with empty data
     routineData.clear();
+    // Load personalization data
+    loadPersonalizationData();
     // Add a small delay to ensure SharedPreferences is ready
     Future.delayed(Duration(milliseconds: 500), () {
       fetchHomeRoutineData();
@@ -44,6 +47,33 @@ class TodayController extends GetxController {
     } catch (e) {
       debugPrint('Error setting up routine event listener: $e');
     }
+  }
+
+  // Load personalization data from SharedPreferences
+  Future<void> loadPersonalizationData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final firstName = prefs.getString('personalization_firstName');
+      
+      if (firstName != null && firstName.isNotEmpty) {
+        userName.value = firstName;
+        debugPrint('=== LOADED PERSONALIZATION DATA ===');
+        debugPrint('First Name: $firstName');
+        debugPrint('Updated userName to: ${userName.value}');
+        debugPrint('==================================');
+      } else {
+        debugPrint('=== NO PERSONALIZATION DATA FOUND ===');
+        debugPrint('Using default userName: ${userName.value}');
+        debugPrint('====================================');
+      }
+    } catch (e) {
+      debugPrint('Error loading personalization data: $e');
+    }
+  }
+
+  // Public method to refresh personalization data
+  Future<void> refreshPersonalizationData() async {
+    await loadPersonalizationData();
   }
 
   Future<void> fetchHomeRoutineData() async {
