@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 
 class NotificationsPerson extends StatelessWidget {
@@ -12,6 +15,8 @@ class NotificationsPerson extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PersonalizationController controller = Get.find<PersonalizationController>();
+    
     return Scaffold(
             resizeToAvoidBottomInset: false,
             body: Container(
@@ -89,9 +94,33 @@ class NotificationsPerson extends StatelessWidget {
                       SizedBox(height: 34.h,),
                       Row(
                         children: [
-                          Expanded(child: CustomButton(text: "Continue 5/5", color: Color(0xff172601), onTap: (){
-                           Get.to(()=>SignInForm());
-
+                          Expanded(child: CustomButton(text: "Continue 5/5", color: Color(0xff172601), onTap: () async {
+                            debugPrint('=== NOTIFICATIONS CONTINUE BUTTON PRESSED ===');
+                            debugPrint('Base URL: http://10.10.12.25:5005/api/v1');
+                            debugPrint('About to call POST {{URL}}/personalisation/create');
+                            debugPrint('Full URL: http://10.10.12.25:5005/api/v1/personalisation/create');
+                            debugPrint('=========================================================');
+                            
+                            // Check token first
+                            await controller.checkToken();
+                            
+                            // Print all collected data
+                            controller.printAllData();
+                            
+                            // Call personalization API (POST method)
+                            debugPrint('=== CALLING POST API ===');
+                            final success = await controller.submitPersonalization();
+                            
+                            if (success) {
+                              debugPrint('=== PERSONALIZATION SUCCESS ===');
+                              debugPrint('Navigating to SignInForm...');
+                              debugPrint('===============================');
+                              Get.to(() => SignInForm());
+                            } else {
+                              debugPrint('=== PERSONALIZATION FAILED ===');
+                              debugPrint('Staying on current screen...');
+                              debugPrint('==============================');
+                            }
                           })),
                           SizedBox(width: 16.w,),
                              Expanded(child: CustomButton(text: "Skip",textStyle: TextStyle(

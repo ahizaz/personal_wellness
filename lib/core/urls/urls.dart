@@ -10,6 +10,7 @@ class Urls{
   static const String getallproduct = "$baseUrl/product/get-all";
   static const String getProductDetails = "$baseUrl/product/details"; // Added product details endpoint
   static const String changepassword = "$baseUrl/auth/change-password";
+  static const String personalizationCreate = "$baseUrl/personalisation/create"; // Added personalization endpoint
  
   
 }

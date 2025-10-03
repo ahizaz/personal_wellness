@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/account_personalization.dart/controller/account_personlization_controller.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/screen/date_of_birth.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/widget/custom_display_nametextfield.dart';
 
@@ -13,7 +13,7 @@ class DisplayName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final personalizationController = Get.put(AccountPersonlizationController());
+    final personalizationController = Get.find<PersonalizationController>();
 
     return Scaffold(
        // Prevents the entire screen from resizing with the keyboard

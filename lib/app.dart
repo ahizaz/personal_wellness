@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/theme/theme.dart';
 import 'package:personal_wellness/feature/splash_screen/screen/splash_screen.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 
 class PeronalWellNess extends StatelessWidget {
   const PeronalWellNess({super.key});
@@ -13,6 +14,9 @@ class PeronalWellNess extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize global event bus
     Get.put(RoutineEvents());
+    
+    // Initialize global PersonalizationController
+    Get.put(PersonalizationController(), permanent: true);
 
     return ScreenUtilInit(
       designSize: const Size(402, 874), // Portrait design size

@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/screen/skin_type.dart';
 
 class DateOfBirth extends StatelessWidget {
@@ -12,6 +14,19 @@ class DateOfBirth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PersonalizationController controller = Get.find<PersonalizationController>();
+    
+    // Set initial date if empty
+    if (controller.selectedDateOfBirth.value.isEmpty) {
+      final initialDate = DateTime(2000, 1, 1);
+      String formattedDate = "${initialDate.year}-${initialDate.month.toString().padLeft(2, '0')}-${initialDate.day.toString().padLeft(2, '0')}";
+      controller.setDateOfBirth(formattedDate);
+      debugPrint('=== INITIAL DATE SET ===');
+      debugPrint('Initial Date: $formattedDate');
+      debugPrint('Controller Hash: ${controller.hashCode}');
+      debugPrint('=======================');
+    }
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -82,6 +97,26 @@ class DateOfBirth extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 30.h),
+                      // Selected Date Display
+                      Obx(() => Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                          decoration: BoxDecoration(
+                            color: Color(0xffF5F5F5),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Text(
+                            'Selected: ${controller.selectedDateOfBirth.value.isEmpty ? "2000-01-01" : controller.selectedDateOfBirth.value}',
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff172601),
+                            ),
+                          ),
+                        ),
+                      )),
+                      SizedBox(height: 20.h),
                       // === Cupertino Date Picker Start ===
                       SizedBox(
                         height: 215.h,
@@ -92,9 +127,13 @@ class DateOfBirth extends StatelessWidget {
                           minimumYear: 1970,
                            maximumYear: 2050,
                            
-      
                           onDateTimeChanged: (DateTime newDate) {
-                       
+                            String formattedDate = "${newDate.year}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}";
+                            controller.setDateOfBirth(formattedDate);
+                            debugPrint('=== DATE OF BIRTH SELECTED ===');
+                            debugPrint('Selected Date: $formattedDate');
+                            debugPrint('Controller Hash: ${controller.hashCode}');
+                            debugPrint('==============================');
                           },
                         ),
                       ),
@@ -102,6 +141,8 @@ class DateOfBirth extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(child: CustomButton(text: "Continue 2/5", color: Color(0xff172601), onTap: (){
+                            debugPrint('=== DATE OF BIRTH CONTINUE PRESSED ===');
+                            controller.debugCurrentState();
                             Get.to(()=>SkinType());
                           })),
                           SizedBox(width: 12.w,),

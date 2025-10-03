@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -7,7 +8,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/account_personalization.dart/controller/allargey_controller.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/screen/notifications_person.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/widget/allargey_option.dart';
 
@@ -16,7 +17,7 @@ class AllargeyLevel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AllargeyController controller = Get.put(AllargeyController());
+    final PersonalizationController controller = Get.find<PersonalizationController>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -89,29 +90,29 @@ class AllargeyLevel extends StatelessWidget {
                       Obx(() => AllergyOption(
                             title: "Normal",
                             description: "I don't feel any allergy issue on my skin",
-                            isSelected: controller.selectedAllergy.value == "Normal",
-                            onTap: () => controller.selectAllergy("Normal"),
+                            isSelected: controller.selectedAllergyLevel.value == "Normal",
+                            onTap: () => controller.setAllergyLevel("Normal"),
                           )),
                       SizedBox(height: 16.h),
                       Obx(() => AllergyOption(
                             title: "Maybe, I have",
                             description: "Few times I feel etching on my face",
-                            isSelected: controller.selectedAllergy.value == "Maybe, I have",
-                            onTap: () => controller.selectAllergy("Maybe, I have"),
+                            isSelected: controller.selectedAllergyLevel.value == "Maybe, I have",
+                            onTap: () => controller.setAllergyLevel("Maybe, I have"),
                           )),
                       SizedBox(height: 16.h),
                       Obx(() => AllergyOption(
                             title: "Sensitive",
                             description: "Most often trouble with allergy",
-                            isSelected: controller.selectedAllergy.value == "Sensitive",
-                            onTap: () => controller.selectAllergy("Sensitive"),
+                            isSelected: controller.selectedAllergyLevel.value == "Sensitive",
+                            onTap: () => controller.setAllergyLevel("Sensitive"),
                           )),
                       SizedBox(height: 16.h),
                       Obx(() => AllergyOption(
                             title: "Extreme",
                             description: "I’m having trouble with allergies always",
-                            isSelected: controller.selectedAllergy.value == "Extreme",
-                            onTap: () => controller.selectAllergy("Extreme"),
+                            isSelected: controller.selectedAllergyLevel.value == "Extreme",
+                            onTap: () => controller.setAllergyLevel("Extreme"),
                           )),
                       SizedBox(height: 34.h),
                       Row(
@@ -122,17 +123,19 @@ class AllargeyLevel extends StatelessWidget {
                                   color: Color(0xff172601),
                                   textStyle: TextStyle(
                                     fontFamily: "SFPro",
-                                    color: controller.selectedAllergy.value.isEmpty
+                                    color: controller.selectedAllergyLevel.value.isEmpty
                                         ? Colors.grey // Faded when no selection
                                         : Color(0xffFFFFFF), // Clear when selected
                                     fontSize: 17.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  onTap: controller.selectedAllergy.value.isEmpty
+                                  onTap: controller.selectedAllergyLevel.value.isEmpty
                                       ? (){} // Disable when no selection
                                       : () {
+                                          debugPrint('=== ALLERGY LEVEL CONTINUE BUTTON PRESSED ===');
+                                          controller.debugCurrentState();
                                           // Navigate to next page when selected
-                                      Get.to(()=>NotificationsPerson()); // Replace with your route
+                                          Get.to(()=>NotificationsPerson()); // Replace with your route
                                         },
                                 )),
                           ),

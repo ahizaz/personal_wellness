@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
-import 'package:personal_wellness/feature/account_personalization.dart/controller/skin_controller.dart';
+import 'package:personal_wellness/feature/account_personalization.dart/controller/personalization_controller.dart';
 import 'package:personal_wellness/feature/account_personalization.dart/screen/allargey_level.dart';
 
 class SkinType extends StatelessWidget {
@@ -12,7 +13,7 @@ class SkinType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SkinTypeController controller = Get.put(SkinTypeController());
+    final PersonalizationController controller = Get.find<PersonalizationController>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -117,6 +118,8 @@ class SkinType extends StatelessWidget {
                                   onTap: controller.selectedSkinType.value.isEmpty
                                       ? (){} // Disable button when no selection
                                       : () {
+                                          debugPrint('=== SKIN TYPE CONTINUE PRESSED ===');
+                                          controller.debugCurrentState();
                                           // Navigate to next page when selected
                                          Get.to(()=>AllargeyLevel()); // Replace with your route
                                         },
@@ -149,11 +152,15 @@ class SkinType extends StatelessWidget {
       ),
     );
   }
-Widget _buildSkinTypeCard(BuildContext context, String skinType, SkinTypeController controller) {
+Widget _buildSkinTypeCard(BuildContext context, String skinType, PersonalizationController controller) {
   final isSelected = controller.selectedSkinType.value == skinType;
   return GestureDetector(
     onTap: () {
-      controller.selectSkinType(skinType);
+      controller.setSkinType(skinType);
+      debugPrint('=== SKIN TYPE SELECTED ===');
+      debugPrint('Selected Skin Type: $skinType');
+      debugPrint('Controller Hash: ${controller.hashCode}');
+      debugPrint('=========================');
     },
     child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
