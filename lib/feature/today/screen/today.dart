@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/utils/constants/colors.dart';
+import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
 import 'package:personal_wellness/feature/explore/screen/explore.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
+import 'package:personal_wellness/feature/profile_accountseetings/screen/account.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/today/screen/routine_completed_view.dart';
 import 'package:personal_wellness/feature/today/screen/routine_in_progressview.dart';
@@ -249,28 +253,94 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
     });
   }
 
+  Widget _buildProfileHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 30.h),
+      child: Column(
+        children: [
+          SizedBox(height: 30.h),
+          Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.to(() => Account());
+                },
+                child: Obx(() {
+                  final imagePath = controller.profileImagePath.value;
+                  return CircleAvatar(
+                    radius: 24.r,
+                    backgroundImage: imagePath.isNotEmpty
+                        ? FileImage(File(imagePath)) as ImageProvider
+                        : AssetImage(IconPath.profileicon),
+                  );
+                }),
+              ),
+              SizedBox(width: 16.w),
+              Obx(() => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hi ${controller.userName.value}!",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff3E4B2C),
+                        ),
+                      ),
+                      Text(
+                        "Good Morning",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff3E4B2C),
+                        ),
+                      ),
+                    ],
+                  )),
+              const Spacer(),
+              Image.asset(IconPath.notificationhome,
+                  height: 48.h, width: 48.w, fit: BoxFit.cover),
+              SizedBox(width: 5.w),
+              Image.asset(IconPath.search,
+                  height: 48.h, width: 48.w, fit: BoxFit.cover),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Color(0xff485908),
-            ),
-          );
-        }
-        if (controller.routineData.isEmpty) {
-          return const EmptyRoutineView();
-        }
-        bool allCompleted =
-            controller.routineData.every((data) => data['isCompleted'].value == true);
-        if (allCompleted) {
-          return const RoutineCompletedView();
-        }
-        return RoutineInProgressview();
-      }),
+      body: Column(
+        children: [
+          _buildProfileHeader(),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xff485908),
+                  ),
+                );
+              }
+              if (controller.routineData.isEmpty) {
+                return const EmptyRoutineView();
+              }
+              bool allCompleted = controller.routineData
+                  .every((data) => data['isCompleted'].value == true);
+              if (allCompleted) {
+                return const RoutineCompletedView();
+              }
+              return RoutineInProgressview();
+            }),
+          ),
+        ],
+      ),
       floatingActionButton: Obx(
         () => FloatingActionButton(
           key: _fabKey,

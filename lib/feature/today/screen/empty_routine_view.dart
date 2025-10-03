@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 
 class EmptyRoutineView extends StatelessWidget {
@@ -14,39 +13,6 @@ class EmptyRoutineView extends StatelessWidget {
     
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-    SizedBox(height: 30.h,),
-      Row(
-        children: [
-          Image.asset(IconPath.profileicon,height: 48.h,width: 48.w,fit: BoxFit.cover,),
-          SizedBox(width: 16.w,),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Hi there!",style: TextStyle(
-                fontFamily: "SFPro",
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w400,
-                color: Color(0xff3E4B2C)
-              ),),
-            
-              Text("Good Morning",style: TextStyle(
-                fontFamily: "SFPro",
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
-                   color: Color(0xff3E4B2C)
-                
-              ),)
-            ],
-          ),
-          Spacer(),
-          Image.asset(IconPath.notificationhome,height: 48.h,width: 48.w,fit: BoxFit.cover,),
-          SizedBox(width: 5.w,),
-          Image.asset(IconPath.search,height: 48.h,width: 48.w,fit: BoxFit.cover,)
-          
-        ],
-      ),
-      SizedBox(height: 16.h,),
       Text("Today",style: TextStyle(
         fontFamily: "SFPro",
         fontSize: 34.sp,
