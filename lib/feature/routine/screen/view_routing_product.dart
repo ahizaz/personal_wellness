@@ -25,7 +25,6 @@ class ViewRoutingProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ViewProductController controller = Get.put(ViewProductController());
-    var editedName = productName.obs; // Observable to track the edited name
     final RxBool isDescriptionExpanded = false.obs;
     
     // Debug print the received data
@@ -68,77 +67,20 @@ class ViewRoutingProduct extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    SizedBox(width: 110.w),
-                    Obx(() => editedName.value.isEmpty
-                        ? FittedBox(
-  fit: BoxFit.fitWidth,
-  child: Text(
-    productName,
-    style: TextStyle(
-      fontFamily: "SFPro",
-      fontSize: 17.sp,
-      fontWeight: FontWeight.w400,
-      color: Color(0xff172601),
-    ),
-    maxLines: 1,
-    softWrap: false,
-    overflow: TextOverflow.ellipsis,
-  ),
-)
-                    
-                        : Text(
-                            editedName.value,
-                            style: const TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff172601),
-                            ),
-                          )),
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {
-                        Get.defaultDialog(
-                          title: "Edit Product Name",
-                          content: Column(
-                            children: [
-                              TextField(
-                                decoration: const InputDecoration(
-                                  hintText: "Enter new name",
-                                  border: OutlineInputBorder(),
-                                ),
-                                onChanged: (value) {
-                                  editedName.value = value;
-                                },
-                              ),
-                              SizedBox(height: 20.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: const Text("Cancel"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                      // Here you can add logic to save the editedName if needed
-                                    },
-                                    child: const Text("Save"),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      child: Image(
-                        image: AssetImage(IconPath.edit),
-                        height: 40.w,
-                        width: 40.w,
-                        fit: BoxFit.cover,
+                    SizedBox(width: 70.w),
+                    FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Text(
+                        productName,
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff172601),
+                        ),
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
