@@ -282,8 +282,23 @@ void submitRoutine() async {
           }
         }
         
+        // Sort routines by upcoming time (closest to current time first)
+        convertedRoutines.sort((a, b) {
+          final timeDiffA = _getTimeDifferenceInMinutes(now, a.time);
+          final timeDiffB = _getTimeDifferenceInMinutes(now, b.time);
+          return timeDiffA.compareTo(timeDiffB); // Closest time first
+        });
+        
+        // Debug: Print sorted order
+        debugPrint('=== Sorted Routines by Upcoming Time ===');
+        for (int i = 0; i < convertedRoutines.length; i++) {
+          final routine = convertedRoutines[i];
+          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (in ${timeDiff} minutes)');
+        }
+        
         routines.assignAll(convertedRoutines);
-        debugPrint('Routine tab updated with ${routines.length} items');
+        debugPrint('Routine tab updated with ${routines.length} items, sorted by upcoming time');
       } else {
         debugPrint('No routines found for routine tab');
         routines.clear();
@@ -342,7 +357,7 @@ void submitRoutine() async {
       final parsedTime = format.parse(upperTime);
       
       // Create DateTime object with today's date but the parsed time
-      final routineTime = DateTime(
+      var routineTime = DateTime(
         currentTime.year, 
         currentTime.month, 
         currentTime.day, 
@@ -350,8 +365,13 @@ void submitRoutine() async {
         parsedTime.minute
       );
       
-      // Calculate absolute difference in minutes
-      return routineTime.difference(currentTime).inMinutes.abs();
+      // If the routine time is in the past today, consider it for tomorrow
+      if (routineTime.isBefore(currentTime)) {
+        routineTime = routineTime.add(Duration(days: 1));
+      }
+      
+      // Calculate difference in minutes (upcoming times will be positive)
+      return routineTime.difference(currentTime).inMinutes;
     } catch (e) {
       debugPrint('Error parsing time for comparison: $timeStr, error: $e');
       return 999999; // Return large number for unparseable times
