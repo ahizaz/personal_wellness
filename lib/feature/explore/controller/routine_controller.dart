@@ -232,53 +232,54 @@ void submitRoutine() async {
         final now = DateTime.now();
         
         for (var item in sortedRoutines) {
-          final color = colors[sortedRoutines.indexOf(item) % colors.length];
+          final color = colors[convertedRoutines.length % colors.length];
           
-          // Collect all times for this routine
-          List<String> allTimes = [];
+          debugPrint('Processing Product: ${item.product.productName}');
+          debugPrint('Morning times: ${item.morningTimeOfDay}');
+          debugPrint('Evening times: ${item.eveningTimeOfDay}');
+          
+          // Create separate routine items for morning times
           if (item.morningTimeOfDay != null && item.morningTimeOfDay!.isNotEmpty) {
-            allTimes.addAll(item.morningTimeOfDay!);
-          }
-          if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
-            allTimes.addAll(item.eveningTimeOfDay!);
+            for (var morningTime in item.morningTimeOfDay!) {
+              convertedRoutines.add(RoutineItem(
+                productName: '${item.product.productName} (Morning)',
+                backgroundColor: color,
+                time: morningTime,
+                productId: item.product.id,
+                startDate: DateTime.now(),
+                endDate: DateTime.now().add(Duration(days: 30)),
+              ));
+              debugPrint('Added morning routine: ${item.product.productName} at $morningTime');
+            }
           }
           
-          if (allTimes.isNotEmpty) {
-            // Find the time closest to current time
-            String closestTime = allTimes.first;
-            int smallestDifference = _getTimeDifferenceInMinutes(now, allTimes.first);
-            
-            for (var timeStr in allTimes) {
-              int timeDiff = _getTimeDifferenceInMinutes(now, timeStr);
-              if (timeDiff < smallestDifference) {
-                smallestDifference = timeDiff;
-                closestTime = timeStr;
-              }
+          // Create separate routine items for evening times
+          if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
+            for (var eveningTime in item.eveningTimeOfDay!) {
+              convertedRoutines.add(RoutineItem(
+                productName: '${item.product.productName} (Evening)',
+                backgroundColor: color,
+                time: eveningTime,
+                productId: item.product.id,
+                startDate: DateTime.now(),
+                endDate: DateTime.now().add(Duration(days: 30)),
+              ));
+              debugPrint('Added evening routine: ${item.product.productName} at $eveningTime');
             }
-            
-            debugPrint('Product: ${item.product.productName}');
-            debugPrint('All times: $allTimes');
-            debugPrint('Current time: ${DateFormat('h:mm aa').format(now)}');
-            debugPrint('Closest time: $closestTime (difference: $smallestDifference minutes)');
-            
-            convertedRoutines.add(RoutineItem(
-              productName: item.product.productName,
-              backgroundColor: color,
-              time: closestTime,
-              productId: item.product.id,
-              startDate: DateTime.now(), // Default start date
-              endDate: DateTime.now().add(Duration(days: 30)), // Default end date
-            ));
-          } else {
-            // If no times are set, create one with default time
+          }
+          
+          // If no times are set, create one with default time
+          if ((item.morningTimeOfDay == null || item.morningTimeOfDay!.isEmpty) && 
+              (item.eveningTimeOfDay == null || item.eveningTimeOfDay!.isEmpty)) {
             convertedRoutines.add(RoutineItem(
               productName: item.product.productName,
               backgroundColor: color,
               time: _getTimeForCategory(item.category),
               productId: item.product.id,
-              startDate: DateTime.now(), // Default start date
-              endDate: DateTime.now().add(Duration(days: 30)), // Default end date
+              startDate: DateTime.now(),
+              endDate: DateTime.now().add(Duration(days: 30)),
             ));
+            debugPrint('Added default routine: ${item.product.productName}');
           }
         }
         
