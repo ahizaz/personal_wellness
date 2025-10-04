@@ -10,6 +10,7 @@ import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RoutineItem {
   final String productName;
@@ -290,6 +291,9 @@ void submitRoutine() async {
           return timeDiffA.compareTo(timeDiffB); // Closest time first
         });
         
+        // Filter out completed time slots for today
+        await _filterCompletedTimeSlots(convertedRoutines);
+        
         // Debug: Print sorted order
         debugPrint('=== Sorted Routines by Upcoming Time ===');
         for (int i = 0; i < convertedRoutines.length; i++) {
@@ -379,11 +383,71 @@ void submitRoutine() async {
     }
   }
 
-  // Method to remove a specific routine by product ID
-  void removeRoutine(String productId) {
-    routines.removeWhere((routine) => routine.productId == productId);
-    debugPrint('Routine removed for product ID: $productId');
-    debugPrint('Remaining routines: ${routines.length}');
+  // Method to mark the closest time slot as completed
+  Future<void> removeRoutine(String productId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now();
+      final today = DateFormat('yyyy-MM-dd').format(now);
+      
+      // Find the closest upcoming routine for this product
+      final productRoutines = routines.where((r) => r.productId == productId).toList();
+      if (productRoutines.isEmpty) {
+        debugPrint('No routines found for product: $productId');
+        return;
+      }
+      
+      // Find closest time
+      RoutineItem? closestRoutine;
+      int minTimeDiff = 999999;
+      
+      for (var routine in productRoutines) {
+        final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+        if (timeDiff < minTimeDiff) {
+          minTimeDiff = timeDiff;
+          closestRoutine = routine;
+        }
+      }
+      
+      if (closestRoutine != null) {
+        // Create a unique key for this time slot completion
+        final completionKey = 'completed_${productId}_${closestRoutine.time}_$today';
+        
+        // Save completion status
+        await prefs.setBool(completionKey, true);
+        
+        // Remove from current display
+        routines.removeWhere((routine) => 
+          routine.productId == productId && routine.time == closestRoutine!.time);
+        
+        debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
+        debugPrint('Completion key: $completionKey');
+        debugPrint('Remaining routines: ${routines.length}');
+      }
+    } catch (e) {
+      debugPrint('Error removing routine: $e');
+    }
+  }
+
+  // Helper method to filter completed time slots
+  Future<void> _filterCompletedTimeSlots(List<RoutineItem> routines) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      
+      routines.removeWhere((routine) {
+        final completionKey = 'completed_${routine.productId}_${routine.time}_$today';
+        final isCompleted = prefs.getBool(completionKey) ?? false;
+        if (isCompleted) {
+          debugPrint('Filtering out completed time slot: ${routine.productName} at ${routine.time}');
+        }
+        return isCompleted;
+      });
+      
+      debugPrint('After filtering completed time slots: ${routines.length} routines remaining');
+    } catch (e) {
+      debugPrint('Error filtering completed time slots: $e');
+    }
   }
 
   // Refresh routines method

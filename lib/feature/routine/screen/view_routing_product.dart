@@ -1,11 +1,11 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/explore/controller/view_product_controller.dart';
+import 'package:personal_wellness/feature/explore/controller/routine_controller.dart';
+import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/routine/widget/my_note.dart';
 import 'package:personal_wellness/feature/routine/widget/usage_direction.dart';
 
@@ -405,7 +405,7 @@ class ViewRoutingProduct extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    // *** এখানে কোড পরিবর্তন করা হয়েছে ***
+                    // *** এখানে কোড পরিবর্তন করা হয়েছে ***
                     Get.generalDialog(
                       barrierDismissible: true,
                       barrierLabel: 'Dismiss',
@@ -469,8 +469,31 @@ class ViewRoutingProduct extends StatelessWidget {
                                 ),
                                 SizedBox(height: 24.h),
                                 TextButton(
-                                  onPressed: () {
-                                    Get.back(); // ডায়ালগ বন্ধ করার জন্য
+                                  onPressed: () async {
+                                    Get.back(); // ডায়ালগ বন্ধ করার জন্য
+                                    
+                                    // Product টি routine থেকে remove করার জন্য
+                                    if (productId != null && productId!.isNotEmpty) {
+                                      try {
+                                        final routineController = Get.find<RoutineController>();
+                                        await routineController.removeRoutine(productId!);
+                                        await routineController.refreshRoutines();
+                                        
+                                        try {
+                                          final todayController = Get.find<TodayController>();
+                                          await todayController.refreshRoutineData();
+                                        } catch (e) {
+                                          debugPrint('Today controller not found: $e');
+                                        }
+                                        
+                                        debugPrint('Product completed and removed: $productId');
+                                      } catch (e) {
+                                        debugPrint('Error removing routine: $e');
+                                      }
+                                    }
+                                    
+                                    // Navigate back to routine screen
+                                    Get.back();
                                   },
                                   child: Text(
                                     "Back to routine",
