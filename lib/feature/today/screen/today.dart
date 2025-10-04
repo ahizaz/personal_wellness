@@ -47,6 +47,19 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
     }
   }
 
+  String _getGreetingMessage() {
+    final now = DateTime.now();
+    final hour = now.hour;
+    
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon";
+    } else {
+      return "Good Evening";
+    }
+  }
+
   void _showMenu(BuildContext context) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final RenderBox fabBox = _fabKey.currentContext!.findRenderObject() as RenderBox;
@@ -289,7 +302,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                         ),
                       ),
                       Text(
-                        "Good Morning",
+                        _getGreetingMessage(),
                         style: TextStyle(
                           fontFamily: "SFPro",
                           fontSize: 17.sp,
