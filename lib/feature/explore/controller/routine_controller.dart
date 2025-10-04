@@ -285,12 +285,36 @@ void submitRoutine() async {
           }
         }
         
+        // Debug: Print routines before sorting
+        debugPrint('=== Routines Before Sorting ===');
+        for (int i = 0; i < convertedRoutines.length; i++) {
+          final routine = convertedRoutines[i];
+          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
+        }
+        
+        // Debug: Print unsorted routines with time differences
+        debugPrint('=== Before Sorting ===');
+        for (int i = 0; i < convertedRoutines.length; i++) {
+          final routine = convertedRoutines[i];
+          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
+        }
+        
         // Sort routines by upcoming time (closest to current time first)
         convertedRoutines.sort((a, b) {
           final timeDiffA = _getTimeDifferenceInMinutes(now, a.time);
           final timeDiffB = _getTimeDifferenceInMinutes(now, b.time);
           return timeDiffA.compareTo(timeDiffB); // Closest time first
         });
+        
+        // Debug: Print sorted routines
+        debugPrint('=== After Sorting ===');
+        for (int i = 0; i < convertedRoutines.length; i++) {
+          final routine = convertedRoutines[i];
+          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
+        }
         
         // Create separate lists for time-based and all-day views
         allDayRoutines.assignAll(convertedRoutines);
@@ -308,12 +332,12 @@ void submitRoutine() async {
           return timeDiffA.compareTo(timeDiffB); // Closest time first
         });
         
-        // Debug: Print sorted order
-        debugPrint('=== Sorted Routines by Upcoming Time (After Filtering) ===');
+        // Debug: Print final sorted order after filtering
+        debugPrint('=== Final Sorted Routines (After Filtering) ===');
         for (int i = 0; i < convertedRoutines.length; i++) {
           final routine = convertedRoutines[i];
           final timeDiff = _getTimeDifferenceInMinutes(currentTime, routine.time);
-          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (in ${timeDiff} minutes)');
+          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
         }
         
         routines.assignAll(convertedRoutines);
@@ -352,7 +376,7 @@ void submitRoutine() async {
     }
   }
 
-  // Helper method to calculate time difference in minutes
+  // Helper method to calculate time difference in minutes (prioritize upcoming times)
   int _getTimeDifferenceInMinutes(DateTime currentTime, String timeStr) {
     try {
       // Normalize time string format
@@ -384,13 +408,20 @@ void submitRoutine() async {
         parsedTime.minute
       );
       
-      // If the routine time is in the past today, consider it for tomorrow
-      if (routineTime.isBefore(currentTime)) {
-        routineTime = routineTime.add(Duration(days: 1));
+      // Calculate time difference in minutes
+      int diffMinutes = routineTime.difference(currentTime).inMinutes;
+      
+      debugPrint('Time comparison: Current=${DateFormat('h:mm a').format(currentTime)}, Routine=$timeStr, Diff=$diffMinutes minutes');
+      
+      // If the routine time is in the past today (negative), consider it for tomorrow
+      if (diffMinutes < 0) {
+        // Add 24 hours (1440 minutes) to get tomorrow's time difference
+        diffMinutes = diffMinutes + 1440;
+        debugPrint('Past time adjusted for tomorrow: $diffMinutes minutes');
       }
       
-      // Calculate difference in minutes (upcoming times will be positive)
-      return routineTime.difference(currentTime).inMinutes;
+      // Return the time difference (positive for upcoming times, including tomorrow's times)
+      return diffMinutes;
     } catch (e) {
       debugPrint('Error parsing time for comparison: $timeStr, error: $e');
       return 999999; // Return large number for unparseable times
@@ -415,13 +446,20 @@ void submitRoutine() async {
       RoutineItem? closestRoutine;
       int minTimeDiff = 999999;
       
+      debugPrint('=== Finding Closest Time Slot to Complete ===');
+      debugPrint('Current time: ${DateFormat('h:mm a').format(now)}');
+      debugPrint('Available routines for product $productId:');
+      
       for (var routine in productRoutines) {
         final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+        debugPrint('- ${routine.productName} at ${routine.time}: ${timeDiff} minutes from now');
         if (timeDiff < minTimeDiff) {
           minTimeDiff = timeDiff;
           closestRoutine = routine;
         }
       }
+      
+      debugPrint('Closest routine selected: ${closestRoutine?.productName} at ${closestRoutine?.time} (${minTimeDiff} minutes)');
       
       if (closestRoutine != null) {
         // Create a unique key for this time slot completion
