@@ -9,6 +9,7 @@ import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navba
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:intl/intl.dart';
 
 class RoutineItem {
   final String productName;
@@ -226,17 +227,60 @@ void submitRoutine() async {
           const Color(0xffE6FFE6),
         ];
         
-        final convertedRoutines = sortedRoutines.map((item) {
+        // Create routine items - find closest time to current time for each product
+        List<RoutineItem> convertedRoutines = [];
+        final now = DateTime.now();
+        
+        for (var item in sortedRoutines) {
           final color = colors[sortedRoutines.indexOf(item) % colors.length];
-          return RoutineItem(
-            productName: item.product.productName,
-            backgroundColor: color,
-            time: _getTimeForCategory(item.category),
-            productId: item.product.id,
-            startDate: DateTime.now(), // Default start date
-            endDate: DateTime.now().add(Duration(days: 30)), // Default end date
-          );
-        }).toList();
+          
+          // Collect all times for this routine
+          List<String> allTimes = [];
+          if (item.morningTimeOfDay != null && item.morningTimeOfDay!.isNotEmpty) {
+            allTimes.addAll(item.morningTimeOfDay!);
+          }
+          if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
+            allTimes.addAll(item.eveningTimeOfDay!);
+          }
+          
+          if (allTimes.isNotEmpty) {
+            // Find the time closest to current time
+            String closestTime = allTimes.first;
+            int smallestDifference = _getTimeDifferenceInMinutes(now, allTimes.first);
+            
+            for (var timeStr in allTimes) {
+              int timeDiff = _getTimeDifferenceInMinutes(now, timeStr);
+              if (timeDiff < smallestDifference) {
+                smallestDifference = timeDiff;
+                closestTime = timeStr;
+              }
+            }
+            
+            debugPrint('Product: ${item.product.productName}');
+            debugPrint('All times: $allTimes');
+            debugPrint('Current time: ${DateFormat('h:mm aa').format(now)}');
+            debugPrint('Closest time: $closestTime (difference: $smallestDifference minutes)');
+            
+            convertedRoutines.add(RoutineItem(
+              productName: item.product.productName,
+              backgroundColor: color,
+              time: closestTime,
+              productId: item.product.id,
+              startDate: DateTime.now(), // Default start date
+              endDate: DateTime.now().add(Duration(days: 30)), // Default end date
+            ));
+          } else {
+            // If no times are set, create one with default time
+            convertedRoutines.add(RoutineItem(
+              productName: item.product.productName,
+              backgroundColor: color,
+              time: _getTimeForCategory(item.category),
+              productId: item.product.id,
+              startDate: DateTime.now(), // Default start date
+              endDate: DateTime.now().add(Duration(days: 30)), // Default end date
+            ));
+          }
+        }
         
         routines.assignAll(convertedRoutines);
         debugPrint('Routine tab updated with ${routines.length} items');
@@ -267,6 +311,53 @@ void submitRoutine() async {
       default:
         return '6:30 am';
     }
+  }
+
+  // Helper method to calculate time difference in minutes
+  int _getTimeDifferenceInMinutes(DateTime currentTime, String timeStr) {
+    try {
+      // Normalize time string format
+      String normalizedTime = timeStr.replaceAll('.', ':').trim();
+      
+      // Ensure proper AM/PM formatting
+      if (!normalizedTime.toLowerCase().contains('am') && !normalizedTime.toLowerCase().contains('pm')) {
+        normalizedTime += ' am'; // Default to AM if no period specified
+      }
+      
+      // Convert to uppercase for proper parsing since DateFormat expects uppercase AM/PM
+      String upperTime = normalizedTime.toUpperCase();
+      
+      // Use 'aa' for full form (AM/PM) or 'a' for single character (A/P)
+      DateFormat format;
+      if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
+        format = DateFormat('h:mm aa'); // For "6:30 AM" or "6:30 PM"
+      } else {
+        format = DateFormat('h:mm a'); // For "6:30 A" or "6:30 P"
+      }
+      final parsedTime = format.parse(upperTime);
+      
+      // Create DateTime object with today's date but the parsed time
+      final routineTime = DateTime(
+        currentTime.year, 
+        currentTime.month, 
+        currentTime.day, 
+        parsedTime.hour, 
+        parsedTime.minute
+      );
+      
+      // Calculate absolute difference in minutes
+      return routineTime.difference(currentTime).inMinutes.abs();
+    } catch (e) {
+      debugPrint('Error parsing time for comparison: $timeStr, error: $e');
+      return 999999; // Return large number for unparseable times
+    }
+  }
+
+  // Method to remove a specific routine by product ID
+  void removeRoutine(String productId) {
+    routines.removeWhere((routine) => routine.productId == productId);
+    debugPrint('Routine removed for product ID: $productId');
+    debugPrint('Remaining routines: ${routines.length}');
   }
 
   // Refresh routines method

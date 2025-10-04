@@ -53,6 +53,11 @@ class ViewProductController extends GetxController {
     }
   }
 
+  void setProductName(String name) {
+    // Update the product name in the productDataview
+    productDataview['productName'] = name;
+  }
+
   final RxList<String> howToUseIt = <String>[].obs;
 
   final RxMap<String, dynamic> viewRoutingProductView = {

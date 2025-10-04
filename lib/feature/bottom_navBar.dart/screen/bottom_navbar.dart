@@ -14,6 +14,7 @@ class BottomNavbar extends StatelessWidget {
 
   final BottomNavcontroller controller = Get.put(BottomNavcontroller());
 
+
   final List<Widget> screens = [
     Today(),
     Explore(),

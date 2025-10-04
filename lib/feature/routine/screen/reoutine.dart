@@ -16,16 +16,45 @@ class Routine extends StatelessWidget {
     // Helper function to parse time strings like "7:15 pm" or "10.00 pm"
     DateTime? _parseRoutineTime(String timeStr) {
       // Normalize time string format
-      final normalizedTime = timeStr.replaceAll('.', ':');
+      String normalizedTime = timeStr.replaceAll('.', ':').trim();
+      
+      // Ensure proper AM/PM formatting
+      if (!normalizedTime.toLowerCase().contains('am') && !normalizedTime.toLowerCase().contains('pm')) {
+        normalizedTime += ' am'; // Default to AM if no period specified
+      }
+      
       try {
         final now = DateTime.now();
-        final format = DateFormat('h:mm a');
-        final parsedTime = format.parse(normalizedTime);
+        // Convert to uppercase for proper parsing since DateFormat expects uppercase AM/PM
+        String upperTime = normalizedTime.toUpperCase();
+        
+        // Use 'a' for single character (A/P) or 'aa' for full form (AM/PM)
+        DateFormat format;
+        if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
+          format = DateFormat('h:mm aa'); // For "6:30 AM" or "6:30 PM"
+        } else {
+          format = DateFormat('h:mm a'); // For "6:30 A" or "6:30 P"
+        }
+        final parsedTime = format.parse(upperTime);
         // Return a DateTime object with today's date but the parsed time
         return DateTime(now.year, now.month, now.day, parsedTime.hour, parsedTime.minute);
       } catch (e) {
-        // Return null if parsing fails
-        return null;
+        // Try alternative formats
+        try {
+          String upperTime = normalizedTime.toUpperCase();
+          DateFormat alternativeFormat;
+          if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
+            alternativeFormat = DateFormat('h:m aa'); // For "6:3 AM" format
+          } else {
+            alternativeFormat = DateFormat('h:m a'); // For "6:3 A" format
+          }
+          final parsedTime = alternativeFormat.parse(upperTime);
+          final now = DateTime.now();
+          return DateTime(now.year, now.month, now.day, parsedTime.hour, parsedTime.minute);
+        } catch (e) {
+          debugPrint('Failed to parse time: $timeStr, normalized: $normalizedTime, error: $e');
+          return null;
+        }
       }
     }
 
@@ -36,7 +65,7 @@ class Routine extends StatelessWidget {
     }
 
     const double hourHeight = 80.0; // Height for each hour slot
-    const int startHour24 = 13; // Timeline starts at 1 PM
+    const int startHour24 = 6; // Timeline starts at 6 AM to cover morning routines
     const int endHour24 = 22; // Timeline ends at 10 PM
     final totalHours = endHour24 - startHour24 + 1;
 
@@ -166,7 +195,7 @@ class Routine extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left side: Time labels (1 PM, 2 PM, etc.)
+                    // Left side: Time labels (6 AM, 7 AM, etc.)
                     Padding(
                       padding: EdgeInsets.only(top: hourHeight / 2 - 10.h), // Adjust alignment
                       child: Column(
@@ -179,7 +208,7 @@ class Routine extends StatelessWidget {
                               DateFormat('h a').format(DateTime(0, 0, 0, hour)),
                               style: TextStyle(
                                 fontFamily: "SFPro",
-                                fontSize: 14.sp,
+                                fontSize: 12.sp, // Smaller text for more hours
                                 fontWeight: FontWeight.w400,
                                 color: const Color(0xff757575),
                               ),
@@ -213,55 +242,115 @@ class Routine extends StatelessWidget {
 
                             // Scheduled Routine Items
                             Obx(
-                              () => Stack(
-                                children: controller.routines.map((routine) {
+                              () {
+                                if (controller.routines.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+
+                                // Find the routine with the closest time to current time
+                                final currentTime = DateTime.now();
+                                var closestRoutine;
+                                int smallestTimeDifference = 999999;
+
+                                for (var routine in controller.routines) {
                                   final routineTime = _parseRoutineTime(routine.time);
-                                  if (routineTime == null) {
-                                    return const SizedBox.shrink();
+                                  if (routineTime != null) {
+                                    final timeDifference = routineTime.difference(currentTime).inMinutes.abs();
+                                    if (timeDifference < smallestTimeDifference) {
+                                      smallestTimeDifference = timeDifference;
+                                      closestRoutine = routine;
+                                    }
                                   }
-                                  final topOffset = _calculateTopOffset(routineTime, hourHeight, startHour24);
+                                }
 
-                                  // Check if the item is within the timeline's hour range
-                                  if (routineTime.hour < startHour24 || routineTime.hour > endHour24) {
-                                    return const SizedBox.shrink();
-                                  }
+                                // Debug: Print closest routine
+                                if (closestRoutine != null) {
+                                  debugPrint('=== Timeline Debug ===');
+                                  debugPrint('Total routines: ${controller.routines.length}');
+                                  debugPrint('Closest routine: ${closestRoutine.productName} at ${closestRoutine.time}');
+                                  debugPrint('Time difference: $smallestTimeDifference minutes');
+                                }
+                                
+                                // Show only the closest routine
+                                if (closestRoutine == null) {
+                                  return const SizedBox.shrink();
+                                }
 
-                                  return Positioned(
-                                    top: topOffset,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xffFFF2F2),
-                                        borderRadius: BorderRadius.circular(8.r),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 10.w,
-                                            height: 10.h,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(color: Colors.red, width: 1.5),
+                                final routineTime = _parseRoutineTime(closestRoutine.time);
+                                
+                                if (routineTime == null || routineTime.hour < startHour24 || routineTime.hour > endHour24) {
+                                  return const SizedBox.shrink();
+                                }
+
+                                final topOffset = _calculateTopOffset(routineTime, hourHeight, startHour24);
+
+                                return Stack(
+                                  children: [
+                                    Positioned(
+                                      top: topOffset,
+                                      left: 0,
+                                      right: 0,
+                                      child: InkWell(
+                                        onTap: () {
+                                          // Navigate to product detail page
+                                          Get.to(() => ViewRoutingProduct(
+                                            productName: closestRoutine.productName, 
+                                            productId: closestRoutine.productId,
+                                            startDate: closestRoutine.startDate,
+                                            endDate: closestRoutine.endDate,
+                                          ));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1), // Red background for closest routine
+                                            borderRadius: BorderRadius.circular(8.r),
+                                            border: Border.all(
+                                              color: Colors.red,
+                                              width: 1.5,
                                             ),
                                           ),
-                                          SizedBox(width: 8.w),
-                                          Text(
-                                            routine.productName,
-                                            style: TextStyle(
-                                              fontFamily: "SFPro",
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: const Color(0xff172601),
-                                            ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 10.w,
+                                                height: 10.h,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              SizedBox(width: 8.w),
+                                              Expanded(
+                                                child: Text(
+                                                  closestRoutine.productName,
+                                                  style: TextStyle(
+                                                    fontFamily: "SFPro",
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: const Color(0xff172601),
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Text(
+                                                closestRoutine.time,
+                                                style: TextStyle(
+                                                  fontFamily: "SFPro",
+                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  );
-                                }).toList(),
-                              ),
+                                  ],
+                                );
+                              },
                             ),
 
                             // Current time indicator (if within timeline hours)
