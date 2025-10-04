@@ -47,14 +47,15 @@ class RoutineController extends GetxController {
   var selectedOrder = 0.obs;
   var selectedEveningOrder = 0.obs;
   final List<String> availableTimes = [
-    '6:00 am', '6:15 am', '6:20 am',
-    '6:25 am', '6:30 am', '6:45 am',
-   
+    '12:00 am', '12:15 am', '12:30 am', '12:45 am',
+      '1:00 am', '1:15 am', '1:30 am', '1:45 am',
+    
+    
   ];
    final List<String> availableeveningTimes = [
-    '7:00 am', '7:15 am', '7:20 am',
-    '7:25 am', '7:30 am', '7:45 am',
-   
+    '12:00 pm', '12:15 pm', '12:30 pm', '12:45 pm',
+      '1:00 pm', '1:15 pm', '1:30 pm', '1:45 pm',
+
   ];
 
   var selectedEveningTimes = <String>[].obs;
@@ -301,15 +302,15 @@ void submitRoutine() async {
     switch (category.toLowerCase()) {
       case 'skin':
       case 'skincare':
-        return '6:30 am';
+        return '8:00 am';
       case 'sun cream':
-        return '7:00 am';
+        return '9:00 am';
       case 'lotion':
-        return '6:45 am';
+        return '8:30 am';
       case 'serum':
-        return '6:35 am';
+        return '8:15 am';
       default:
-        return '6:30 am';
+        return '8:00 am';
     }
   }
 

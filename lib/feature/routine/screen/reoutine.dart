@@ -65,8 +65,8 @@ class Routine extends StatelessWidget {
     }
 
     const double hourHeight = 80.0; // Height for each hour slot
-    const int startHour24 = 6; // Timeline starts at 6 AM to cover morning routines
-    const int endHour24 = 22; // Timeline ends at 10 PM
+    const int startHour24 = 0; // Timeline starts at 12 AM (midnight)
+    const int endHour24 = 23; // Timeline ends at 11 PM (23:00)
     final totalHours = endHour24 - startHour24 + 1;
 
     final now = DateTime.now();
