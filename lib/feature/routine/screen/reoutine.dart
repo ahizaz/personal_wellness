@@ -247,34 +247,20 @@ class Routine extends StatelessWidget {
                                   return const SizedBox.shrink();
                                 }
 
-                                // Find the routine with the closest time to current time
-                                final currentTime = DateTime.now();
-                                var closestRoutine;
-                                int smallestTimeDifference = 999999;
-
-                                for (var routine in controller.routines) {
-                                  final routineTime = _parseRoutineTime(routine.time);
-                                  if (routineTime != null) {
-                                    final timeDifference = routineTime.difference(currentTime).inMinutes.abs();
-                                    if (timeDifference < smallestTimeDifference) {
-                                      smallestTimeDifference = timeDifference;
-                                      closestRoutine = routine;
-                                    }
-                                  }
-                                }
+                                // Use the first routine from already sorted list (closest to current time)
+                                final closestRoutine = controller.routines.first;
 
                                 // Debug: Print closest routine
-                                if (closestRoutine != null) {
-                                  debugPrint('=== Timeline Debug ===');
-                                  debugPrint('Total routines: ${controller.routines.length}');
-                                  debugPrint('Closest routine: ${closestRoutine.productName} at ${closestRoutine.time}');
-                                  debugPrint('Time difference: $smallestTimeDifference minutes');
+                                debugPrint('=== Timeline Debug ===');
+                                debugPrint('Total routines: ${controller.routines.length}');
+                                debugPrint('Showing closest routine: ${closestRoutine.productName} at ${closestRoutine.time}');
+                                debugPrint('All routines in order:');
+                                for (int i = 0; i < controller.routines.length; i++) {
+                                  final routine = controller.routines[i];
+                                  debugPrint('${i + 1}. ${routine.productName} - ${routine.time}');
                                 }
                                 
-                                // Show only the closest routine
-                                if (closestRoutine == null) {
-                                  return const SizedBox.shrink();
-                                }
+                                // Show the closest routine (first in sorted list)
 
                                 final routineTime = _parseRoutineTime(closestRoutine.time);
                                 

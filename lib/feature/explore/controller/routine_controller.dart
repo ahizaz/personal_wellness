@@ -480,10 +480,14 @@ void submitRoutine() async {
           return timeDiffA.compareTo(timeDiffB); // Closest time first
         });
         
+        // Force refresh the reactive list to trigger UI update
+        routines.refresh();
+        
         debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
         debugPrint('Completion key: $completionKey');
         debugPrint('Remaining routines after completion: ${routines.length}');
         debugPrint('Next closest routine: ${routines.isNotEmpty ? '${routines.first.productName} at ${routines.first.time}' : 'None'}');
+        debugPrint('UI refreshed to show next routine');
       }
     } catch (e) {
       debugPrint('Error marking time slot as completed: $e');
