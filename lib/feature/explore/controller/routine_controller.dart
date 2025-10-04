@@ -48,14 +48,13 @@ class RoutineController extends GetxController {
   var selectedEveningOrder = 0.obs;
   final List<String> availableTimes = [
     '12:00 am', '12:15 am', '12:30 am', '12:45 am',
-      '1:00 am', '1:15 am', '1:30 am', '1:45 am',
-    
-    
+    '1:00 am', '1:15 am', '1:30 am', '1:45 am',
+ 
   ];
-   final List<String> availableeveningTimes = [
+  final List<String> availableeveningTimes = [
     '12:00 pm', '12:15 pm', '12:30 pm', '12:45 pm',
-      '1:00 pm', '1:15 pm', '1:30 pm', '1:45 pm',
-
+    '1:00 pm', '1:15 pm', '1:30 pm', '1:45 pm',
+   
   ];
 
   var selectedEveningTimes = <String>[].obs;
@@ -297,20 +296,25 @@ void submitRoutine() async {
     }
   }
 
-  // Helper method to get time based on category
+  // Helper method to get time based on user selected times
   String _getTimeForCategory(String category) {
+    // First check if user has selected any morning times
+    if (selectedTimes.isNotEmpty) {
+      return selectedTimes.first; // Return the first selected morning time
+    }
+    
+    // If no morning times selected, check evening times
+    if (selectedEveningTimes.isNotEmpty) {
+      return selectedEveningTimes.first; // Return the first selected evening time
+    }
+    
+    // If no times selected at all, return default based on category type
     switch (category.toLowerCase()) {
-      case 'skin':
-      case 'skincare':
-        return '8:00 am';
-      case 'sun cream':
-        return '9:00 am';
-      case 'lotion':
-        return '8:30 am';
-      case 'serum':
-        return '8:15 am';
+      case 'night cream':
+      case 'night':
+        return availableeveningTimes.first; // Default evening time
       default:
-        return '8:00 am';
+        return availableTimes.first; // Default morning time
     }
   }
 
