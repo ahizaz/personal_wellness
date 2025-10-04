@@ -300,11 +300,19 @@ void submitRoutine() async {
         await _filterCompletedTimeSlots(convertedRoutines);
         debugPrint('Time-based Routines count after filtering: ${convertedRoutines.length}');
         
+        // Re-sort after filtering to ensure closest time is first
+        final currentTime = DateTime.now();
+        convertedRoutines.sort((a, b) {
+          final timeDiffA = _getTimeDifferenceInMinutes(currentTime, a.time);
+          final timeDiffB = _getTimeDifferenceInMinutes(currentTime, b.time);
+          return timeDiffA.compareTo(timeDiffB); // Closest time first
+        });
+        
         // Debug: Print sorted order
-        debugPrint('=== Sorted Routines by Upcoming Time ===');
+        debugPrint('=== Sorted Routines by Upcoming Time (After Filtering) ===');
         for (int i = 0; i < convertedRoutines.length; i++) {
           final routine = convertedRoutines[i];
-          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+          final timeDiff = _getTimeDifferenceInMinutes(currentTime, routine.time);
           debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (in ${timeDiff} minutes)');
         }
         
@@ -422,9 +430,22 @@ void submitRoutine() async {
         // Save completion status
         await prefs.setBool(completionKey, true);
         
+        // Remove the completed time slot from current display
+        routines.removeWhere((routine) => 
+          routine.productId == productId && routine.time == closestRoutine!.time);
+        
+        // Re-sort remaining routines by closest time to show next upcoming routine
+        final currentTime = DateTime.now();
+        routines.sort((a, b) {
+          final timeDiffA = _getTimeDifferenceInMinutes(currentTime, a.time);
+          final timeDiffB = _getTimeDifferenceInMinutes(currentTime, b.time);
+          return timeDiffA.compareTo(timeDiffB); // Closest time first
+        });
+        
         debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
         debugPrint('Completion key: $completionKey');
-        debugPrint('Routine remains in All Day section');
+        debugPrint('Remaining routines after completion: ${routines.length}');
+        debugPrint('Next closest routine: ${routines.isNotEmpty ? '${routines.first.productName} at ${routines.first.time}' : 'None'}');
       }
     } catch (e) {
       debugPrint('Error marking time slot as completed: $e');
@@ -500,7 +521,12 @@ void submitRoutine() async {
 
   // Refresh routines method
   Future<void> refreshRoutines() async {
+    debugPrint('=== Refreshing Routines ===');
     await fetchRoutines();
+    // Force update of reactive lists to trigger UI rebuild
+    routines.refresh();
+    allDayRoutines.refresh();
+    debugPrint('Routines refreshed and UI updated');
   }
 
   @override
