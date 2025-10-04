@@ -6,6 +6,7 @@ import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/today/screen/go_picture.dart';
 import 'package:personal_wellness/feature/today/screen/product_details.dart';
+import 'package:personal_wellness/feature/explore/controller/routine_controller.dart';
 
 class RoutineInProgressview extends StatelessWidget {
   const RoutineInProgressview({super.key});
@@ -122,9 +123,23 @@ class RoutineInProgressview extends StatelessWidget {
                                       scale: 1.3,
                                       child: Checkbox(
                                         value: data['isCompleted'].value,
-                                        onChanged: (value) {
+                                        onChanged: (value) async {
                                           if (value != null) {
                                             controller.toggleCompletion(index, value);
+                                            
+                                            // If marked as completed, mark the time slot as completed
+                                            if (value == true) {
+                                              final productId = data['productId'] as String?;
+                                              if (productId != null && productId.isNotEmpty) {
+                                                try {
+                                                  final routineController = Get.find<RoutineController>();
+                                                  await routineController.markCurrentTimeSlotCompleted(productId);
+                                                  await routineController.refreshRoutines();
+                                                } catch (e) {
+                                                  debugPrint('Error marking time slot as completed: $e');
+                                                }
+                                              }
+                                            }
                                           }
                                         },
                                         activeColor: Color(0xff485908),

@@ -414,11 +414,12 @@ class ViewRoutingProduct extends StatelessWidget {
                                   onPressed: () async {
                                     Get.back(); // ডায়ালগ বন্ধ করার জন্য
                                     
-                                    // Product টি routine থেকে remove করার জন্য
+                                    // Product টির current time slot completed mark করার জন্য (routine remove না করে)
                                     if (productId != null && productId!.isNotEmpty) {
                                       try {
                                         final routineController = Get.find<RoutineController>();
-                                        await routineController.removeRoutine(productId!);
+                                        // Mark only the current time slot as completed
+                                        await routineController.markCurrentTimeSlotCompleted(productId!);
                                         await routineController.refreshRoutines();
                                         
                                         try {
@@ -428,9 +429,9 @@ class ViewRoutingProduct extends StatelessWidget {
                                           debugPrint('Today controller not found: $e');
                                         }
                                         
-                                        debugPrint('Product completed and removed: $productId');
+                                        debugPrint('Current time slot marked as completed: $productId');
                                       } catch (e) {
-                                        debugPrint('Error removing routine: $e');
+                                        debugPrint('Error marking time slot as completed: $e');
                                       }
                                     }
                                     

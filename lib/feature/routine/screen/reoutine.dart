@@ -137,7 +137,7 @@ class Routine extends StatelessWidget {
                       child: Obx(
                         () => Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: controller.routines.map((routine) {
+                          children: controller.allDayRoutines.map((routine) {
                             return InkWell(
                               onTap: () {
                                 Get.to(() => ViewRoutingProduct(

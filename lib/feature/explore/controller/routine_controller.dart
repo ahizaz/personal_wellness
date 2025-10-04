@@ -110,6 +110,7 @@ class RoutineController extends GetxController {
   var progressMessage = 'Setting up your routine...'.obs;
 
   final RxList<RoutineItem> routines = <RoutineItem>[].obs;
+  final RxList<RoutineItem> allDayRoutines = <RoutineItem>[].obs;  // For All Day section
   var isLoadingRoutines = false.obs;
 
 void submitRoutine() async {
@@ -291,8 +292,13 @@ void submitRoutine() async {
           return timeDiffA.compareTo(timeDiffB); // Closest time first
         });
         
-        // Filter out completed time slots for today
+        // Create separate lists for time-based and all-day views
+        allDayRoutines.assignAll(convertedRoutines);
+        debugPrint('All Day Routines count: ${allDayRoutines.length}');
+        
+        // Filter out completed time slots for time-based view only
         await _filterCompletedTimeSlots(convertedRoutines);
+        debugPrint('Time-based Routines count after filtering: ${convertedRoutines.length}');
         
         // Debug: Print sorted order
         debugPrint('=== Sorted Routines by Upcoming Time ===');
@@ -380,6 +386,48 @@ void submitRoutine() async {
     } catch (e) {
       debugPrint('Error parsing time for comparison: $timeStr, error: $e');
       return 999999; // Return large number for unparseable times
+    }
+  }
+
+  // Method to mark the current time slot as completed (without removing routine)
+  Future<void> markCurrentTimeSlotCompleted(String productId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now();
+      final today = DateFormat('yyyy-MM-dd').format(now);
+      
+      // Find the closest upcoming routine for this product
+      final productRoutines = routines.where((r) => r.productId == productId).toList();
+      if (productRoutines.isEmpty) {
+        debugPrint('No routines found for product: $productId');
+        return;
+      }
+      
+      // Find closest time
+      RoutineItem? closestRoutine;
+      int minTimeDiff = 999999;
+      
+      for (var routine in productRoutines) {
+        final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
+        if (timeDiff < minTimeDiff) {
+          minTimeDiff = timeDiff;
+          closestRoutine = routine;
+        }
+      }
+      
+      if (closestRoutine != null) {
+        // Create a unique key for this time slot completion
+        final completionKey = 'completed_${productId}_${closestRoutine.time}_$today';
+        
+        // Save completion status
+        await prefs.setBool(completionKey, true);
+        
+        debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
+        debugPrint('Completion key: $completionKey');
+        debugPrint('Routine remains in All Day section');
+      }
+    } catch (e) {
+      debugPrint('Error marking time slot as completed: $e');
     }
   }
 
