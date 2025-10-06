@@ -1134,25 +1134,61 @@ class ProgressData extends StatelessWidget {
                         SizedBox(height: 14.h),
                         Divider(thickness: 1),
 
-                        ////Right Side
-                           Row(
+                        ////Left Side
+                        Row(
                           children: [
+                            // First left image (1st captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.leftimage1),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final firstLeftImage = controller.getLeftImageAtIndex(0);
+                                return firstLeftImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(firstLeftImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.leftimage1),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.leftimage1),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(width: 2.w),
+                            // Second left image (2nd captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.leftimage2),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final secondLeftImage = controller.getLeftImageAtIndex(1);
+                                return secondLeftImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(secondLeftImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.leftimage2),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.leftimage2),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(
                               width: 14.w,
@@ -1162,13 +1198,31 @@ class ProgressData extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            // Third left image (3rd captured image)
                             SizedBox(
                               width: 125.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.leftimage3),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final thirdLeftImage = controller.getLeftImageAtIndex(2);
+                                return thirdLeftImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(thirdLeftImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.leftimage3),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.leftimage3),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                           ],
                         ),////right side
@@ -1182,27 +1236,63 @@ class ProgressData extends StatelessWidget {
                         ),),
                         SizedBox(height: 16.h),
                      
-                    ///leftSIde 
+                    ///Right Side 
                     Obx(() => controller.showAll.value ? Column(
                       children: [
                           Row(
                           children: [
+                            // First right image (1st captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.rightimage1),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final firstRightImage = controller.getRightImageAtIndex(0);
+                                return firstRightImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(firstRightImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.rightimage1),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.rightimage1),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(width: 2.w),
+                            // Second right image (2nd captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.rightimage2),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final secondRightImage = controller.getRightImageAtIndex(1);
+                                return secondRightImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(secondRightImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.rightimage2),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.rightimage2),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(
                               width: 14.w,
@@ -1212,13 +1302,31 @@ class ProgressData extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            // Third right image (3rd captured image)
                             SizedBox(
                               width: 125.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.rightimage3),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final thirdRightImage = controller.getRightImageAtIndex(2);
+                                return thirdRightImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(thirdRightImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.rightimage3),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.rightimage3),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                           ],
                         ),
@@ -1242,22 +1350,58 @@ class ProgressData extends StatelessWidget {
                         SizedBox(height: 4.h),
                         Row(
                           children: [
+                            // First front image (1st captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage1),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final firstFrontImage = controller.getFrontImageAtIndex(0);
+                                return firstFrontImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(firstFrontImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.beforeafterimage1),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.beforeafterimage1),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(width: 2.w),
+                            // Second front image (2nd captured image)
                             SizedBox(
                               width: 99.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage1),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final secondFrontImage = controller.getFrontImageAtIndex(1);
+                                return secondFrontImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(secondFrontImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.beforeafterimage1),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.beforeafterimage1),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                             SizedBox(
                               width: 14.w,
@@ -1267,13 +1411,31 @@ class ProgressData extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            // Third front image (3rd captured image)
                             SizedBox(
                               width: 125.w,
                               height: 220.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.beforeafterimage1),
-                                fit: BoxFit.cover,
-                              ),
+                              child: Obx(() {
+                                final thirdFrontImage = controller.getFrontImageAtIndex(2);
+                                return thirdFrontImage != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: Image.file(
+                                          File(thirdFrontImage),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image(
+                                              image: AssetImage(ImagePath.beforeafterimage1),
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Image(
+                                        image: AssetImage(ImagePath.beforeafterimage1),
+                                        fit: BoxFit.cover,
+                                      );
+                              }),
                             ),
                           ],
                         ),

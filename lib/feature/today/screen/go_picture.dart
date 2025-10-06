@@ -5,8 +5,10 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 
 class GoPicture extends StatelessWidget {
   const GoPicture({super.key});
@@ -211,10 +213,25 @@ class OverlayPainter extends CustomPainter {
 }
 
 // Text page after capturing all images
-class TextPage extends StatelessWidget {
+class TextPage extends StatefulWidget {
   final List<String> imagePaths;
 
   const TextPage({super.key, required this.imagePaths});
+
+  @override
+  State<TextPage> createState() => _TextPageState();
+}
+
+class _TextPageState extends State<TextPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Save images to ProgressController after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ProgressController progressController = Get.put(ProgressController());
+      progressController.saveCapturedImages(widget.imagePaths);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +261,7 @@ class TextPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 // Display captured images at the bottom
-                if (imagePaths.length >= 3)
+                if (widget.imagePaths.length >= 3)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -252,7 +269,7 @@ class TextPage extends StatelessWidget {
                       children: [
                         ClipOval(
                           child: Image.file(
-                            File(imagePaths[0]),
+                            File(widget.imagePaths[0]),
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
@@ -260,7 +277,7 @@ class TextPage extends StatelessWidget {
                         ),
                         ClipOval(
                           child: Image.file(
-                            File(imagePaths[1]),
+                            File(widget.imagePaths[1]),
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
@@ -268,7 +285,7 @@ class TextPage extends StatelessWidget {
                         ),
                         ClipOval(
                           child: Image.file(
-                            File(imagePaths[2]),
+                            File(widget.imagePaths[2]),
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
@@ -277,6 +294,35 @@ class TextPage extends StatelessWidget {
                       ],
                     ),
                   ),
+                const SizedBox(height: 40),
+                // Done button to go back to Progress screen
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate back to previous screen (Progress screen)
+                      Get.back();
+                      Get.back(); // Go back twice to reach Progress screen
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff485908),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Done',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

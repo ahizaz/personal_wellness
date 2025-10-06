@@ -6,6 +6,11 @@ class ProgressController extends GetxController{
    var janData = <FlSpot>[].obs;
   var febData = <FlSpot>[].obs;
   var showAll = false.obs;
+  
+  // Store captured progress images
+  var leftProgressImages = <String>[].obs;  // Left side images
+  var rightProgressImages = <String>[].obs; // Right side images  
+  var frontProgressImages = <String>[].obs; // Front images
   @override
   void onInit() {
    
@@ -69,4 +74,47 @@ class ProgressController extends GetxController{
   void toggleShowAll(){
     showAll.value = !showAll.value;
   }
+  
+  // Method to save captured progress images from GoPicture
+  void saveCapturedImages(List<String> imagePaths) {
+    if (imagePaths.length >= 3) {
+      // Add new images to the beginning (first position) of each list
+      leftProgressImages.insert(0, imagePaths[0]);   // Left image first
+      rightProgressImages.insert(0, imagePaths[1]);  // Right image first  
+      frontProgressImages.insert(0, imagePaths[2]);  // Front image first
+      
+      print('Progress images saved:');
+      print('Left: ${imagePaths[0]}');
+      print('Right: ${imagePaths[1]}');
+      print('Front: ${imagePaths[2]}');
+      
+      // Keep only last 5 images for each angle to avoid memory issues
+      if (leftProgressImages.length > 5) leftProgressImages.removeLast();
+      if (rightProgressImages.length > 5) rightProgressImages.removeLast();
+      if (frontProgressImages.length > 5) frontProgressImages.removeLast();
+    }
+  }
+  
+  // Method to get the first (latest) image for each angle
+  String? getLatestLeftImage() => leftProgressImages.isEmpty ? null : leftProgressImages.first;
+  String? getLatestRightImage() => rightProgressImages.isEmpty ? null : rightProgressImages.first;
+  String? getLatestFrontImage() => frontProgressImages.isEmpty ? null : frontProgressImages.first;
+  
+  // Methods to get images by index for displaying in different positions
+  String? getLeftImageAtIndex(int index) {
+    return index < leftProgressImages.length ? leftProgressImages[index] : null;
+  }
+  
+  String? getRightImageAtIndex(int index) {
+    return index < rightProgressImages.length ? rightProgressImages[index] : null;
+  }
+  
+  String? getFrontImageAtIndex(int index) {
+    return index < frontProgressImages.length ? frontProgressImages[index] : null;
+  }
+  
+  // Get total count of captured images for each angle
+  int get leftImagesCount => leftProgressImages.length;
+  int get rightImagesCount => rightProgressImages.length;
+  int get frontImagesCount => frontProgressImages.length;
 }
