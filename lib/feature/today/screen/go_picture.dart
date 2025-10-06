@@ -295,33 +295,32 @@ class _TextPageState extends State<TextPage> {
                     ),
                   ),
                 const SizedBox(height: 40),
-                // Done button to go back to Progress screen
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Navigate back to previous screen (Progress screen)
-                      Get.back();
-                      Get.back(); // Go back twice to reach Progress screen
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff485908),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
+                // Processing indicator - will auto-navigate after upload completes
+                Column(
+                  children: [
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xff485908)),
                     ),
-                    child: const Center(
-                      child: Text(
-                        'Done',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Processing your photos...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'You will be redirected automatically',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ],
             ),

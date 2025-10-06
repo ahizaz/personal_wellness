@@ -25,7 +25,7 @@ class ProgressController extends GetxController{
     super.onInit();
     loadData();
     loadGraphData();
-    getAllPhotoProgress(); // Load photo progress from API
+    getAllPhotoProgress(showLoading: true); // Load photo progress from API
   }
   void loadData(){
     progressItems.value=[
@@ -251,9 +251,25 @@ class ProgressController extends GetxController{
     debugPrint('Successfully uploaded: $successCount/3 photos');
     
     if (successCount == 3) {
-      // Show success with done button
+      // Show success message briefly
       EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(seconds: 2));
       debugPrint('=== All Photos Uploaded Successfully ===');
+      
+      // Wait for success message to show, then refresh data and auto-navigate back
+      Future.delayed(Duration(seconds: 2), () async {
+        debugPrint('=== Starting Auto Refresh and Navigation ===');
+        
+        // Refresh all photo progress silently
+        await getAllPhotoProgress(showLoading: false);
+        
+        // Wait a bit more for data to sync properly
+        await Future.delayed(Duration(seconds: 1));
+        
+        // Auto-navigate back to progress screen
+        debugPrint('=== Auto Navigation Back ===');
+        Get.back(); // Go back from TextPage
+        Get.back(); // Go back from GoPicture to Progress screen
+      });
     } else if (successCount > 0) {
       EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
     } else {
@@ -262,9 +278,11 @@ class ProgressController extends GetxController{
   }
 
   // Get photo progress by specific type
-  Future<void> getPhotoProgressByType(String type, {int page = 1, int limit = 20}) async {
+  Future<void> getPhotoProgressByType(String type, {int page = 1, int limit = 20, bool showLoading = true}) async {
     try {
-      EasyLoading.show(status: 'Loading $type photos...');
+      if (showLoading) {
+        EasyLoading.show(status: 'Loading $type photos...');
+      }
       debugPrint('=== Getting Photo Progress by Type ===');
       debugPrint('Type: $type, Page: $page, Limit: $limit');
       
@@ -292,7 +310,9 @@ class ProgressController extends GetxController{
       debugPrint('Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
       
-      EasyLoading.dismiss();
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -357,26 +377,32 @@ class ProgressController extends GetxController{
       }
     } catch (e) {
       debugPrint('Exception during getting $type photo progress: $e');
-      EasyLoading.dismiss();
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
     }
   }
 
   // Get all photo progress from API (loads all types)
-  Future<void> getAllPhotoProgress({int page = 1, int limit = 20}) async {
+  Future<void> getAllPhotoProgress({int page = 1, int limit = 20, bool showLoading = false}) async {
     try {
-      EasyLoading.show(status: 'Loading all photos...');
+      if (showLoading) {
+        EasyLoading.show(status: 'Loading photos...');
+      }
       debugPrint('=== Getting All Photo Progress ===');
       
       // Load each type separately for better organization
-      await getPhotoProgressByType('left', page: page, limit: limit);
-      await Future.delayed(Duration(milliseconds: 300)); // Small delay between requests
+      await getPhotoProgressByType('left', page: page, limit: limit, showLoading: false);
+      await Future.delayed(Duration(milliseconds: 200)); // Small delay between requests
       
-      await getPhotoProgressByType('right', page: page, limit: limit);
-      await Future.delayed(Duration(milliseconds: 300)); // Small delay between requests
+      await getPhotoProgressByType('right', page: page, limit: limit, showLoading: false);
+      await Future.delayed(Duration(milliseconds: 200)); // Small delay between requests
       
-      await getPhotoProgressByType('front', page: page, limit: limit);
+      await getPhotoProgressByType('front', page: page, limit: limit, showLoading: false);
       
-      EasyLoading.dismiss();
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
       debugPrint('=== All Photo Types Loaded ===');
       debugPrint('Left images: ${leftProgressImages.length}');
       debugPrint('Right images: ${rightProgressImages.length}');
@@ -384,7 +410,9 @@ class ProgressController extends GetxController{
       
     } catch (e) {
       debugPrint('Exception during getting all photo progress: $e');
-      EasyLoading.dismiss();
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
     }
   }
 
