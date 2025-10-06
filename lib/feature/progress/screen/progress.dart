@@ -1134,97 +1134,74 @@ class ProgressData extends StatelessWidget {
                         SizedBox(height: 14.h),
                         Divider(thickness: 1),
 
-                        ////Left Side
-                        Row(
-                          children: [
-                            // First left image (1st captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final firstLeftImage = controller.getLeftImageAtIndex(0);
-                                return firstLeftImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(firstLeftImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.leftimage1),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.leftimage1),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(width: 2.w),
-                            // Second left image (2nd captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final secondLeftImage = controller.getLeftImageAtIndex(1);
-                                return secondLeftImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(secondLeftImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.leftimage2),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.leftimage2),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(
-                              width: 14.w,
-                              height: 230.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.bamboo),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            // Third left image (3rd captured image)
-                            SizedBox(
-                              width: 125.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final thirdLeftImage = controller.getLeftImageAtIndex(2);
-                                return thirdLeftImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(thirdLeftImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.leftimage3),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.leftimage3),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                          ],
+                        ////Left Side - Horizontal Scrollable
+                        SizedBox(
+                          height: 230.h,
+                          child: Obx(() {
+                            // Combine captured images with static fallback images
+                            List<Widget> images = [];
+                            
+                            // Add all captured left images
+                            for (int i = 0; i < controller.leftProgressImages.length; i++) {
+                              images.add(
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.file(
+                                      File(controller.leftProgressImages[i]),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.error),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            
+                            // Add static images if no captured images or as fallback
+                            if (images.isEmpty) {
+                              images.addAll([
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: Image(
+                                    image: AssetImage(ImagePath.leftimage1),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: Image(
+                                    image: AssetImage(ImagePath.leftimage2),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  width: 125.w,
+                                  height: 220.h,
+                                  child: Image(
+                                    image: AssetImage(ImagePath.leftimage3),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ]);
+                            }
+                            
+                            return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: images,
+                            );
+                          }),
                         ),////right side
                         SizedBox(height: 4.h),
                         Text("Right Side",style: TextStyle(
@@ -1239,97 +1216,75 @@ class ProgressData extends StatelessWidget {
                     ///Right Side 
                     Obx(() => controller.showAll.value ? Column(
                       children: [
-                          Row(
-                          children: [
-                            // First right image (1st captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final firstRightImage = controller.getRightImageAtIndex(0);
-                                return firstRightImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(firstRightImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.rightimage1),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.rightimage1),
+                          // Right Side - Horizontal Scrollable
+                          SizedBox(
+                            height: 230.h,
+                            child: Obx(() {
+                              // Combine captured images with static fallback images
+                              List<Widget> images = [];
+                              
+                              // Add all captured right images
+                              for (int i = 0; i < controller.rightProgressImages.length; i++) {
+                                images.add(
+                                  Container(
+                                    width: 99.w,
+                                    height: 220.h,
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: Image.file(
+                                        File(controller.rightProgressImages[i]),
                                         fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(width: 2.w),
-                            // Second right image (2nd captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final secondRightImage = controller.getRightImageAtIndex(1);
-                                return secondRightImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(secondRightImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.rightimage2),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.rightimage2),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(
-                              width: 14.w,
-                              height: 230.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.bamboo),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            // Third right image (3rd captured image)
-                            SizedBox(
-                              width: 125.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final thirdRightImage = controller.getRightImageAtIndex(2);
-                                return thirdRightImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(thirdRightImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.rightimage3),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.rightimage3),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                          ],
-                        ),
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey[300],
+                                            child: Icon(Icons.error),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              
+                              // Add static images if no captured images or as fallback
+                              if (images.isEmpty) {
+                                images.addAll([
+                                  Container(
+                                    width: 99.w,
+                                    height: 220.h,
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: Image(
+                                      image: AssetImage(ImagePath.rightimage1),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 99.w,
+                                    height: 220.h,
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: Image(
+                                      image: AssetImage(ImagePath.rightimage2),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 125.w,
+                                    height: 220.h,
+                                    child: Image(
+                                      image: AssetImage(ImagePath.rightimage3),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ]);
+                              }
+                              
+                              return ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: images,
+                              );
+                            }),
+                          ),
                         SizedBox(height: 4.h),
                         
                       Row(
@@ -1348,96 +1303,74 @@ class ProgressData extends StatelessWidget {
 ),
 
                         SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            // First front image (1st captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final firstFrontImage = controller.getFrontImageAtIndex(0);
-                                return firstFrontImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(firstFrontImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.beforeafterimage1),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.beforeafterimage1),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(width: 2.w),
-                            // Second front image (2nd captured image)
-                            SizedBox(
-                              width: 99.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final secondFrontImage = controller.getFrontImageAtIndex(1);
-                                return secondFrontImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(secondFrontImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.beforeafterimage1),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.beforeafterimage1),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                            SizedBox(
-                              width: 14.w,
-                              height: 230.h,
-                              child: Image(
-                                image: AssetImage(ImagePath.bamboo),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            // Third front image (3rd captured image)
-                            SizedBox(
-                              width: 125.w,
-                              height: 220.h,
-                              child: Obx(() {
-                                final thirdFrontImage = controller.getFrontImageAtIndex(2);
-                                return thirdFrontImage != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.file(
-                                          File(thirdFrontImage),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image(
-                                              image: AssetImage(ImagePath.beforeafterimage1),
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    : Image(
-                                        image: AssetImage(ImagePath.beforeafterimage1),
-                                        fit: BoxFit.cover,
-                                      );
-                              }),
-                            ),
-                          ],
+                        // Front Side - Horizontal Scrollable
+                        SizedBox(
+                          height: 230.h,
+                          child: Obx(() {
+                            // Combine captured images with static fallback images
+                            List<Widget> images = [];
+                            
+                            // Add all captured front images
+                            for (int i = 0; i < controller.frontProgressImages.length; i++) {
+                              images.add(
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.file(
+                                      File(controller.frontProgressImages[i]),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.error),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            
+                            // Add static images if no captured images or as fallback
+                            if (images.isEmpty) {
+                              images.addAll([
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: Image(
+                                    image: AssetImage(ImagePath.beforeafterimage1),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  width: 99.w,
+                                  height: 220.h,
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  child: Image(
+                                    image: AssetImage(ImagePath.beforeafterimage1),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  width: 125.w,
+                                  height: 220.h,
+                                  child: Image(
+                                    image: AssetImage(ImagePath.beforeafterimage1),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ]);
+                            }
+                            
+                            return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: images,
+                            );
+                          }),
                         ),
                                              Row(
   mainAxisAlignment: MainAxisAlignment.start,
