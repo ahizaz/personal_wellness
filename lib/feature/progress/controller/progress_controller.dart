@@ -1,5 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:personal_wellness/core/urls/urls.dart';
 
 class ProgressController extends GetxController{
   var progressItems = <Map<String,dynamic>>[].obs;
@@ -17,6 +25,7 @@ class ProgressController extends GetxController{
     super.onInit();
     loadData();
     loadGraphData();
+    getAllPhotoProgress(); // Load photo progress from API
   }
   void loadData(){
     progressItems.value=[
@@ -75,23 +84,320 @@ class ProgressController extends GetxController{
     showAll.value = !showAll.value;
   }
   
+  // Helper method to get access token
+  Future<String?> getAccessToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+      debugPrint('=== Photo Progress Authentication Check ===');
+      debugPrint('Access Token exists: ${token != null}');
+      debugPrint('Token preview: ${token != null ? '${token.substring(0, token.length > 20 ? 20 : token.length)}...' : 'null'}');
+      return token;
+    } catch (e) {
+      debugPrint('Error getting access token: $e');
+      return null;
+    }
+  }
+
+  // Upload single photo progress to API
+  Future<bool> uploadSinglePhotoProgress(String imagePath, String type) async {
+    try {
+      EasyLoading.show(status: 'Uploading $type photo...');
+      debugPrint('=== Uploading Single Photo Progress ===');
+      debugPrint('Image Path: $imagePath');
+      debugPrint('Type: $type');
+      
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for photo upload');
+        EasyLoading.dismiss();
+        return false;
+      }
+      
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(Urls.photoProgressCreate),
+      );
+      
+      // Add headers with Bearer token
+      request.headers.addAll({
+        'Authorization': 'Bearer $accessToken',
+      });
+      
+      // Check if file exists
+      final file = File(imagePath);
+      if (!await file.exists()) {
+        debugPrint('Image file does not exist: $imagePath');
+        EasyLoading.dismiss();
+        return false;
+      }
+      
+      // Get file extension and determine content type
+      String fileName = imagePath.split('/').last;
+      String fileExtension = fileName.toLowerCase().split('.').last;
+      
+      debugPrint('=== File Details ===');
+      debugPrint('Original fileName: $fileName');
+      debugPrint('File extension: $fileExtension');
+      
+      // Ensure proper content type
+      String contentType;
+      switch (fileExtension) {
+        case 'jpg':
+        case 'jpeg':
+          contentType = 'image/jpeg';
+          break;
+        case 'png':
+          contentType = 'image/png';
+          break;
+        case 'webp':
+          contentType = 'image/webp';
+          break;
+        case 'heif':
+          contentType = 'image/heif';
+          break;
+        case 'heic':
+          contentType = 'image/heic';
+          break;
+        case 'tiff':
+          contentType = 'image/tiff';
+          break;
+        case 'avif':
+          contentType = 'image/avif';
+          break;
+        default:
+          contentType = 'image/jpeg';
+          break;
+      }
+      
+      debugPrint('Content-Type: $contentType');
+      
+      // Add image file to form data
+      request.files.add(await http.MultipartFile.fromPath(
+        'image', 
+        imagePath,
+        filename: fileName,
+        contentType: MediaType.parse(contentType),
+      ));
+      
+      // Add type field to form data
+      request.fields['type'] = type;
+      
+      debugPrint('=== API Request Details ===');
+      debugPrint('URL: ${Urls.photoProgressCreate}');
+      debugPrint('Headers: ${request.headers}');
+      debugPrint('Fields: ${request.fields}');
+      debugPrint('Files: ${request.files.map((f) => '${f.field}: ${f.filename}').toList()}');
+      
+      final response = await request.send();
+      final responseString = await response.stream.bytesToString();
+      
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: $responseString');
+      
+      EasyLoading.dismiss();
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(responseString);
+        debugPrint('=== Upload Success ===');
+        debugPrint('Response Data: $data');
+        return true;
+      } else {
+        debugPrint('=== Upload Error ===');
+        debugPrint('Error response: $responseString');
+        
+        // Log error response for debugging
+        
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Exception during photo upload: $e');
+      EasyLoading.dismiss();
+      return false;
+    }
+  }
+
+  // Upload all 3 photos (left, right, front) individually
+  Future<void> uploadAllPhotos(List<String> imagePaths) async {
+    if (imagePaths.length != 3) {
+      debugPrint('Invalid number of images. Expected 3, got ${imagePaths.length}');
+      return;
+    }
+    
+    debugPrint('=== Uploading All 3 Photos ===');
+    final types = ['left', 'right', 'front'];
+    int successCount = 0;
+    
+    // Upload each photo individually
+    for (int i = 0; i < imagePaths.length; i++) {
+      debugPrint('Uploading photo ${i + 1}/3: ${types[i]}');
+      final success = await uploadSinglePhotoProgress(imagePaths[i], types[i]);
+      if (success) {
+        successCount++;
+        debugPrint('Successfully uploaded ${types[i]} photo');
+        
+        // Immediately refresh this specific type after successful upload
+        await getPhotoProgressByType(types[i]);
+      } else {
+        debugPrint('Failed to upload ${types[i]} photo');
+      }
+      
+      // Small delay between uploads to prevent server overload
+      await Future.delayed(Duration(milliseconds: 300));
+    }
+    
+    debugPrint('=== Upload Summary ===');
+    debugPrint('Successfully uploaded: $successCount/3 photos');
+    
+    if (successCount == 3) {
+      // Show success with done button
+      EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(seconds: 2));
+      debugPrint('=== All Photos Uploaded Successfully ===');
+    } else if (successCount > 0) {
+      EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
+    } else {
+      EasyLoading.showError('Failed to upload photos', duration: Duration(seconds: 2));
+    }
+  }
+
+  // Get photo progress by specific type
+  Future<void> getPhotoProgressByType(String type, {int page = 1, int limit = 20}) async {
+    try {
+      EasyLoading.show(status: 'Loading $type photos...');
+      debugPrint('=== Getting Photo Progress by Type ===');
+      debugPrint('Type: $type, Page: $page, Limit: $limit');
+      
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for getting photo progress');
+        EasyLoading.dismiss();
+        return;
+      }
+      
+      final url = '${Urls.photoProgressGetAll}?type=$type&page=$page&limit=$limit';
+      debugPrint('=== API Request Details ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: {Authorization: Bearer [TOKEN]}');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      
+      EasyLoading.dismiss();
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('=== Get Success ===');
+        debugPrint('Response Data: $data');
+        
+        if (data['success'] == true && data['data'] != null) {
+          final result = data['data']['result'] as List;
+          final meta = data['data']['meta'];
+          
+          debugPrint('=== Processing $type Results ===');
+          debugPrint('Total $type photos: ${result.length}');
+          debugPrint('Meta data: $meta');
+          
+          // Clear existing images for this type only
+          switch (type) {
+            case 'left':
+              leftProgressImages.clear();
+              break;
+            case 'right':
+              rightProgressImages.clear();
+              break;
+            case 'front':
+              frontProgressImages.clear();
+              break;
+          }
+          
+          // Process and add images to respective list
+          for (var item in result) {
+            final imageUrl = '${Urls.imageurl}${item['image']}';
+            final itemType = item['type'];
+            final date = item['date'];
+            final createdAt = item['createdAt'];
+            
+            debugPrint('Processing: Type=$itemType, Date=$date, Created=$createdAt, Image=$imageUrl');
+            
+            if (itemType == type) {
+              switch (type) {
+                case 'left':
+                  leftProgressImages.add(imageUrl);
+                  break;
+                case 'right':
+                  rightProgressImages.add(imageUrl);
+                  break;
+                case 'front':
+                  frontProgressImages.add(imageUrl);
+                  break;
+              }
+            }
+          }
+          
+          debugPrint('=== $type Images Updated ===');
+          debugPrint('$type images count: ${type == 'left' ? leftProgressImages.length : type == 'right' ? rightProgressImages.length : frontProgressImages.length}');
+        } else {
+          debugPrint('=== API Response Error ===');
+          debugPrint('Success: ${data['success']}');
+          debugPrint('Message: ${data['message']}');
+        }
+      } else {
+        debugPrint('=== HTTP Error ===');
+        debugPrint('Error response: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('Exception during getting $type photo progress: $e');
+      EasyLoading.dismiss();
+    }
+  }
+
+  // Get all photo progress from API (loads all types)
+  Future<void> getAllPhotoProgress({int page = 1, int limit = 20}) async {
+    try {
+      EasyLoading.show(status: 'Loading all photos...');
+      debugPrint('=== Getting All Photo Progress ===');
+      
+      // Load each type separately for better organization
+      await getPhotoProgressByType('left', page: page, limit: limit);
+      await Future.delayed(Duration(milliseconds: 300)); // Small delay between requests
+      
+      await getPhotoProgressByType('right', page: page, limit: limit);
+      await Future.delayed(Duration(milliseconds: 300)); // Small delay between requests
+      
+      await getPhotoProgressByType('front', page: page, limit: limit);
+      
+      EasyLoading.dismiss();
+      debugPrint('=== All Photo Types Loaded ===');
+      debugPrint('Left images: ${leftProgressImages.length}');
+      debugPrint('Right images: ${rightProgressImages.length}');
+      debugPrint('Front images: ${frontProgressImages.length}');
+      
+    } catch (e) {
+      debugPrint('Exception during getting all photo progress: $e');
+      EasyLoading.dismiss();
+    }
+  }
+
   // Method to save captured progress images from GoPicture
   void saveCapturedImages(List<String> imagePaths) {
     if (imagePaths.length >= 3) {
-      // Add new images to the beginning (first position) of each list
-      leftProgressImages.insert(0, imagePaths[0]);   // Left image first
-      rightProgressImages.insert(0, imagePaths[1]);  // Right image first  
-      frontProgressImages.insert(0, imagePaths[2]);  // Front image first
+      debugPrint('=== Saving Captured Images ===');
+      debugPrint('Left: ${imagePaths[0]}');
+      debugPrint('Right: ${imagePaths[1]}');
+      debugPrint('Front: ${imagePaths[2]}');
       
-      print('Progress images saved:');
-      print('Left: ${imagePaths[0]}');
-      print('Right: ${imagePaths[1]}');
-      print('Front: ${imagePaths[2]}');
-      
-      // Keep only last 5 images for each angle to avoid memory issues
-      if (leftProgressImages.length > 5) leftProgressImages.removeLast();
-      if (rightProgressImages.length > 5) rightProgressImages.removeLast();
-      if (frontProgressImages.length > 5) frontProgressImages.removeLast();
+      // Upload all 3 photos to API first, then refresh from server
+      uploadAllPhotos(imagePaths);
     }
   }
   
@@ -117,4 +423,24 @@ class ProgressController extends GetxController{
   int get leftImagesCount => leftProgressImages.length;
   int get rightImagesCount => rightProgressImages.length;
   int get frontImagesCount => frontProgressImages.length;
+  
+  // Method to refresh photo progress data
+  Future<void> refreshPhotoProgress() async {
+    debugPrint('=== Refreshing Photo Progress ===');
+    await getAllPhotoProgress();
+  }
+  
+  // Method to refresh specific type photo progress
+  Future<void> refreshPhotoProgressByType(String type) async {
+    debugPrint('=== Refreshing $type Photo Progress ===');
+    await getPhotoProgressByType(type);
+  }
+  
+  // Method to upload photos via refresh button
+  Future<void> uploadPhotosViaRefresh() async {
+    // This would typically be called when user has captured new photos
+    // For now, we'll just refresh the data from database
+    debugPrint('=== Upload Photos Via Refresh Button ===');
+    await getAllPhotoProgress();
+  }
 }

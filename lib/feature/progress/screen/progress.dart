@@ -804,6 +804,49 @@ import 'package:personal_wellness/feature/progress/controller/progress_controlle
 class ProgressData extends StatelessWidget {
   const ProgressData({super.key});
 
+  // Helper method to build progress image widget (handles both local files and remote URLs)
+  Widget _buildProgressImage(String imagePath) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      // Remote URL
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[300],
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.error),
+          );
+        },
+      );
+    } else {
+      // Local file
+      return Image.file(
+        File(imagePath),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.error),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ProgressController controller = Get.put(ProgressController());
@@ -970,8 +1013,12 @@ class ProgressData extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffEDEEE6),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await controller.refreshPhotoProgress();
+          },
+          child: SingleChildScrollView(
+            child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1150,51 +1197,43 @@ class ProgressData extends StatelessWidget {
                                   margin: EdgeInsets.only(right: 8.w),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.r),
-                                    child: Image.file(
-                                      File(controller.leftProgressImages[i]),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: Colors.grey[300],
-                                          child: Icon(Icons.error),
-                                        );
-                                      },
-                                    ),
+                                    child: _buildProgressImage(controller.leftProgressImages[i]),
                                   ),
                                 ),
                               );
                             }
                             
-                            // Add static images if no captured images or as fallback
+                            // Show message if no images captured
                             if (images.isEmpty) {
-                              images.addAll([
+                              images.add(
                                 Container(
-                                  width: 99.w,
+                                  width: double.infinity,
                                   height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: Image(
-                                    image: AssetImage(ImagePath.leftimage1),
-                                    fit: BoxFit.cover,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                        SizedBox(height: 8.h),
+                                        Text(
+                                          'No left side photos yet',
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Take photos to see progress',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                Container(
-                                  width: 99.w,
-                                  height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: Image(
-                                    image: AssetImage(ImagePath.leftimage2),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Container(
-                                  width: 125.w,
-                                  height: 220.h,
-                                  child: Image(
-                                    image: AssetImage(ImagePath.leftimage3),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ]);
+                              );
                             }
                             
                             return ListView(
@@ -1204,13 +1243,44 @@ class ProgressData extends StatelessWidget {
                           }),
                         ),////right side
                         SizedBox(height: 4.h),
-                        Text("Right Side",style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff172601)
-
-                        ),),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Right Side",style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xff172601)
+                            ),),
+                            GestureDetector(
+                              onTap: () async {
+                                await controller.refreshPhotoProgressByType('right');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: Color(0xff485908),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.refresh, color: Colors.white, size: 16.sp),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      "Refresh",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 16.h),
                      
                     ///Right Side 
@@ -1232,51 +1302,43 @@ class ProgressData extends StatelessWidget {
                                     margin: EdgeInsets.only(right: 8.w),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8.r),
-                                      child: Image.file(
-                                        File(controller.rightProgressImages[i]),
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[300],
-                                            child: Icon(Icons.error),
-                                          );
-                                        },
-                                      ),
+                                      child: _buildProgressImage(controller.rightProgressImages[i]),
                                     ),
                                   ),
                                 );
                               }
                               
-                              // Add static images if no captured images or as fallback
+                              // Show message if no images captured
                               if (images.isEmpty) {
-                                images.addAll([
+                                images.add(
                                   Container(
-                                    width: 99.w,
+                                    width: double.infinity,
                                     height: 220.h,
-                                    margin: EdgeInsets.only(right: 8.w),
-                                    child: Image(
-                                      image: AssetImage(ImagePath.rightimage1),
-                                      fit: BoxFit.cover,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                          SizedBox(height: 8.h),
+                                          Text(
+                                            'No right side photos yet',
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Take photos to see progress',
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  Container(
-                                    width: 99.w,
-                                    height: 220.h,
-                                    margin: EdgeInsets.only(right: 8.w),
-                                    child: Image(
-                                      image: AssetImage(ImagePath.rightimage2),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 125.w,
-                                    height: 220.h,
-                                    child: Image(
-                                      image: AssetImage(ImagePath.rightimage3),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ]);
+                                );
                               }
                               
                               return ListView(
@@ -1288,7 +1350,7 @@ class ProgressData extends StatelessWidget {
                         SizedBox(height: 4.h),
                         
                       Row(
-  mainAxisAlignment: MainAxisAlignment.start,
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
   children: [
     Text(
       "Left Side",
@@ -1299,10 +1361,79 @@ class ProgressData extends StatelessWidget {
         color: Color(0xff172601),
       ),
     ),
+    GestureDetector(
+      onTap: () async {
+        await controller.refreshPhotoProgressByType('left');
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: Color(0xff485908),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.refresh, color: Colors.white, size: 16.sp),
+            SizedBox(width: 4.w),
+            Text(
+              "Refresh",
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
   ],
 ),
 
                         SizedBox(height: 4.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Front Side",
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff172601),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                await controller.refreshPhotoProgressByType('front');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: Color(0xff485908),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.refresh, color: Colors.white, size: 16.sp),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      "Refresh",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
                         // Front Side - Horizontal Scrollable
                         SizedBox(
                           height: 230.h,
@@ -1319,51 +1450,43 @@ class ProgressData extends StatelessWidget {
                                   margin: EdgeInsets.only(right: 8.w),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.r),
-                                    child: Image.file(
-                                      File(controller.frontProgressImages[i]),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: Colors.grey[300],
-                                          child: Icon(Icons.error),
-                                        );
-                                      },
-                                    ),
+                                    child: _buildProgressImage(controller.frontProgressImages[i]),
                                   ),
                                 ),
                               );
                             }
                             
-                            // Add static images if no captured images or as fallback
+                            // Show message if no images captured
                             if (images.isEmpty) {
-                              images.addAll([
+                              images.add(
                                 Container(
-                                  width: 99.w,
+                                  width: double.infinity,
                                   height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: Image(
-                                    image: AssetImage(ImagePath.beforeafterimage1),
-                                    fit: BoxFit.cover,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                        SizedBox(height: 8.h),
+                                        Text(
+                                          'No front photos yet',
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Take photos to see progress',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                Container(
-                                  width: 99.w,
-                                  height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: Image(
-                                    image: AssetImage(ImagePath.beforeafterimage1),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Container(
-                                  width: 125.w,
-                                  height: 220.h,
-                                  child: Image(
-                                    image: AssetImage(ImagePath.beforeafterimage1),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ]);
+                              );
                             }
                             
                             return ListView(
@@ -1452,7 +1575,7 @@ class ProgressData extends StatelessWidget {
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1667,7 +1790,32 @@ class ProgressData extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 29.h),
+                SizedBox(height: 16.h),
+                Container(
+                  width: double.infinity,
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    color: Color(0xff485908),
+                    borderRadius: BorderRadius.circular(999.r),
+                  ),
+                  child: InkWell(
+                    onTap: () async {
+                      await controller.refreshPhotoProgress();
+                    },
+                    child: Center(
+                      child: Text(
+                        "Refresh Photo Progress",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xffFFFFFF),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.h),
                 Center(
                   child: Text(
                     "Share Progress",
@@ -1683,7 +1831,8 @@ class ProgressData extends StatelessWidget {
               ],
             ),
           ),
-        ),
+        ), // RefreshIndicator
+      ),
       ),
     );
   }
