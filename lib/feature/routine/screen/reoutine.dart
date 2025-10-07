@@ -60,11 +60,18 @@ class Routine extends StatelessWidget {
 
     const double timeSlotHeight = 35.0; // Increased height for better spacing between time slots
     const double slotMargin = 40.0; // Increased margin for more spacing between time slots
+    const double routineSlotDuration = 15.0; // Each routine takes 15 minutes slot
     
     // Helper function to calculate the vertical position based on time (15-minute intervals)
     double _calculateTopOffset(DateTime time, double slotHeight, int startHour) {
       final minutesFromTimelineStart = (time.hour * 60 + time.minute) - (startHour * 60);
       return (minutesFromTimelineStart / 15.0) * (slotHeight + slotMargin / 4); // Fixed calculation with proper spacing
+    }
+    
+    // Helper function to calculate routine item height based on duration
+    double _calculateRoutineHeight(double baseDuration) {
+      // Each routine takes a 15-minute slot, so calculate height accordingly
+      return (baseDuration / 15.0) * timeSlotHeight + 10.0; // Extra 10px for padding
     }
     const int startHour24 = 0; // Timeline starts at 12 AM (midnight)
     const int endHour24 = 23; // Timeline ends at 11 PM (23:00) - full 24 hours
@@ -321,6 +328,7 @@ class Routine extends StatelessWidget {
                                               final displayColor = isCompleted ? Colors.green : routineColor;
                                               
                                               return Container(
+                                                height: controller.calculateRoutineHeight(),
                                                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                                                 decoration: BoxDecoration(
                                                   color: displayColor.withOpacity(0.1),

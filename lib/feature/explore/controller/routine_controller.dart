@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -520,6 +521,14 @@ void submitRoutine() async {
     allDayRoutines.refresh();
     timeSlotRoutines.refresh();
     debugPrint('Routines refreshed and UI updated');
+  }
+
+  // Constants for time slot calculations
+  static const double routineSlotDuration = 15.0; // 15 minutes per slot
+
+  // Helper method to calculate routine container height based on duration
+  double calculateRoutineHeight() {
+    return routineSlotDuration * 4.0.h; // 15 minutes = 60px height
   }
 
   @override
