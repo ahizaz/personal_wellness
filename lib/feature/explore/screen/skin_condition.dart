@@ -202,8 +202,10 @@ class SkinCondition extends StatelessWidget {
                   if (recProducts.isEmpty) {
                     return const Text("No recommended products available");
                   }
-                  return Row(
-                    children: [
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
                       if (recProducts.isNotEmpty)
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -244,13 +246,18 @@ class SkinCondition extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 8.h,),
-                          Text(
-                            recProducts[0]["title"]!,
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000)
+                          SizedBox(
+                            width: 177.w,
+                            child: Text(
+                              recProducts[0]["title"]!,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff000000)
+                              ),
                             ),
                           )
                         ],
@@ -296,18 +303,24 @@ class SkinCondition extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 8.h,),
-                          Text(
-                            recProducts[1]["title"]!,
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000)
+                          SizedBox(
+                            width: 177.w,
+                            child: Text(
+                              recProducts[1]["title"]!,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff000000)
+                              ),
                             ),
                           )
                         ],
                       ),
-                    ],
+                      ],
+                    ),
                   );
                 }),
               ],
