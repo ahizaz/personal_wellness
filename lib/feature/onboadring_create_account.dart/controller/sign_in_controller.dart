@@ -79,9 +79,7 @@ class SignInController extends GetxController {
         accessToken: googleAuth.accessToken,
       );
 
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? user = userCredential.user;
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       final body = {
         "email": googleUser.email,

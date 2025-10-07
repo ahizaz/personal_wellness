@@ -44,7 +44,7 @@ class CategoryIcon extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor: bgColor,
-      child: Image.asset(iconPath!, color: Colors.white, width: iconSize, height: iconSize),
+      child: Image.asset(iconPath, color: Colors.white, width: iconSize, height: iconSize),
     );
   }
 }

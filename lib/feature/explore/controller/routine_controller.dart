@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
@@ -6,7 +7,6 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
-import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +19,7 @@ class RoutineItem {
   final String productId; // ✅ Field to store the product ID
   final DateTime startDate; // ✅ Field to store start date
   final DateTime endDate; // ✅ Field to store end date
+  final String id; // ✅ Unique identifier for each routine item
 
   RoutineItem({
     required this.productName,
@@ -27,7 +28,34 @@ class RoutineItem {
     required this.productId, // ✅ Added product ID
     required this.startDate, // ✅ Added start date
     required this.endDate, // ✅ Added end date
+    required this.id, // ✅ Added unique ID
   });
+
+  // Convert to JSON for SharedPreferences storage
+  Map<String, dynamic> toJson() {
+    return {
+      'productName': productName,
+      'backgroundColor': backgroundColor.value,
+      'time': time,
+      'productId': productId,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'id': id,
+    };
+  }
+
+  // Create from JSON for SharedPreferences loading
+  static RoutineItem fromJson(Map<String, dynamic> json) {
+    return RoutineItem(
+      productName: json['productName'],
+      backgroundColor: Color(json['backgroundColor']),
+      time: json['time'],
+      productId: json['productId'],
+      startDate: DateTime.parse(json['startDate']),
+      endDate: DateTime.parse(json['endDate']),
+      id: json['id'],
+    );
+  }
 }
 
 class RoutineController extends GetxController {
@@ -151,48 +179,32 @@ void submitRoutine() async {
 
     await Future.delayed(const Duration(seconds: 1));
     progress.value = 50;
-    progressMessage.value = 'Submitting';
+    progressMessage.value = 'Adding to routine';
 
-    // Make API call
-    final success = await ApiService.addProductToRoutine(
-      productId: productId.value,
-      category: selectedCategory.value.isNotEmpty ? selectedCategory.value : "Skincare",
-      startDate: startDate.value!,
-      endDate: endDate.value!,
-      morningOrder: selectedOrder.value != 0 ? selectedOrder.value : null,
-      morningTimeOfDay: selectedTimes.isNotEmpty ? selectedTimes.toList() : null,
-      eveningOrder: selectedEveningOrder.value != 0 ? selectedEveningOrder.value : null,
-      eveningTimeOfDay: selectedEveningTimes.isNotEmpty ? selectedEveningTimes.toList() : null,
-      additionalIntroduction: instructionText.value,
-    );
+    // Create routine items from selected times and save to SharedPreferences
+    await _addRoutinesToSharedPreferences();
 
     await Future.delayed(const Duration(seconds: 1));
     progress.value = 75;
     progressMessage.value = 'Almost done';
 
-    if (success) {
-      await Future.delayed(const Duration(seconds: 1));
-      progress.value = 100;
-      progressMessage.value = 'Routine added successfully!';
-      
-      // Refresh routines from API to get the latest data
-      await fetchRoutines();
-      
-      // Trigger global event to notify all listeners
-      RoutineEvents.instance.notifyRoutineAdded();
-      
-      // Refresh Today controller to show new routine immediately
-      try {
-        final todayController = Get.find<TodayController>();
-        debugPrint('Refreshing Today controller after routine added');
-        await todayController.refreshRoutineData();
-      } catch (e) {
-        debugPrint('Today controller not found or error refreshing: $e');
-        // This is normal if Today tab hasn't been visited yet
-      }
-    } else {
-      progress.value = 100;
-      progressMessage.value = 'Failed to add routine';
+    // Refresh routines from SharedPreferences
+    await loadRoutinesFromSharedPreferences();
+    
+    progress.value = 100;
+    progressMessage.value = 'Routine added successfully!';
+    
+    // Trigger global event to notify all listeners
+    RoutineEvents.instance.notifyRoutineAdded();
+    
+    // Refresh Today controller to show new routine immediately
+    try {
+      final todayController = Get.find<TodayController>();
+      debugPrint('Refreshing Today controller after routine added');
+      await todayController.refreshRoutineData();
+    } catch (e) {
+      debugPrint('Today controller not found or error refreshing: $e');
+      // This is normal if Today tab hasn't been visited yet
     }
 
     await Future.delayed(const Duration(seconds: 1));
@@ -220,182 +232,159 @@ void submitRoutine() async {
     progressMessage.value = 'Error occurred';
   }
 }
-  // Fetch routines from API
-  Future<void> fetchRoutines() async {
+  // Add routines to SharedPreferences when user submits a new routine
+  Future<void> _addRoutinesToSharedPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get existing routines from SharedPreferences
+      final existingRoutinesJson = prefs.getString('saved_routines') ?? '[]';
+      final List<dynamic> existingRoutinesList = jsonDecode(existingRoutinesJson);
+      final List<RoutineItem> existingRoutines = existingRoutinesList
+          .map((json) => RoutineItem.fromJson(json))
+          .toList();
+
+      // Create color palette
+      final colors = [
+        const Color(0xffFFF8E6),
+        const Color(0xffE6F7F7),
+        const Color(0xffF2E6FF),
+        const Color(0xffE6FFE6),
+      ];
+
+      // Generate new routines from selected times
+      List<RoutineItem> newRoutines = [];
+      
+      // Add morning routines
+      for (String morningTime in selectedTimes) {
+        final newRoutine = RoutineItem(
+          productName: '${productName.value} (Morning)',
+          backgroundColor: colors[newRoutines.length % colors.length],
+          time: morningTime,
+          productId: productId.value,
+          startDate: startDate.value ?? DateTime.now(),
+          endDate: endDate.value ?? DateTime.now().add(Duration(days: 30)),
+          id: '${productId.value}_morning_${morningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+        );
+        newRoutines.add(newRoutine);
+        debugPrint('Created morning routine: ${productName.value} at $morningTime');
+      }
+
+      // Add evening routines  
+      for (String eveningTime in selectedEveningTimes) {
+        final newRoutine = RoutineItem(
+          productName: '${productName.value} (Evening)',
+          backgroundColor: colors[newRoutines.length % colors.length],
+          time: eveningTime,
+          productId: productId.value,
+          startDate: startDate.value ?? DateTime.now(),
+          endDate: endDate.value ?? DateTime.now().add(Duration(days: 30)),
+          id: '${productId.value}_evening_${eveningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+        );
+        newRoutines.add(newRoutine);
+        debugPrint('Created evening routine: ${productName.value} at $eveningTime');
+      }
+
+      // Add new routines to existing ones (don't replace, add to the list)
+      existingRoutines.addAll(newRoutines);
+      
+      // Convert back to JSON and save
+      final allRoutinesJson = jsonEncode(existingRoutines.map((r) => r.toJson()).toList());
+      await prefs.setString('saved_routines', allRoutinesJson);
+      
+      debugPrint('=== Saved ${newRoutines.length} new routines to SharedPreferences ===');
+      debugPrint('New routines added:');
+      for (var routine in newRoutines) {
+        debugPrint('- ${routine.productName} at ${routine.time} (ID: ${routine.id})');
+      }
+      debugPrint('Total routines now: ${existingRoutines.length}');
+    } catch (e) {
+      debugPrint('Error saving routines to SharedPreferences: $e');
+    }
+  }
+
+  // Load routines from SharedPreferences
+  Future<void> loadRoutinesFromSharedPreferences() async {
     try {
       isLoadingRoutines.value = true;
-      debugPrint('=== Fetching Routines for Routine Tab ===');
+      debugPrint('=== Loading Routines from SharedPreferences ===');
       
-      final response = await ApiService.getHomeRoutineData();
+      final prefs = await SharedPreferences.getInstance();
+      final routinesJson = prefs.getString('saved_routines') ?? '[]';
+      final List<dynamic> routinesList = jsonDecode(routinesJson);
       
-      if (response != null && response.success && response.data.result.isNotEmpty) {
-        debugPrint('Found ${response.data.result.length} routines for routine tab');
-        
-        // Sort routines by creation date (most recent first)
-        var sortedRoutines = response.data.result.toList();
-        sortedRoutines.sort((a, b) {
-          final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          return dateB.compareTo(dateA); // Most recent first
-        });
-        
-        // Convert API data to RoutineItem format
-        final colors = [
-          const Color(0xffFFF8E6),
-          const Color(0xffE6F7F7),
-          const Color(0xffF2E6FF),
-          const Color(0xffE6FFE6),
-        ];
-        
-        // Create routine items - find closest time to current time for each product
-        List<RoutineItem> convertedRoutines = [];
-        final now = DateTime.now();
-        
-        for (var item in sortedRoutines) {
-          final color = colors[convertedRoutines.length % colors.length];
-          
-          debugPrint('Processing Product: ${item.product.productName}');
-          debugPrint('Morning times: ${item.morningTimeOfDay}');
-          debugPrint('Evening times: ${item.eveningTimeOfDay}');
-          
-          // Create separate routine items for morning times
-          if (item.morningTimeOfDay != null && item.morningTimeOfDay!.isNotEmpty) {
-            for (var morningTime in item.morningTimeOfDay!) {
-              convertedRoutines.add(RoutineItem(
-                productName: '${item.product.productName} (Morning)',
-                backgroundColor: color,
-                time: morningTime,
-                productId: item.product.id,
-                startDate: DateTime.now(),
-                endDate: DateTime.now().add(Duration(days: 30)),
-              ));
-              debugPrint('Added morning routine: ${item.product.productName} at $morningTime');
-            }
-          }
-          
-          // Create separate routine items for evening times
-          if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
-            for (var eveningTime in item.eveningTimeOfDay!) {
-              convertedRoutines.add(RoutineItem(
-                productName: '${item.product.productName} (Evening)',
-                backgroundColor: color,
-                time: eveningTime,
-                productId: item.product.id,
-                startDate: DateTime.now(),
-                endDate: DateTime.now().add(Duration(days: 30)),
-              ));
-              debugPrint('Added evening routine: ${item.product.productName} at $eveningTime');
-            }
-          }
-          
-          // If no times are set, create one with default time
-          if ((item.morningTimeOfDay == null || item.morningTimeOfDay!.isEmpty) && 
-              (item.eveningTimeOfDay == null || item.eveningTimeOfDay!.isEmpty)) {
-            convertedRoutines.add(RoutineItem(
-              productName: item.product.productName,
-              backgroundColor: color,
-              time: _getTimeForCategory(item.category),
-              productId: item.product.id,
-              startDate: DateTime.now(),
-              endDate: DateTime.now().add(Duration(days: 30)),
-            ));
-            debugPrint('Added default routine: ${item.product.productName}');
-          }
-        }
-        
-        // Debug: Print routines before sorting
-        debugPrint('=== Routines Before Sorting ===');
-        for (int i = 0; i < convertedRoutines.length; i++) {
-          final routine = convertedRoutines[i];
-          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
-          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
-        }
-        
-        // Debug: Print unsorted routines with time differences
-        debugPrint('=== Before Sorting ===');
-        for (int i = 0; i < convertedRoutines.length; i++) {
-          final routine = convertedRoutines[i];
-          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
-          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
-        }
-        
-        // Sort routines by upcoming time (closest to current time first)
-        convertedRoutines.sort((a, b) {
-          final timeDiffA = _getTimeDifferenceInMinutes(now, a.time);
-          final timeDiffB = _getTimeDifferenceInMinutes(now, b.time);
-          return timeDiffA.compareTo(timeDiffB); // Closest time first
-        });
-        
-        // Debug: Print sorted routines
-        debugPrint('=== After Sorting ===');
-        for (int i = 0; i < convertedRoutines.length; i++) {
-          final routine = convertedRoutines[i];
-          final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
-          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
-        }
-        
-        // Create separate lists for time-based and all-day views
-        allDayRoutines.assignAll(convertedRoutines);
-        debugPrint('All Day Routines count: ${allDayRoutines.length}');
-        
-        // Filter out completed time slots for time-based view only
-        await _filterCompletedTimeSlots(convertedRoutines);
-        debugPrint('Time-based Routines count after filtering: ${convertedRoutines.length}');
-        
-        // Re-sort after filtering to ensure closest time is first
-        final currentTime = DateTime.now();
-        convertedRoutines.sort((a, b) {
-          final timeDiffA = _getTimeDifferenceInMinutes(currentTime, a.time);
-          final timeDiffB = _getTimeDifferenceInMinutes(currentTime, b.time);
-          return timeDiffA.compareTo(timeDiffB); // Closest time first
-        });
-        
-        // Debug: Print final sorted order after filtering
-        debugPrint('=== Final Sorted Routines (After Filtering) ===');
-        for (int i = 0; i < convertedRoutines.length; i++) {
-          final routine = convertedRoutines[i];
-          final timeDiff = _getTimeDifferenceInMinutes(currentTime, routine.time);
-          debugPrint('${i + 1}. ${routine.productName} - Time: ${routine.time} (${timeDiff} minutes from now)');
-        }
-        
-        routines.assignAll(convertedRoutines);
-        debugPrint('Routine tab updated with ${routines.length} items, sorted by upcoming time');
-      } else {
-        debugPrint('No routines found for routine tab');
+      if (routinesList.isEmpty) {
+        debugPrint('No routines found in SharedPreferences');
         routines.clear();
+        allDayRoutines.clear();
+        return;
+      }
+
+      // Convert JSON to RoutineItem objects
+      final List<RoutineItem> loadedRoutines = routinesList
+          .map((json) => RoutineItem.fromJson(json))
+          .toList();
+
+      debugPrint('Loaded ${loadedRoutines.length} routines from SharedPreferences');
+
+      // Sort routines by time (no more time-based filtering)
+      loadedRoutines.sort((a, b) {
+        try {
+          // Parse times for proper sorting
+          final timeA = _parseTimeForSorting(a.time);
+          final timeB = _parseTimeForSorting(b.time);
+          return timeA.compareTo(timeB);
+        } catch (e) {
+          // Fallback to string comparison if parsing fails
+          return a.time.compareTo(b.time);
+        }
+      });
+
+      // Create all day routines (copy of all routines)
+      allDayRoutines.assignAll(loadedRoutines);
+      
+      // Filter out completed routines for time slots view only
+      final filteredRoutines = await _getFilteredRoutinesForTimeSlots(loadedRoutines);
+      routines.assignAll(filteredRoutines);
+
+      debugPrint('All Day Routines: ${allDayRoutines.length}');
+      debugPrint('Time Slot Routines (after filtering completed): ${routines.length}');
+      
+      for (int i = 0; i < loadedRoutines.length; i++) {
+        final routine = loadedRoutines[i];
+        debugPrint('${i + 1}. ${routine.productName} at ${routine.time}');
       }
     } catch (e) {
-      debugPrint('Error fetching routines for routine tab: $e');
+      debugPrint('Error loading routines from SharedPreferences: $e');
       routines.clear();
+      allDayRoutines.clear();
     } finally {
       isLoadingRoutines.value = false;
     }
   }
 
-  // Helper method to get time based on user selected times
-  String _getTimeForCategory(String category) {
-    // First check if user has selected any morning times
-    if (selectedTimes.isNotEmpty) {
-      return selectedTimes.first; // Return the first selected morning time
-    }
-    
-    // If no morning times selected, check evening times
-    if (selectedEveningTimes.isNotEmpty) {
-      return selectedEveningTimes.first; // Return the first selected evening time
-    }
-    
-    // If no times selected at all, return default based on category type
-    switch (category.toLowerCase()) {
-      case 'night cream':
-      case 'night':
-        return availableeveningTimes.first; // Default evening time
-      default:
-        return availableTimes.first; // Default morning time
+  // Get filtered routines for time slots (remove completed ones)
+  Future<List<RoutineItem>> _getFilteredRoutinesForTimeSlots(List<RoutineItem> allRoutines) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      
+      return allRoutines.where((routine) {
+        final completionKey = 'completed_${routine.id}_$today';
+        final isCompleted = prefs.getBool(completionKey) ?? false;
+        if (isCompleted) {
+          debugPrint('Filtering out completed routine: ${routine.productName} at ${routine.time}');
+        }
+        return !isCompleted;
+      }).toList();
+    } catch (e) {
+      debugPrint('Error filtering routines: $e');
+      return allRoutines;
     }
   }
 
-  // Helper method to calculate time difference in minutes (prioritize upcoming times)
-  int _getTimeDifferenceInMinutes(DateTime currentTime, String timeStr) {
+  // Helper method to parse time for sorting
+  int _parseTimeForSorting(String timeStr) {
     try {
       // Normalize time string format
       String normalizedTime = timeStr.replaceAll('.', ':').trim();
@@ -417,166 +406,96 @@ void submitRoutine() async {
       }
       final parsedTime = format.parse(upperTime);
       
-      // Create DateTime object with today's date but the parsed time
-      var routineTime = DateTime(
-        currentTime.year, 
-        currentTime.month, 
-        currentTime.day, 
-        parsedTime.hour, 
-        parsedTime.minute
-      );
-      
-      // Calculate time difference in minutes
-      int diffMinutes = routineTime.difference(currentTime).inMinutes;
-      
-      debugPrint('Time comparison: Current=${DateFormat('h:mm a').format(currentTime)}, Routine=$timeStr, Diff=$diffMinutes minutes');
-      
-      // If the routine time is in the past today (negative), consider it for tomorrow
-      if (diffMinutes < 0) {
-        // Add 24 hours (1440 minutes) to get tomorrow's time difference
-        diffMinutes = diffMinutes + 1440;
-        debugPrint('Past time adjusted for tomorrow: $diffMinutes minutes');
-      }
-      
-      // Return the time difference (positive for upcoming times, including tomorrow's times)
-      return diffMinutes;
+      // Return minutes from midnight for sorting
+      return parsedTime.hour * 60 + parsedTime.minute;
     } catch (e) {
-      debugPrint('Error parsing time for comparison: $timeStr, error: $e');
-      return 999999; // Return large number for unparseable times
+      debugPrint('Error parsing time for sorting: $timeStr, error: $e');
+      // Fallback: return a high number for unparseable times so they appear at end
+      return 9999;
     }
   }
 
-  // Method to mark the current time slot as completed (without removing routine)
-  Future<void> markCurrentTimeSlotCompleted(String productId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final now = DateTime.now();
-      final today = DateFormat('yyyy-MM-dd').format(now);
-      
-      // Find the closest upcoming routine for this product
-      final productRoutines = routines.where((r) => r.productId == productId).toList();
-      if (productRoutines.isEmpty) {
-        debugPrint('No routines found for product: $productId');
-        return;
-      }
-      
-      // Find closest time
-      RoutineItem? closestRoutine;
-      int minTimeDiff = 999999;
-      
-      debugPrint('=== Finding Closest Time Slot to Complete ===');
-      debugPrint('Current time: ${DateFormat('h:mm a').format(now)}');
-      debugPrint('Available routines for product $productId:');
-      
-      for (var routine in productRoutines) {
-        final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
-        debugPrint('- ${routine.productName} at ${routine.time}: ${timeDiff} minutes from now');
-        if (timeDiff < minTimeDiff) {
-          minTimeDiff = timeDiff;
-          closestRoutine = routine;
-        }
-      }
-      
-      debugPrint('Closest routine selected: ${closestRoutine?.productName} at ${closestRoutine?.time} (${minTimeDiff} minutes)');
-      
-      if (closestRoutine != null) {
-        // Create a unique key for this time slot completion
-        final completionKey = 'completed_${productId}_${closestRoutine.time}_$today';
-        
-        // Save completion status
-        await prefs.setBool(completionKey, true);
-        
-        // Remove the completed time slot from current display
-        routines.removeWhere((routine) => 
-          routine.productId == productId && routine.time == closestRoutine!.time);
-        
-        // Re-sort remaining routines by closest time to show next upcoming routine
-        final currentTime = DateTime.now();
-        routines.sort((a, b) {
-          final timeDiffA = _getTimeDifferenceInMinutes(currentTime, a.time);
-          final timeDiffB = _getTimeDifferenceInMinutes(currentTime, b.time);
-          return timeDiffA.compareTo(timeDiffB); // Closest time first
-        });
-        
-        // Force refresh the reactive list to trigger UI update
-        routines.refresh();
-        
-        debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
-        debugPrint('Completion key: $completionKey');
-        debugPrint('Remaining routines after completion: ${routines.length}');
-        debugPrint('Next closest routine: ${routines.isNotEmpty ? '${routines.first.productName} at ${routines.first.time}' : 'None'}');
-        debugPrint('UI refreshed to show next routine');
-      }
-    } catch (e) {
-      debugPrint('Error marking time slot as completed: $e');
-    }
+  // Updated fetchRoutines method to load from SharedPreferences
+  Future<void> fetchRoutines() async {
+    await loadRoutinesFromSharedPreferences();
   }
 
-  // Method to mark the closest time slot as completed
-  Future<void> removeRoutine(String productId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final now = DateTime.now();
-      final today = DateFormat('yyyy-MM-dd').format(now);
-      
-      // Find the closest upcoming routine for this product
-      final productRoutines = routines.where((r) => r.productId == productId).toList();
-      if (productRoutines.isEmpty) {
-        debugPrint('No routines found for product: $productId');
-        return;
-      }
-      
-      // Find closest time
-      RoutineItem? closestRoutine;
-      int minTimeDiff = 999999;
-      
-      for (var routine in productRoutines) {
-        final timeDiff = _getTimeDifferenceInMinutes(now, routine.time);
-        if (timeDiff < minTimeDiff) {
-          minTimeDiff = timeDiff;
-          closestRoutine = routine;
-        }
-      }
-      
-      if (closestRoutine != null) {
-        // Create a unique key for this time slot completion
-        final completionKey = 'completed_${productId}_${closestRoutine.time}_$today';
-        
-        // Save completion status
-        await prefs.setBool(completionKey, true);
-        
-        // Remove from current display
-        routines.removeWhere((routine) => 
-          routine.productId == productId && routine.time == closestRoutine!.time);
-        
-        debugPrint('Marked time slot as completed: ${closestRoutine.time} for product: $productId');
-        debugPrint('Completion key: $completionKey');
-        debugPrint('Remaining routines: ${routines.length}');
-      }
-    } catch (e) {
-      debugPrint('Error removing routine: $e');
-    }
-  }
 
-  // Helper method to filter completed time slots
-  Future<void> _filterCompletedTimeSlots(List<RoutineItem> routines) async {
+
+  // Method to mark a specific routine as completed
+  Future<void> markRoutineCompleted(String routineId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       
-      routines.removeWhere((routine) {
-        final completionKey = 'completed_${routine.productId}_${routine.time}_$today';
-        final isCompleted = prefs.getBool(completionKey) ?? false;
-        if (isCompleted) {
-          debugPrint('Filtering out completed time slot: ${routine.productName} at ${routine.time}');
-        }
-        return isCompleted;
-      });
+      // Find the routine to mark as completed
+      final routineToComplete = routines.firstWhere(
+        (routine) => routine.id == routineId,
+        orElse: () => allDayRoutines.firstWhere(
+          (routine) => routine.id == routineId,
+          orElse: () => throw Exception('Routine not found'),
+        ),
+      );
       
-      debugPrint('After filtering completed time slots: ${routines.length} routines remaining');
+      debugPrint('=== Marking Routine as Completed ===');
+      debugPrint('Routine: ${routineToComplete.productName} at ${routineToComplete.time}');
+      debugPrint('Routine ID: $routineId');
+      
+      // Create completion key using routine ID
+      final completionKey = 'completed_${routineId}_$today';
+      
+      // Save completion status
+      await prefs.setBool(completionKey, true);
+      
+      // Remove from "all day" and "today" views (time slots view)
+      routines.removeWhere((routine) => routine.id == routineId);
+      
+      // BUT keep in allDayRoutines for time slot display (keep in time slot)
+      // allDayRoutines keeps all routines regardless of completion status
+      
+      // Force refresh the reactive lists
+      routines.refresh();
+      allDayRoutines.refresh();
+      
+      debugPrint('Routine marked as completed and removed from time slots view');
+      debugPrint('Completion key: $completionKey');
+      debugPrint('Remaining routines in time slots: ${routines.length}');
+      debugPrint('All day routines (including completed): ${allDayRoutines.length}');
+      
+      // Notify today controller to refresh
+      try {
+        final todayController = Get.find<TodayController>();
+        await todayController.refreshRoutineData();
+      } catch (e) {
+        debugPrint('Today controller not found: $e');
+      }
+      
     } catch (e) {
-      debugPrint('Error filtering completed time slots: $e');
+      debugPrint('Error marking routine as completed: $e');
     }
+  }
+
+  // Method for backward compatibility - marks routine by product ID
+  Future<void> markCurrentTimeSlotCompleted(String productId) async {
+    try {
+      // Find first routine with this product ID
+      final routine = routines.firstWhere(
+        (r) => r.productId == productId,
+        orElse: () => allDayRoutines.firstWhere(
+          (r) => r.productId == productId,
+          orElse: () => throw Exception('No routine found for product: $productId'),
+        ),
+      );
+      
+      await markRoutineCompleted(routine.id);
+    } catch (e) {
+      debugPrint('Error marking routine by product ID: $e');
+    }
+  }
+
+  // Method for backward compatibility
+  Future<void> removeRoutine(String productId) async {
+    await markCurrentTimeSlotCompleted(productId);
   }
 
   // Refresh routines method
@@ -595,7 +514,7 @@ void submitRoutine() async {
     // Don't use Get.arguments here as it can conflict with AddToRoutine's arguments handling
     // Product name will be set via setProductName() from AddToRoutine
     
-    // Fetch routines when controller initializes
-    fetchRoutines();
+    // Load routines from SharedPreferences when controller initializes
+    loadRoutinesFromSharedPreferences();
   }
 }

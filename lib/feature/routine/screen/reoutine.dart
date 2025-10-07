@@ -257,101 +257,111 @@ class Routine extends StatelessWidget {
                               );
                             }),
 
-                            // Scheduled Routine Items
+                            // Scheduled Routine Items - Show ALL routines in their respective time slots
                             Obx(
                               () {
                                 if (controller.routines.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
 
-                                // Use the first routine from already sorted list (closest to current time)
-                                final closestRoutine = controller.routines.first;
-
-                                // Debug: Print closest routine
+                                // Debug: Print all routines
                                 debugPrint('=== Timeline Debug ===');
                                 debugPrint('Total routines: ${controller.routines.length}');
-                                debugPrint('Showing closest routine: ${closestRoutine.productName} at ${closestRoutine.time}');
-                                debugPrint('All routines in order:');
+                                debugPrint('Showing ALL routines in their time slots:');
                                 for (int i = 0; i < controller.routines.length; i++) {
                                   final routine = controller.routines[i];
                                   debugPrint('${i + 1}. ${routine.productName} - ${routine.time}');
                                 }
                                 
-                                // Show the closest routine (first in sorted list)
-
-                                final routineTime = _parseRoutineTime(closestRoutine.time);
-                                
-                                if (routineTime == null || routineTime.hour < startHour24 || routineTime.hour > endHour24) {
-                                  return const SizedBox.shrink();
-                                }
-
-                                final topOffset = _calculateTopOffset(routineTime, timeSlotHeight, startHour24);
-
+                                // Show ALL routines in their respective time slots
                                 return Stack(
-                                  children: [
-                                    Positioned(
+                                  children: controller.routines.map((routine) {
+                                    final routineTime = _parseRoutineTime(routine.time);
+                                    
+                                    if (routineTime == null || routineTime.hour < startHour24 || routineTime.hour > endHour24) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    final topOffset = _calculateTopOffset(routineTime, timeSlotHeight, startHour24);
+
+                                    // Different colors for different routines to distinguish them
+                                    final colors = [
+                                      Colors.red,
+                                      Colors.blue,
+                                      Colors.green,
+                                      Colors.purple,
+                                      Colors.orange,
+                                      Colors.teal,
+                                    ];
+                                    final colorIndex = controller.routines.indexOf(routine) % colors.length;
+                                    final routineColor = colors[colorIndex];
+
+                                    return Positioned(
                                       top: topOffset,
                                       left: 0,
                                       right: 0,
-                                      child: InkWell(
-                                        onTap: () {
-                                          // Navigate to product detail page
-                                          Get.to(() => ViewRoutingProduct(
-                                            productName: closestRoutine.productName, 
-                                            productId: closestRoutine.productId,
-                                            startDate: closestRoutine.startDate,
-                                            endDate: closestRoutine.endDate,
-                                          ));
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red.withOpacity(0.1), // Red background for closest routine
-                                            borderRadius: BorderRadius.circular(8.r),
-                                            border: Border.all(
-                                              color: Colors.red,
-                                              width: 1.5,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: 10.w,
-                                                height: 10.h,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red,
-                                                  shape: BoxShape.circle,
-                                                ),
+                                      child: Container(
+                                        margin: EdgeInsets.only(bottom: 4.h), // Add space between routines
+                                        child: InkWell(
+                                          onTap: () {
+                                            // Navigate to product detail page
+                                            Get.to(() => ViewRoutingProduct(
+                                              productName: routine.productName, 
+                                              productId: routine.productId,
+                                              startDate: routine.startDate,
+                                              endDate: routine.endDate,
+                                            ));
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                            decoration: BoxDecoration(
+                                              color: routineColor.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: routineColor,
+                                                width: 1.5,
                                               ),
-                                              SizedBox(width: 8.w),
-                                              Expanded(
-                                                child: Text(
-                                                  closestRoutine.productName,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 10.w,
+                                                  height: 10.h,
+                                                  decoration: BoxDecoration(
+                                                    color: routineColor,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 8.w),
+                                                Expanded(
+                                                  child: Text(
+                                                    routine.productName,
+                                                    style: TextStyle(
+                                                      fontFamily: "SFPro",
+                                                      fontSize: 14.sp,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: const Color(0xff172601),
+                                                    ),
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  routine.time,
                                                   style: TextStyle(
                                                     fontFamily: "SFPro",
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: const Color(0xff172601),
+                                                    fontSize: 11.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: routineColor,
                                                   ),
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                              Text(
-                                                closestRoutine.time,
-                                                style: TextStyle(
-                                                  fontFamily: "SFPro",
-                                                  fontSize: 11.sp,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  }).toList(),
                                 );
                               },
                             ),

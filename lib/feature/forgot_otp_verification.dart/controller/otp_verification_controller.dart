@@ -55,7 +55,6 @@ class OtpVerificationController extends GetxController {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
       
-        final accessToken = data['accessToken'] ?? data['data']?['accessToken'];
         debugPrint('AccessToken (direct): ${data['accessToken']}');
         debugPrint('AccessToken (nested): ${data['data']?['accessToken']}');
         // Use nested accessToken (your response structure)

@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
-import 'package:personal_wellness/core/models/routine_home_model.dart';
 
 class TodayController extends GetxController {
   var userName = "Liana".obs; // Default username
@@ -79,67 +79,44 @@ class TodayController extends GetxController {
   Future<void> fetchHomeRoutineData() async {
     try {
       isLoading.value = true;
-      debugPrint('=== Fetching Home Routine Data ===');
+      debugPrint('=== Fetching Home Routine Data from SharedPreferences ===');
       
-      // Check authentication first
-      final isAuthenticated = await checkAuthentication();
-      if (!isAuthenticated) {
-        debugPrint('User not authenticated - clearing routine data');
+      final prefs = await SharedPreferences.getInstance();
+      final routinesJson = prefs.getString('saved_routines') ?? '[]';
+      final List<dynamic> routinesList = jsonDecode(routinesJson);
+      
+      if (routinesList.isEmpty) {
+        debugPrint('No routines found in SharedPreferences');
         routineData.clear();
         return;
       }
+
+      debugPrint('Found ${routinesList.length} routines in SharedPreferences');
       
-      final response = await ApiService.getHomeRoutineData();
+      // Take only the most recent 3 items for today view
+      final recentRoutines = routinesList.take(3).toList();
       
-      debugPrint('API Response: $response');
-      debugPrint('Response success: ${response?.success}');
-      debugPrint('Response data result length: ${response?.data.result.length}');
+      // Convert JSON data to the format expected by the UI
+      final formattedData = recentRoutines.map((routineJson) {
+        final productName = routineJson['productName'] ?? '';
+        final time = routineJson['time'] ?? '';
+        final productId = routineJson['productId'] ?? '';
+        
+        debugPrint('Adding routine: $productName at $time');
+        return {
+          'icon': _getCategoryIcon('skincare'), // Default category
+          'title': 'Skincare', // Default title
+          'description': productName,
+          'time': time,
+          'isCompleted': RxBool(false),
+          'productId': productId,
+        };
+      }).toList();
       
-      if (response == null) {
-        debugPrint('API response is null - likely authentication issue');
-        routineData.clear();
-      } else if (response.success) {
-        if (response.data.result.isEmpty) {
-          debugPrint('No routines found in response - showing empty view');
-          routineData.clear();
-        } else {
-          debugPrint('Found ${response.data.result.length} routines');
-          
-          // Sort routines by creation date (most recent first)
-          var sortedRoutines = response.data.result.toList();
-          sortedRoutines.sort((a, b) {
-            final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-            final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-            return dateB.compareTo(dateA); // Most recent first
-          });
-          
-          // Take only the most recent 3 items
-          final routineItems = sortedRoutines.take(3).toList();
-          debugPrint('Showing ${routineItems.length} most recent routines');
-          
-          // Convert API data to the format expected by the UI
-          final formattedData = routineItems.map((item) {
-            debugPrint('Adding routine: ${item.category} - ${item.product.productName}');
-            return {
-              'icon': _getCategoryIcon(item.category),
-              'title': item.category,
-              'description': item.product.productName,
-              'time': _getActualSelectedTime(item),
-              'isCompleted': RxBool(false),
-              'productId': item.product.id, // Add product ID for navigation
-            };
-          }).toList();
-          
-          routineData.assignAll(formattedData);
-          debugPrint('Routine data updated with ${routineData.length} items');
-        }
-      } else {
-        debugPrint('API request failed - response success: ${response.success}');
-        routineData.clear();
-      }
+      routineData.assignAll(formattedData);
+      debugPrint('Today view updated with ${routineData.length} items');
     } catch (e) {
-      debugPrint('Error fetching routine data: $e');
-      // Clear routine data if API fails
+      debugPrint('Error fetching routine data from SharedPreferences: $e');
       routineData.clear();
     } finally {
       isLoading.value = false;
@@ -163,46 +140,6 @@ class TodayController extends GetxController {
       default:
         return IconPath.cleanser;
     }
-  }
-
-  String _getActualSelectedTime(RoutineItem item) {
-    debugPrint('Getting time for item: ${item.category}');
-    debugPrint('Morning times: ${item.morningTimeOfDay}');
-    debugPrint('Evening times: ${item.eveningTimeOfDay}');
-    
-    // Combine all available times (morning and evening)
-    List<String> allTimes = [];
-    
-    if (item.morningTimeOfDay != null && item.morningTimeOfDay!.isNotEmpty) {
-      allTimes.addAll(item.morningTimeOfDay!);
-    }
-    
-    if (item.eveningTimeOfDay != null && item.eveningTimeOfDay!.isNotEmpty) {
-      allTimes.addAll(item.eveningTimeOfDay!);
-    }
-    
-    // If we have any selected times, show the first one
-    if (allTimes.isNotEmpty) {
-      debugPrint('Using selected time: ${allTimes.first}');
-      return allTimes.first;
-    }
-    
-    // If no times found, show current time as fallback
-    debugPrint('No selected times found, using current time');
-    return _getCurrentTime();
-  }
-
-  String _getCurrentTime() {
-    final now = DateTime.now();
-    final hour = now.hour;
-    final minute = now.minute;
-    
-    // Convert to 12-hour format
-    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    final amPm = hour >= 12 ? 'PM' : 'AM';
-    final displayMinute = minute.toString().padLeft(2, '0');
-    
-    return '$displayHour:$displayMinute $amPm';
   }
 
   void setUserName(String name) {
