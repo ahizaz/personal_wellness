@@ -58,19 +58,22 @@ class Routine extends StatelessWidget {
       }
     }
 
-    // Helper function to calculate the vertical position based on time
-    double _calculateTopOffset(DateTime time, double hourHeight, int startHour) {
+    const double timeSlotHeight = 28.0; // Height with more spacing for 15-minute slot
+    const double slotMargin = 30.0; // Consistent margin for spacing
+    
+    // Helper function to calculate the vertical position based on time (15-minute intervals)
+    double _calculateTopOffset(DateTime time, double slotHeight, int startHour) {
       final minutesFromTimelineStart = (time.hour * 60 + time.minute) - (startHour * 60);
-      return (minutesFromTimelineStart / 60.0) * hourHeight;
+      return (minutesFromTimelineStart / 15.0) * (timeSlotHeight + slotMargin); // Include spacing in calculation
     }
-
-    const double hourHeight = 80.0; // Height for each hour slot
     const int startHour24 = 0; // Timeline starts at 12 AM (midnight)
-    const int endHour24 = 23; // Timeline ends at 11 PM (23:00)
+    const int endHour24 = 23; // Timeline ends at 11 PM (23:00) - full 24 hours
+    const int minutesPerSlot = 15; // 15-minute intervals
     final totalHours = endHour24 - startHour24 + 1;
+    final totalTimeSlots = totalHours * 4; // 4 slots per hour (15-minute intervals)
 
     final now = DateTime.now();
-    final currentTimeOffset = _calculateTopOffset(now, hourHeight, startHour24);
+    final currentTimeOffset = _calculateTopOffset(now, timeSlotHeight, startHour24);
 
     return Scaffold(
       backgroundColor: Color(0xffFFFFFF),
@@ -192,25 +195,36 @@ class Routine extends StatelessWidget {
                 ),
                 SizedBox(height: 16.h),
                 // --- Start of new timeline implementation ---
-                Row(
+                SizedBox(
+                 // Fixed height for scrollable timeline
+                  child: SingleChildScrollView(
+                    child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left side: Time labels (6 AM, 7 AM, etc.)
+                    // Left side: Time labels (12:00 AM, 12:15 AM, 12:30 AM, etc.)
                     Padding(
-                      padding: EdgeInsets.only(top: hourHeight / 2 - 10.h), // Adjust alignment
+                      padding: EdgeInsets.only(top: timeSlotHeight / 2 - 5.h), // Adjust alignment
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(totalHours, (index) {
-                          final hour = startHour24 + index;
-                          return SizedBox(
-                            height: hourHeight,
-                            child: Text(
-                              DateFormat('h a').format(DateTime(0, 0, 0, hour)),
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 12.sp, // Smaller text for more hours
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff757575),
+                        children: List.generate(totalTimeSlots, (index) {
+                          final totalMinutes = (startHour24 * 60) + (index * minutesPerSlot);
+                          final hour = (totalMinutes ~/ 60) % 24; // Ensure 24-hour format
+                          final minute = totalMinutes % 60;
+                          
+                          // Show labels for 15-minute intervals with better spacing
+                          return Container(
+                            height: timeSlotHeight,
+                            margin: EdgeInsets.symmetric(vertical: slotMargin.h), // Consistent spacing
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                DateFormat('h:mm a').format(DateTime(0, 0, 0, hour, minute)),
+                                style: TextStyle(
+                                  fontFamily: "SFPro",
+                                  fontSize: 10.sp, // Slightly larger text for better readability
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff757575),
+                                ),
                               ),
                             ),
                           );
@@ -221,24 +235,25 @@ class Routine extends StatelessWidget {
                     // Right side: Timeline with items and current time indicator
                     Expanded(
                       child: SizedBox(
-                        height: totalHours * hourHeight,
+                        height: totalTimeSlots * (timeSlotHeight + slotMargin.h), // Account for consistent vertical margins
                         child: Stack(
                           children: [
-                            // Background horizontal lines
-                            Column(
-                              children: List.generate(totalHours, (index) {
-                                return SizedBox(
-                                  height: hourHeight,
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Container(
-                                      height: 1,
-                                      color: const Color(0xffE0E0E0),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
+                            // Background horizontal lines (every hour)
+                            ...List.generate(totalHours, (hourIndex) {
+                              // Calculate position for each hour line (after each full hour)
+                              // Each hour has 4 time slots (15-minute intervals)
+                              // Line should appear after every 4 slots
+                              final lineTopPosition = (hourIndex + 1) * 4 * (timeSlotHeight + slotMargin.h); // Position after each hour
+                              return Positioned(
+                                top: lineTopPosition,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 2, // Make lines thicker to be more visible
+                                  color: const Color(0xffD0D0D0), // Make lines darker to be more visible
+                                ),
+                              );
+                            }),
 
                             // Scheduled Routine Items
                             Obx(
@@ -268,7 +283,7 @@ class Routine extends StatelessWidget {
                                   return const SizedBox.shrink();
                                 }
 
-                                final topOffset = _calculateTopOffset(routineTime, hourHeight, startHour24);
+                                final topOffset = _calculateTopOffset(routineTime, timeSlotHeight, startHour24);
 
                                 return Stack(
                                   children: [
@@ -380,6 +395,8 @@ class Routine extends StatelessWidget {
                       ),
                     ),
                   ],
+                    ),
+                  ),
                 ),
                 // --- End of new timeline implementation ---
               ],

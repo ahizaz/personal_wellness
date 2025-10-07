@@ -61,6 +61,14 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
 
   // Helper method to build progress image widget (handles both local files and remote URLs)
   Widget _buildProgressImage(String imagePath) {
+    // Handle empty/null image path
+    if (imagePath.isEmpty) {
+      return Container(
+        color: Colors.grey[300],
+        child: Icon(Icons.image_not_supported),
+      );
+    }
+    
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       // Remote URL
       return Image.network(
@@ -74,7 +82,7 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
+                        (loadingProgress.expectedTotalBytes ?? 1)
                     : null,
               ),
             ),
@@ -440,17 +448,20 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                             
                             // Add all captured left images
                             for (int i = 0; i < controller.leftProgressImages.length; i++) {
-                              images.add(
-                                Container(
-                                  width: 99.w,
-                                  height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    child: _buildProgressImage(controller.leftProgressImages[i]),
+                              final imagePath = controller.leftProgressImages[i];
+                              if (imagePath.isNotEmpty) {
+                                images.add(
+                                  Container(
+                                    width: 99.w,
+                                    height: 220.h,
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: _buildProgressImage(imagePath),
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              }
                             }
                             
                             // Show message if no images captured
@@ -518,17 +529,20 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               
                               // Add all captured right images
                               for (int i = 0; i < controller.rightProgressImages.length; i++) {
-                                images.add(
-                                  Container(
-                                    width: 99.w,
-                                    height: 220.h,
-                                    margin: EdgeInsets.only(right: 8.w),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      child: _buildProgressImage(controller.rightProgressImages[i]),
+                                final imagePath = controller.rightProgressImages[i];
+                                if (imagePath.isNotEmpty) {
+                                  images.add(
+                                    Container(
+                                      width: 99.w,
+                                      height: 220.h,
+                                      margin: EdgeInsets.only(right: 8.w),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: _buildProgressImage(imagePath),
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               }
                               
                               // Show message if no images captured
@@ -612,17 +626,20 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                             
                             // Add all captured front images
                             for (int i = 0; i < controller.frontProgressImages.length; i++) {
-                              images.add(
-                                Container(
-                                  width: 99.w,
-                                  height: 220.h,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    child: _buildProgressImage(controller.frontProgressImages[i]),
+                              final imagePath = controller.frontProgressImages[i];
+                              if (imagePath.isNotEmpty) {
+                                images.add(
+                                  Container(
+                                    width: 99.w,
+                                    height: 220.h,
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: _buildProgressImage(imagePath),
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              }
                             }
                             
                             // Show message if no images captured

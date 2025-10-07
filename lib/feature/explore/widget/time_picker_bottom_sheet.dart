@@ -80,7 +80,7 @@ class TimePickerBottomSheet extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Minute picker
+                  // Minute picker (15-minute intervals)
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
@@ -88,20 +88,17 @@ class TimePickerBottomSheet extends StatelessWidget {
                       ),
                       itemExtent: 40,
                       onSelectedItemChanged: (index) {
-                        selectedMinute = index;
+                        selectedMinute = [0, 15, 30, 45][index];
                       },
-                      children: List.generate(
-                        60,
-                        (i) => Center(
+                      children: [0, 15, 30, 45].map((minute) => Center(
                           child: Text(
-                            i.toString().padLeft(2, '0'),
+                            minute.toString().padLeft(2, '0'),
                             style: TextStyle(
                               fontSize: 20.sp,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                      ),
+                        )).toList(),
                     ),
                   ),
                   // AM/PM picker

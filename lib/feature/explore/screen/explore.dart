@@ -79,6 +79,8 @@ class Explore extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
               SizedBox(
+                
+                
                 height: 200.h, // Set a fixed height to limit the container
                 child: Obx(() => ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -86,16 +88,17 @@ class Explore extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = controller.sortedSkinConditions[index];
                         return InkWell(
-                          onTap:(){
-                              Get.to(()=>SkinCondition(
-                                imagePath: item['image']!,
-                                title: item['title']!,
-                                id: item['id'],
-                              ));
-                          },
-                          child: SizedBox(
-                            width: 160.h,
-                            child: Column(
+                            onTap:(){
+                                Get.to(()=>SkinCondition(
+                                  imagePath: item['image']!,
+                                  title: item['title']!,
+                                  id: item['id'],
+                                ));
+                            },
+                            child: Container(
+                              width: 160.h,
+                              margin: EdgeInsets.only(right: 16.w),
+                              child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -106,10 +109,22 @@ class Explore extends StatelessWidget {
                                     child: Image.network(
                                       item["image"]!,
                                       fit: BoxFit.cover,
+                                      cacheWidth: 320, // Optimize image loading
+                                      cacheHeight: 320,
                                       errorBuilder: (context, error, stackTrace) {
                                         return Container(
                                           color: Colors.grey[300],
-                                          child: Icon(Icons.error, color: Colors.grey[600]),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.broken_image, color: Colors.grey[600], size: 24),
+                                              SizedBox(height: 4),
+                                              Text('Image failed', 
+                                                style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
                                         );
                                       },
                                       loadingBuilder: (context, child, loadingProgress) {
@@ -117,12 +132,21 @@ class Explore extends StatelessWidget {
                                         return Container(
                                           color: Colors.grey[200],
                                           child: Center(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              value: loadingProgress.expectedTotalBytes != null
-                                                  ? loadingProgress.cumulativeBytesLoaded /
-                                                      loadingProgress.expectedTotalBytes!
-                                                  : null,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: Color(0xff3E4B2C),
+                                                  value: loadingProgress.expectedTotalBytes != null
+                                                      ? loadingProgress.cumulativeBytesLoaded /
+                                                          loadingProgress.expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text('Loading...', 
+                                                  style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
+                                              ],
                                             ),
                                           ),
                                         );
@@ -135,7 +159,7 @@ class Explore extends StatelessWidget {
                                   item["title"]!,
                                   style: TextStyle(
                                     fontFamily: "SFPro",
-                                    fontSize: 17.sp,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.w500,
                                     color: Color(0xff000000),
                                   ),
@@ -146,11 +170,12 @@ class Explore extends StatelessWidget {
                         );
                       },
                     )),
-              ),
+              ),///
             
               SizedBox(height: 12.h),
+              //2nd one 
               SizedBox(
-                height: 200.h, // Set a fixed height to limit the container
+                height: 220.h, // Set a fixed height to limit the container
                 child: Obx(() => ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: controller.sortedSkinTypes.length,
@@ -164,8 +189,9 @@ class Explore extends StatelessWidget {
                                 id: item['id'],
                               ));
                           },
-                          child: SizedBox(
+                          child: Container(
                             width: 160.h,
+                            margin: EdgeInsets.only(right: 16.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
@@ -245,65 +271,69 @@ Obx(() {
       Row(
         children: [
           // Product 1
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () {
-                  //Get.to(() => ViewProduct(), arguments: products[0]["title"]);
-                  Get.to(() => ViewProduct(), arguments: products[0]["id"]);
-                },
-                child: SizedBox(
-                  width: 178.w,
-                  height: 182.h,
-                  child: Image.network(
-                    products[0]["image"] ?? "",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    //Get.to(() => ViewProduct(), arguments: products[0]["title"]);
+                    Get.to(() => ViewProduct(), arguments: products[0]["id"]);
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 182.h,
+                    child: Image.network(
+                      products[0]["image"] ?? "",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                products[0]["title"] ?? "",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: 8.h),
+                Text(
+                  products[0]["title"] ?? "",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           SizedBox(width: 8.w),
           // Product 2
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () {
-                  // Get.to(() => ViewProduct(), arguments: products[1]["title"]);
-                     Get.to(() => ViewProduct(), arguments: products[1]["id"]);
-                },
-                child: SizedBox(
-                  width: 178.w,
-                  height: 182.h,
-                  child: Image.network(
-                    products[1]["image"] ?? "",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    // Get.to(() => ViewProduct(), arguments: products[1]["title"]);
+                    Get.to(() => ViewProduct(), arguments: products[1]["id"]);
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 182.h,
+                    child: Image.network(
+                      products[1]["image"] ?? "",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                products[1]["title"] ?? "",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: 8.h),
+                Text(
+                  products[1]["title"] ?? "",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -311,65 +341,69 @@ Obx(() {
       Row(
         children: [
           // Product 3
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () {
-               //   Get.to(() => ViewProduct(), arguments: products[2]["title"]);
-                 Get.to(() => ViewProduct(), arguments: products[2]["id"]);
-               
-                },
-                child: SizedBox(
-                  width: 178.w,
-                  height: 182.h,
-                  child: Image.network(
-                    products[2]["image"] ?? "",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                 //   Get.to(() => ViewProduct(), arguments: products[2]["title"]);
+                   Get.to(() => ViewProduct(), arguments: products[2]["id"]);
+                 
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 182.h,
+                    child: Image.network(
+                      products[2]["image"] ?? "",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                products[2]["title"] ?? "",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: 8.h),
+                Text(
+                  products[2]["title"] ?? "",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           SizedBox(width: 8.w),
           // Product 4
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () {
-              Get.to(() => ViewProduct(), arguments: products[3]["id"]);
-                },
-                child: SizedBox(
-                  width: 178.w,
-                  height: 182.h,
-                  child: Image.network(
-                    products[3]["image"] ?? "",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Get.to(() => ViewProduct(), arguments: products[3]["id"]);
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 182.h,
+                    child: Image.network(
+                      products[3]["image"] ?? "",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                products[3]["title"] ?? "",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: 8.h),
+                Text(
+                  products[3]["title"] ?? "",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
