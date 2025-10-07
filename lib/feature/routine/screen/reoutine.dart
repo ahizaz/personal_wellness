@@ -318,7 +318,7 @@ class Routine extends StatelessWidget {
                                             future: controller.isRoutineCompleted(routine.id),
                                             builder: (context, snapshot) {
                                               final isCompleted = snapshot.data ?? false;
-                                              final displayColor = isCompleted ? Colors.grey : routineColor;
+                                              final displayColor = isCompleted ? Colors.green : routineColor;
                                               
                                               return Container(
                                                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -348,7 +348,7 @@ class Routine extends StatelessWidget {
                                                           fontFamily: "SFPro",
                                                           fontSize: 14.sp,
                                                           fontWeight: FontWeight.w600,
-                                                          color: isCompleted ? Colors.grey.shade600 : const Color(0xff172601),
+                                                          color: isCompleted ? Colors.green.shade700 : const Color(0xff172601),
                                                           decoration: isCompleted ? TextDecoration.lineThrough : null,
                                                         ),
                                                         maxLines: 2,
@@ -368,8 +368,8 @@ class Routine extends StatelessWidget {
                                                       SizedBox(width: 8.w),
                                                       Icon(
                                                         Icons.check_circle,
-                                                        color: Colors.green,
-                                                        size: 16.sp,
+                                                        color: Colors.green.shade600,
+                                                        size: 18.sp,
                                                       ),
                                                     ],
                                                   ],

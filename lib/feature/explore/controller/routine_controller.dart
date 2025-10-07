@@ -486,7 +486,7 @@ void submitRoutine() async {
       debugPrint('✅ Routine marked as completed');
       debugPrint('❌ Removed from All Day section');
       debugPrint('❌ Removed from Today section');
-      debugPrint('✅ BUT kept in Time Slot timeline');
+      debugPrint('🟢 BUT kept in Time Slot timeline with GREEN color');
       debugPrint('Completion key: $completionKey');
       debugPrint('Remaining All Day routines: ${allDayRoutines.length}');
       debugPrint('Remaining Today routines: ${routines.length}');

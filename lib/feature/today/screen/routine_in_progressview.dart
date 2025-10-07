@@ -83,16 +83,19 @@ class RoutineInProgressview extends StatelessWidget {
                                       fit: BoxFit.cover,
                                     ),
                                     SizedBox(width: 10.w),
-                                    Text(
-                                      data['title'],
-                                      style: TextStyle(
-                                        fontFamily: "SFPro",
-                                        fontSize: 17.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xff000000),
+                                    Expanded(
+                                      child: Text(
+                                        data['title'],
+                                        style: TextStyle(
+                                          fontFamily: "SFPro",
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff000000),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
                                     ),
-                                    Spacer(),
                                     Text(
                                       data['time'],
                                       style: TextStyle(
@@ -106,19 +109,22 @@ class RoutineInProgressview extends StatelessWidget {
                                
                                 Row(
                                   children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 30.w,),
-                                      child: Text(
-                                        data['description'],
-                                        style: TextStyle(
-                                          fontFamily: "SFPro",
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff000000),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 30.w,),
+                                        child: Text(
+                                          data['description'],
+                                          style: TextStyle(
+                                            fontFamily: "SFPro",
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xff000000),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ),
-                                    Spacer(),
                                     Transform.scale(
                                       scale: 1.3,
                                       child: Checkbox(
@@ -213,23 +219,30 @@ class RoutineInProgressview extends StatelessWidget {
                                                  Image.asset(IconPath.camera,height: 48.h,width: 48.w,fit: BoxFit.cover,
                       ),
                       SizedBox(width: 16.w,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                           Text("Weekly Progress Photo",style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff000000)
-                           ),),
-                           SizedBox(height: 8,),
-                           Text("Take your weekly progress photo\nto take your skin journey",style: TextStyle(
-                             fontFamily: "SFPro",
-                             fontSize: 16.sp,
-                             fontWeight: FontWeight.w400,
-                             color: Color(0xff172601)
-                           ),),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                             Text("Weekly Progress Photo",style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000)
+                             ),
+                             overflow: TextOverflow.ellipsis,
+                             maxLines: 1,
+                             ),
+                             SizedBox(height: 8,),
+                             Text("Take your weekly progress photo\nto take your skin journey",style: TextStyle(
+                               fontFamily: "SFPro",
+                               fontSize: 16.sp,
+                               fontWeight: FontWeight.w400,
+                               color: Color(0xff172601)
+                             ),
+                             overflow: TextOverflow.ellipsis,
+                             maxLines: 2,
+                             ),
                            SizedBox(height: 16.h,),
                            InkWell(
                             onTap: (){
@@ -256,6 +269,7 @@ class RoutineInProgressview extends StatelessWidget {
                            ),
                            
                           ],
+                        ),
                         )
                       ],
                     ),
