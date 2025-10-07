@@ -67,9 +67,8 @@ class ViewRoutingProduct extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    SizedBox(width: 70.w),
-                    FittedBox(
-                      fit: BoxFit.fitWidth,
+                    SizedBox(width: 16.w), // Reduced from 70.w to 16.w
+                    Expanded( // Use Expanded instead of FittedBox for better text handling
                       child: Text(
                         productName,
                         style: TextStyle(
@@ -78,11 +77,12 @@ class ViewRoutingProduct extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xff172601),
                         ),
-                        maxLines: 1,
-                        softWrap: false,
+                        maxLines: 2, // Allow 2 lines for longer product names
                         overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center, // Center the product name
                       ),
                     ),
+                    SizedBox(width: 40.w), // Add right padding for balance
                   ],
                 ),
                 SizedBox(

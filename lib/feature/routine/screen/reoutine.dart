@@ -58,8 +58,8 @@ class Routine extends StatelessWidget {
       }
     }
 
-    const double timeSlotHeight = 28.0; // Height with more spacing for 15-minute slot
-    const double slotMargin = 30.0; // Consistent margin for spacing
+    const double timeSlotHeight = 35.0; // Increased height for better spacing between time slots
+    const double slotMargin = 40.0; // Increased margin for more spacing between time slots
     
     // Helper function to calculate the vertical position based on time (15-minute intervals)
     double _calculateTopOffset(DateTime time, double slotHeight, int startHour) {
@@ -224,7 +224,7 @@ class Routine extends StatelessWidget {
                               DateFormat('h:mm a').format(DateTime(0, 0, 0, hour, minute)),
                               style: TextStyle(
                                 fontFamily: "SFPro",
-                                fontSize: 10.sp,
+                                fontSize: 11.sp, // Slightly increased font size for better readability
                                 fontWeight: FontWeight.w400,
                                 color: const Color(0xff757575),
                               ),
@@ -303,7 +303,7 @@ class Routine extends StatelessWidget {
                                       left: 0,
                                       right: 0,
                                       child: Container(
-                                        margin: EdgeInsets.only(bottom: 4.h), // Add space between routines
+                                        margin: EdgeInsets.only(bottom: 8.h), // Increased margin for better spacing between routine items
                                         child: InkWell(
                                           onTap: () {
                                             // Navigate to product detail page
