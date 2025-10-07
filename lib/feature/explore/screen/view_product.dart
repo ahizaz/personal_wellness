@@ -124,10 +124,10 @@ class ViewProduct extends StatelessWidget {
                       controller.productDataview["productName"] ?? "",
                       style: TextStyle(
                           fontFamily: "SFPro",
-                          fontSize: 28.sp,
+                          fontSize: 30.sp,
                           fontWeight: FontWeight.w400,
                           color: Color(0xff172601)),
-                      maxLines: 1,
+                      maxLines: 2,
                       softWrap: false,
                       overflow: TextOverflow.clip,
                     ),
@@ -200,39 +200,99 @@ class ViewProduct extends StatelessWidget {
                         ),
                       );
                     }
-                    // Show relevant products dynamically from API
-                    return Wrap(
-                      spacing: 16.w,
-                      runSpacing: 16.h,
-                      children: controller.relevantProducts.map((prod) {
-                        return SizedBox(
-                          width: 177.w,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              prod["image"] != ""
-                                ? Image.network(prod["image"], width: 177.w, height: 182.h, fit: BoxFit.cover)
-                                : Container(
-                                    width: 177.w,
-                                    height: 182.h,
-                                    color: Colors.grey[300],
-                                    child: Icon(Icons.image_not_supported, size: 40),
+                    // Show relevant products dynamically from API in parallel rows
+                    return Column(
+                      children: [
+                        for (int i = 0; i < controller.relevantProducts.length; i += 2)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 16.h),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // First product in the row
+                                Expanded(
+                                  child: Container(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          child: controller.relevantProducts[i]["image"] != ""
+                                            ? Image.network(
+                                                controller.relevantProducts[i]["image"], 
+                                                width: double.infinity, 
+                                                height: 182.h, 
+                                                fit: BoxFit.cover
+                                              )
+                                            : Container(
+                                                width: double.infinity,
+                                                height: 182.h,
+                                                color: Colors.grey[300],
+                                                child: Icon(Icons.image_not_supported, size: 40),
+                                              ),
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Text(
+                                          controller.relevantProducts[i]["productName"] ?? "",
+                                          style: TextStyle(
+                                            fontFamily: "SFPro",
+                                            fontSize: 17.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xff000000)
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                              SizedBox(height: 8.h),
-                              Text(
-                                prod["productName"] ?? "",
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xff000000)
                                 ),
-                              )
-                            ],
+                                // Add spacing between products
+                                SizedBox(width: 16.w),
+                                // Second product in the row (or empty space if odd number)
+                                Expanded(
+                                  child: i + 1 < controller.relevantProducts.length
+                                    ? Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(8.r),
+                                              child: controller.relevantProducts[i + 1]["image"] != ""
+                                                ? Image.network(
+                                                    controller.relevantProducts[i + 1]["image"], 
+                                                    width: double.infinity, 
+                                                    height: 182.h, 
+                                                    fit: BoxFit.cover
+                                                  )
+                                                : Container(
+                                                    width: double.infinity,
+                                                    height: 182.h,
+                                                    color: Colors.grey[300],
+                                                    child: Icon(Icons.image_not_supported, size: 40),
+                                                  ),
+                                            ),
+                                            SizedBox(height: 8.h),
+                                            Text(
+                                              controller.relevantProducts[i + 1]["productName"] ?? "",
+                                              style: TextStyle(
+                                                fontFamily: "SFPro",
+                                                fontSize: 17.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff000000)
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    : SizedBox(), // Empty space for odd number of products
+                                ),
+                              ],
+                            ),
                           ),
-                        );
-                      }).toList(),
+                      ],
                     );
                   }),
                   SizedBox(height: 14.h),

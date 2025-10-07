@@ -64,7 +64,7 @@ class Routine extends StatelessWidget {
     // Helper function to calculate the vertical position based on time (15-minute intervals)
     double _calculateTopOffset(DateTime time, double slotHeight, int startHour) {
       final minutesFromTimelineStart = (time.hour * 60 + time.minute) - (startHour * 60);
-      return (minutesFromTimelineStart / 15.0) * (timeSlotHeight + slotMargin); // Include spacing in calculation
+      return (minutesFromTimelineStart / 15.0) * (slotHeight + slotMargin / 4); // Fixed calculation with proper spacing
     }
     const int startHour24 = 0; // Timeline starts at 12 AM (midnight)
     const int endHour24 = 23; // Timeline ends at 11 PM (23:00) - full 24 hours
@@ -74,6 +74,12 @@ class Routine extends StatelessWidget {
 
     final now = DateTime.now();
     final currentTimeOffset = _calculateTopOffset(now, timeSlotHeight, startHour24);
+    
+    // Debug: Print current time and calculated offset
+    debugPrint('=== Current Time Debug ===');
+    debugPrint('Current time: ${DateFormat('h:mm a').format(now)}');
+    debugPrint('Current hour: ${now.hour}, minute: ${now.minute}');
+    debugPrint('Calculated offset: $currentTimeOffset');
 
     return Scaffold(
       backgroundColor: Color(0xffFFFFFF),
@@ -201,41 +207,37 @@ class Routine extends StatelessWidget {
                     child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left side: Time labels (12:00 AM, 12:15 AM, 12:30 AM, etc.)
-                    Padding(
-                      padding: EdgeInsets.only(top: timeSlotHeight / 2 - 5.h), // Adjust alignment
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(totalTimeSlots, (index) {
-                          final totalMinutes = (startHour24 * 60) + (index * minutesPerSlot);
-                          final hour = (totalMinutes ~/ 60) % 24; // Ensure 24-hour format
-                          final minute = totalMinutes % 60;
-                          
-                          // Show labels for 15-minute intervals with better spacing
-                          return Container(
-                            height: timeSlotHeight,
-                            margin: EdgeInsets.symmetric(vertical: slotMargin.h), // Consistent spacing
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                DateFormat('h:mm a').format(DateTime(0, 0, 0, hour, minute)),
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 10.sp, // Slightly larger text for better readability
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff757575),
-                                ),
+                    // Left side: Time labels (12:00 AM, 12:15 AM, 12:30 AM, etc.)  
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List.generate(totalTimeSlots, (index) {
+                        final totalMinutes = (startHour24 * 60) + (index * minutesPerSlot);
+                        final hour = (totalMinutes ~/ 60) % 24; // Ensure 24-hour format
+                        final minute = totalMinutes % 60;
+                        
+                        // Show labels for 15-minute intervals with proper spacing
+                        return Container(
+                          height: timeSlotHeight + slotMargin / 4,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              DateFormat('h:mm a').format(DateTime(0, 0, 0, hour, minute)),
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xff757575),
                               ),
                             ),
-                          );
-                        }),
-                      ),
+                          ),
+                        );
+                      }),
                     ),
                     SizedBox(width: 8.w),
                     // Right side: Timeline with items and current time indicator
                     Expanded(
                       child: SizedBox(
-                        height: totalTimeSlots * (timeSlotHeight + slotMargin.h), // Account for consistent vertical margins
+                        height: totalTimeSlots * (timeSlotHeight + slotMargin / 4), // Fixed height calculation
                         child: Stack(
                           children: [
                             // Background horizontal lines (every hour)
@@ -243,7 +245,7 @@ class Routine extends StatelessWidget {
                               // Calculate position for each hour line (after each full hour)
                               // Each hour has 4 time slots (15-minute intervals)
                               // Line should appear after every 4 slots
-                              final lineTopPosition = (hourIndex + 1) * 4 * (timeSlotHeight + slotMargin.h); // Position after each hour
+                              final lineTopPosition = (hourIndex + 1) * 4 * (timeSlotHeight + slotMargin / 4); // Fixed position calculation
                               return Positioned(
                                 top: lineTopPosition,
                                 left: 0,
@@ -364,7 +366,7 @@ class Routine extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      DateFormat('h:mm').format(now),
+                                      DateFormat('h:mm a').format(now), // Changed to include AM/PM for clarity
                                       style: TextStyle(
                                         fontFamily: "SFPro",
                                         fontSize: 14.sp,
