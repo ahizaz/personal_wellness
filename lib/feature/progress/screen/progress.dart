@@ -316,14 +316,17 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               color: Color(0xff000000),
                             ),
                           ),
-                          Text(
-                            "View all",
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff172601),
-                            ),
+                          GestureDetector(
+                            onTap: controller.toggleTimelineShowAll,
+                            child: Obx(() => Text(
+                              controller.showTimelineAll.value ? "View less" : "View more",
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff172601),
+                              ),
+                            )),
                           ),
                         ],
                       ),
@@ -331,7 +334,9 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                       Divider(thickness: 1),
                       Obx(
                         () => ListView.builder(
-                          itemCount: controller.progressItems.length,
+                          itemCount: controller.showTimelineAll.value 
+                              ? controller.progressItems.length 
+                              : (controller.progressItems.length > 0 ? 1 : 0),
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemBuilder: (context, index) {

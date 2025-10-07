@@ -14,6 +14,7 @@ class ProgressController extends GetxController{
    var janData = <FlSpot>[].obs;
   var febData = <FlSpot>[].obs;
   var showAll = false.obs;
+  var showTimelineAll = false.obs;
   
   // Store captured progress images
   var leftProgressImages = <String>[].obs;  // Left side images
@@ -82,6 +83,10 @@ class ProgressController extends GetxController{
    }
   void toggleShowAll(){
     showAll.value = !showAll.value;
+  }
+  
+  void toggleTimelineShowAll(){
+    showTimelineAll.value = !showTimelineAll.value;
   }
   
   // Helper method to get access token
