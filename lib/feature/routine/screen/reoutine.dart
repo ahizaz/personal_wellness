@@ -257,25 +257,25 @@ class Routine extends StatelessWidget {
                               );
                             }),
 
-                            // Scheduled Routine Items - Show ALL routines in their respective time slots
+                            // Scheduled Routine Items - Show ALL routines in their respective time slots (including completed)
                             Obx(
                               () {
-                                if (controller.routines.isEmpty) {
+                                if (controller.timeSlotRoutines.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
 
                                 // Debug: Print all routines
                                 debugPrint('=== Timeline Debug ===');
-                                debugPrint('Total routines: ${controller.routines.length}');
-                                debugPrint('Showing ALL routines in their time slots:');
-                                for (int i = 0; i < controller.routines.length; i++) {
-                                  final routine = controller.routines[i];
+                                debugPrint('Total time slot routines: ${controller.timeSlotRoutines.length}');
+                                debugPrint('Showing ALL routines in their time slots (including completed):');
+                                for (int i = 0; i < controller.timeSlotRoutines.length; i++) {
+                                  final routine = controller.timeSlotRoutines[i];
                                   debugPrint('${i + 1}. ${routine.productName} - ${routine.time}');
                                 }
                                 
-                                // Show ALL routines in their respective time slots
+                                // Show ALL routines in their respective time slots (including completed ones)
                                 return Stack(
-                                  children: controller.routines.map((routine) {
+                                  children: controller.timeSlotRoutines.map((routine) {
                                     final routineTime = _parseRoutineTime(routine.time);
                                     
                                     if (routineTime == null || routineTime.hour < startHour24 || routineTime.hour > endHour24) {
@@ -283,6 +283,8 @@ class Routine extends StatelessWidget {
                                     }
 
                                     final topOffset = _calculateTopOffset(routineTime, timeSlotHeight, startHour24);
+
+                                    // Check if this routine is completed for visual indication
 
                                     // Different colors for different routines to distinguish them
                                     final colors = [
@@ -293,7 +295,7 @@ class Routine extends StatelessWidget {
                                       Colors.orange,
                                       Colors.teal,
                                     ];
-                                    final colorIndex = controller.routines.indexOf(routine) % colors.length;
+                                    final colorIndex = controller.timeSlotRoutines.indexOf(routine) % colors.length;
                                     final routineColor = colors[colorIndex];
 
                                     return Positioned(
@@ -312,51 +314,68 @@ class Routine extends StatelessWidget {
                                               endDate: routine.endDate,
                                             ));
                                           },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                                            decoration: BoxDecoration(
-                                              color: routineColor.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(8.r),
-                                              border: Border.all(
-                                                color: routineColor,
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 10.w,
-                                                  height: 10.h,
-                                                  decoration: BoxDecoration(
-                                                    color: routineColor,
-                                                    shape: BoxShape.circle,
+                                          child: FutureBuilder<bool>(
+                                            future: controller.isRoutineCompleted(routine.id),
+                                            builder: (context, snapshot) {
+                                              final isCompleted = snapshot.data ?? false;
+                                              final displayColor = isCompleted ? Colors.grey : routineColor;
+                                              
+                                              return Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                                decoration: BoxDecoration(
+                                                  color: displayColor.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8.r),
+                                                  border: Border.all(
+                                                    color: displayColor,
+                                                    width: 1.5,
                                                   ),
                                                 ),
-                                                SizedBox(width: 8.w),
-                                                Expanded(
-                                                  child: Text(
-                                                    routine.productName,
-                                                    style: TextStyle(
-                                                      fontFamily: "SFPro",
-                                                      fontSize: 14.sp,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: const Color(0xff172601),
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 10.w,
+                                                      height: 10.h,
+                                                      decoration: BoxDecoration(
+                                                        color: displayColor,
+                                                        shape: BoxShape.circle,
+                                                      ),
                                                     ),
-                                                    maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                                    SizedBox(width: 8.w),
+                                                    Expanded(
+                                                      child: Text(
+                                                        routine.productName,
+                                                        style: TextStyle(
+                                                          fontFamily: "SFPro",
+                                                          fontSize: 14.sp,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: isCompleted ? Colors.grey.shade600 : const Color(0xff172601),
+                                                          decoration: isCompleted ? TextDecoration.lineThrough : null,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      routine.time,
+                                                      style: TextStyle(
+                                                        fontFamily: "SFPro",
+                                                        fontSize: 11.sp,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: displayColor,
+                                                      ),
+                                                    ),
+                                                    if (isCompleted) ...[
+                                                      SizedBox(width: 8.w),
+                                                      Icon(
+                                                        Icons.check_circle,
+                                                        color: Colors.green,
+                                                        size: 16.sp,
+                                                      ),
+                                                    ],
+                                                  ],
                                                 ),
-                                                Text(
-                                                  routine.time,
-                                                  style: TextStyle(
-                                                    fontFamily: "SFPro",
-                                                    fontSize: 11.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: routineColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),

@@ -155,8 +155,9 @@ class RoutineController extends GetxController {
   var progress = 0.obs;
   var progressMessage = 'Setting up your routine...'.obs;
 
-  final RxList<RoutineItem> routines = <RoutineItem>[].obs;
-  final RxList<RoutineItem> allDayRoutines = <RoutineItem>[].obs;  // For All Day section
+  final RxList<RoutineItem> routines = <RoutineItem>[].obs;  // For time slots view (no completed)
+  final RxList<RoutineItem> allDayRoutines = <RoutineItem>[].obs;  // For All Day section (no completed)
+  final RxList<RoutineItem> timeSlotRoutines = <RoutineItem>[].obs;  // For timeline display (includes completed)
   var isLoadingRoutines = false.obs;
 
 void submitRoutine() async {
@@ -317,6 +318,7 @@ void submitRoutine() async {
         debugPrint('No routines found in SharedPreferences');
         routines.clear();
         allDayRoutines.clear();
+        timeSlotRoutines.clear();
         return;
       }
 
@@ -340,15 +342,21 @@ void submitRoutine() async {
         }
       });
 
-      // Create all day routines (copy of all routines)
-      allDayRoutines.assignAll(loadedRoutines);
+      // Time slot routines (for timeline display) - includes ALL routines (even completed)
+      timeSlotRoutines.assignAll(loadedRoutines);
       
-      // Filter out completed routines for time slots view only
+      // Filter out completed routines for "all day" and "today" views
       final filteredRoutines = await _getFilteredRoutinesForTimeSlots(loadedRoutines);
+      
+      // All day routines (for "All Day" section) - excludes completed
+      allDayRoutines.assignAll(filteredRoutines);
+      
+      // Time slots view routines (for "Today" section) - excludes completed  
       routines.assignAll(filteredRoutines);
 
-      debugPrint('All Day Routines: ${allDayRoutines.length}');
-      debugPrint('Time Slot Routines (after filtering completed): ${routines.length}');
+      debugPrint('Time Slot Routines (includes completed): ${timeSlotRoutines.length}');
+      debugPrint('All Day Routines (excludes completed): ${allDayRoutines.length}');
+      debugPrint('Today Routines (excludes completed): ${routines.length}');
       
       for (int i = 0; i < loadedRoutines.length; i++) {
         final routine = loadedRoutines[i];
@@ -358,6 +366,7 @@ void submitRoutine() async {
       debugPrint('Error loading routines from SharedPreferences: $e');
       routines.clear();
       allDayRoutines.clear();
+      timeSlotRoutines.clear();
     } finally {
       isLoadingRoutines.value = false;
     }
@@ -415,6 +424,19 @@ void submitRoutine() async {
     }
   }
 
+  // Check if a routine is completed today
+  Future<bool> isRoutineCompleted(String routineId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final completionKey = 'completed_${routineId}_$today';
+      return prefs.getBool(completionKey) ?? false;
+    } catch (e) {
+      debugPrint('Error checking routine completion: $e');
+      return false;
+    }
+  }
+
   // Updated fetchRoutines method to load from SharedPreferences
   Future<void> fetchRoutines() async {
     await loadRoutinesFromSharedPreferences();
@@ -447,20 +469,28 @@ void submitRoutine() async {
       // Save completion status
       await prefs.setBool(completionKey, true);
       
-      // Remove from "all day" and "today" views (time slots view)
+      // Remove from "All Day" section (allDayRoutines)
+      allDayRoutines.removeWhere((routine) => routine.id == routineId);
+      
+      // Remove from "Today" section (routines) 
       routines.removeWhere((routine) => routine.id == routineId);
       
-      // BUT keep in allDayRoutines for time slot display (keep in time slot)
-      // allDayRoutines keeps all routines regardless of completion status
+      // BUT keep in timeSlotRoutines for timeline display (stays in time slot)
+      // timeSlotRoutines keeps all routines regardless of completion status
       
       // Force refresh the reactive lists
       routines.refresh();
       allDayRoutines.refresh();
+      timeSlotRoutines.refresh();
       
-      debugPrint('Routine marked as completed and removed from time slots view');
+      debugPrint('✅ Routine marked as completed');
+      debugPrint('❌ Removed from All Day section');
+      debugPrint('❌ Removed from Today section');
+      debugPrint('✅ BUT kept in Time Slot timeline');
       debugPrint('Completion key: $completionKey');
-      debugPrint('Remaining routines in time slots: ${routines.length}');
-      debugPrint('All day routines (including completed): ${allDayRoutines.length}');
+      debugPrint('Remaining All Day routines: ${allDayRoutines.length}');
+      debugPrint('Remaining Today routines: ${routines.length}');
+      debugPrint('Time Slot routines (all): ${timeSlotRoutines.length}');
       
       // Notify today controller to refresh
       try {
@@ -505,6 +535,7 @@ void submitRoutine() async {
     // Force update of reactive lists to trigger UI rebuild
     routines.refresh();
     allDayRoutines.refresh();
+    timeSlotRoutines.refresh();
     debugPrint('Routines refreshed and UI updated');
   }
 
