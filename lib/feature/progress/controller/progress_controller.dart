@@ -13,6 +13,16 @@ class ProgressController extends GetxController{
   var progressItems = <Map<String,dynamic>>[].obs;
    var janData = <FlSpot>[].obs;
   var febData = <FlSpot>[].obs;
+  var marData = <FlSpot>[].obs;
+  var aprData = <FlSpot>[].obs;
+  var mayData = <FlSpot>[].obs;
+  var junData = <FlSpot>[].obs;
+  var julData = <FlSpot>[].obs;
+  var augData = <FlSpot>[].obs;
+  var sepData = <FlSpot>[].obs;
+  var octData = <FlSpot>[].obs;
+  var novData = <FlSpot>[].obs;
+  var decData = <FlSpot>[].obs;
   var showAll = false.obs;
   var showTimelineAll = false.obs;
   
@@ -149,7 +159,261 @@ class ProgressController extends GetxController{
        FlSpot(10, 4.9),
        FlSpot(11, 3.2),
      ];
+
+     marData.value = [
+       FlSpot(0, 3.2),
+       FlSpot(1, 4.1),
+       FlSpot(2, 3.8),
+       FlSpot(3, 4.5),
+       FlSpot(4, 3.3),
+       FlSpot(5, 4.2),
+       FlSpot(6, 3.9),
+       FlSpot(7, 4.6),
+       FlSpot(8, 3.7),
+       FlSpot(9, 4.3),
+       FlSpot(10, 3.5),
+       FlSpot(11, 4.0),
+     ];
+
+     aprData.value = [
+       FlSpot(0, 4.0),
+       FlSpot(1, 3.8),
+       FlSpot(2, 4.2),
+       FlSpot(3, 3.6),
+       FlSpot(4, 4.4),
+       FlSpot(5, 3.9),
+       FlSpot(6, 4.1),
+       FlSpot(7, 3.7),
+       FlSpot(8, 4.5),
+       FlSpot(9, 3.4),
+       FlSpot(10, 4.3),
+       FlSpot(11, 3.8),
+     ];
+
+     mayData.value = [
+       FlSpot(0, 3.5),
+       FlSpot(1, 4.2),
+       FlSpot(2, 3.9),
+       FlSpot(3, 4.6),
+       FlSpot(4, 3.3),
+       FlSpot(5, 4.0),
+       FlSpot(6, 3.7),
+       FlSpot(7, 4.4),
+       FlSpot(8, 3.8),
+       FlSpot(9, 4.1),
+       FlSpot(10, 3.6),
+       FlSpot(11, 4.3),
+     ];
+
+     junData.value = [
+       FlSpot(0, 4.1),
+       FlSpot(1, 3.7),
+       FlSpot(2, 4.3),
+       FlSpot(3, 3.9),
+       FlSpot(4, 4.5),
+       FlSpot(5, 3.6),
+       FlSpot(6, 4.2),
+       FlSpot(7, 3.8),
+       FlSpot(8, 4.6),
+       FlSpot(9, 3.4),
+       FlSpot(10, 4.0),
+       FlSpot(11, 3.7),
+     ];
+
+     julData.value = [
+       FlSpot(0, 3.8),
+       FlSpot(1, 4.4),
+       FlSpot(2, 3.6),
+       FlSpot(3, 4.1),
+       FlSpot(4, 3.9),
+       FlSpot(5, 4.3),
+       FlSpot(6, 3.7),
+       FlSpot(7, 4.5),
+       FlSpot(8, 3.5),
+       FlSpot(9, 4.2),
+       FlSpot(10, 3.8),
+       FlSpot(11, 4.0),
+     ];
+
+     augData.value = [
+       FlSpot(0, 4.2),
+       FlSpot(1, 3.9),
+       FlSpot(2, 4.5),
+       FlSpot(3, 3.7),
+       FlSpot(4, 4.1),
+       FlSpot(5, 3.8),
+       FlSpot(6, 4.4),
+       FlSpot(7, 3.6),
+       FlSpot(8, 4.3),
+       FlSpot(9, 3.9),
+       FlSpot(10, 4.0),
+       FlSpot(11, 3.5),
+     ];
+
+     sepData.value = [
+       FlSpot(0, 3.6),
+       FlSpot(1, 4.3),
+       FlSpot(2, 3.9),
+       FlSpot(3, 4.7),
+       FlSpot(4, 3.4),
+       FlSpot(5, 4.1),
+       FlSpot(6, 3.8),
+       FlSpot(7, 4.5),
+       FlSpot(8, 3.7),
+       FlSpot(9, 4.2),
+       FlSpot(10, 3.5),
+       FlSpot(11, 4.4),
+     ];
+
+     octData.value = [
+       FlSpot(0, 4.0),
+       FlSpot(1, 3.8),
+       FlSpot(2, 4.4),
+       FlSpot(3, 3.6),
+       FlSpot(4, 4.2),
+       FlSpot(5, 3.9),
+       FlSpot(6, 4.6),
+       FlSpot(7, 3.5),
+       FlSpot(8, 4.1),
+       FlSpot(9, 3.7),
+       FlSpot(10, 4.3),
+       FlSpot(11, 3.8),
+     ];
+
+     novData.value = [
+       FlSpot(0, 3.7),
+       FlSpot(1, 4.1),
+       FlSpot(2, 3.8),
+       FlSpot(3, 4.5),
+       FlSpot(4, 3.3),
+       FlSpot(5, 4.2),
+       FlSpot(6, 3.9),
+       FlSpot(7, 4.4),
+       FlSpot(8, 3.6),
+       FlSpot(9, 4.0),
+       FlSpot(10, 3.7),
+       FlSpot(11, 4.3),
+     ];
+
+     decData.value = [
+       FlSpot(0, 4.3),
+       FlSpot(1, 3.6),
+       FlSpot(2, 4.1),
+       FlSpot(3, 3.8),
+       FlSpot(4, 4.5),
+       FlSpot(5, 3.7),
+       FlSpot(6, 4.2),
+       FlSpot(7, 3.9),
+       FlSpot(8, 4.4),
+       FlSpot(9, 3.5),
+       FlSpot(10, 4.0),
+       FlSpot(11, 3.8),
+     ];
    }
+
+  // Get all month data as a list
+  List<RxList<FlSpot>> getAllMonthsData() {
+    return [janData, febData, marData, aprData, mayData, junData, 
+           julData, augData, sepData, octData, novData, decData];
+  }
+
+  // Get month names
+  List<String> getMonthNames() {
+    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  }
+
+  // Get current month index (0-based)
+  int getCurrentMonthIndex() {
+    return DateTime.now().month - 1; // Convert to 0-based index
+  }
+
+  // Get previous month index (0-based)
+  int getPreviousMonthIndex() {
+    int currentMonth = getCurrentMonthIndex();
+    return currentMonth == 0 ? 11 : currentMonth - 1; // Handle January wraparound
+  }
+
+  // Get current month data
+  List<FlSpot> getCurrentMonthData() {
+    int currentIndex = getCurrentMonthIndex();
+    switch (currentIndex) {
+      case 0: return janData.toList();
+      case 1: return febData.toList();
+      case 2: return marData.toList();
+      case 3: return aprData.toList();
+      case 4: return mayData.toList();
+      case 5: return junData.toList();
+      case 6: return julData.toList();
+      case 7: return augData.toList();
+      case 8: return sepData.toList();
+      case 9: return octData.toList();
+      case 10: return novData.toList();
+      case 11: return decData.toList();
+      default: return janData.toList();
+    }
+  }
+
+  // Get previous month data
+  List<FlSpot> getPreviousMonthData() {
+    int previousIndex = getPreviousMonthIndex();
+    switch (previousIndex) {
+      case 0: return janData.toList();
+      case 1: return febData.toList();
+      case 2: return marData.toList();
+      case 3: return aprData.toList();
+      case 4: return mayData.toList();
+      case 5: return junData.toList();
+      case 6: return julData.toList();
+      case 7: return augData.toList();
+      case 8: return sepData.toList();
+      case 9: return octData.toList();
+      case 10: return novData.toList();
+      case 11: return decData.toList();
+      default: return febData.toList();
+    }
+  }
+
+  // Get current month name
+  String getCurrentMonthName() {
+    return getMonthNames()[getCurrentMonthIndex()];
+  }
+
+  // Get previous month name
+  String getPreviousMonthName() {
+    return getMonthNames()[getPreviousMonthIndex()];
+  }
+
+
+
+  // Get visible months for the chart (current + 3 previous months)
+  List<int> getVisibleMonthIndices() {
+    int currentIndex = getCurrentMonthIndex();
+    List<int> visibleIndices = [];
+    
+    // Add current month and 3 previous months
+    for (int i = 0; i < 4; i++) {
+      int monthIndex = (currentIndex - i + 12) % 12;
+      visibleIndices.insert(0, monthIndex); // Insert at beginning to maintain order
+    }
+    
+    return visibleIndices;
+  }
+
+  // Get data for visible months
+  List<RxList<FlSpot>> getVisibleMonthsData() {
+    List<int> visibleIndices = getVisibleMonthIndices();
+    List<RxList<FlSpot>> allData = getAllMonthsData();
+    return visibleIndices.map((index) => allData[index]).toList();
+  }
+
+  // Get names for visible months
+  List<String> getVisibleMonthNames() {
+    List<int> visibleIndices = getVisibleMonthIndices();
+    List<String> allNames = getMonthNames();
+    return visibleIndices.map((index) => allNames[index]).toList();
+  }
+
   void toggleShowAll(){
     showAll.value = !showAll.value;
   }
