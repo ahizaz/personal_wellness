@@ -64,8 +64,16 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
     // Handle empty/null image path
     if (imagePath.isEmpty) {
       return Container(
+        width: double.infinity,
+        height: double.infinity,
         color: Colors.grey[300],
-        child: Icon(Icons.image_not_supported),
+        child: Center(
+          child: Icon(
+            Icons.image_not_supported,
+            size: 32,
+            color: Colors.grey[600],
+          ),
+        ),
       );
     }
     
@@ -74,12 +82,17 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
       return Image.network(
         imagePath,
         fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(
+            width: double.infinity,
+            height: double.infinity,
             color: Colors.grey[300],
             child: Center(
               child: CircularProgressIndicator(
+                strokeWidth: 2,
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
                         (loadingProgress.expectedTotalBytes ?? 1)
@@ -90,23 +103,81 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
         },
         errorBuilder: (context, error, stackTrace) {
           return Container(
+            width: double.infinity,
+            height: double.infinity,
             color: Colors.grey[300],
-            child: Icon(Icons.error),
+            child: Center(
+              child: Icon(
+                Icons.error,
+                size: 32,
+                color: Colors.grey[600],
+              ),
+            ),
           );
         },
       );
     } else {
-      // Local file
-      return Image.file(
-        File(imagePath),
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
+      // Local file - add extra safety checks
+      try {
+        final file = File(imagePath);
+        if (!file.existsSync()) {
           return Container(
+            width: double.infinity,
+            height: double.infinity,
             color: Colors.grey[300],
-            child: Icon(Icons.error),
+            child: Center(
+              child: Icon(
+                Icons.image_not_supported,
+                size: 32,
+                color: Colors.grey[600],
+              ),
+            ),
           );
-        },
-      );
+        }
+        
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.grey[300],
+              child: Center(
+                child: Icon(
+                  Icons.error,
+                  size: 32,
+                  color: Colors.grey[600],
+                ),
+              ),
+            );
+          },
+        );
+      } catch (e) {
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.grey[300],
+          child: Center(
+            child: Icon(
+              Icons.error,
+              size: 32,
+              color: Colors.grey[600],
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // Helper method to get appropriate image provider (asset or network)
+  ImageProvider _getImageProvider(String imagePath) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return NetworkImage(imagePath);
+    } else {
+      return AssetImage(imagePath);
     }
   }
 
@@ -316,17 +387,37 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               color: Color(0xff000000),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: controller.toggleTimelineShowAll,
-                            child: Obx(() => Text(
-                              controller.showTimelineAll.value ? "View less" : "View more",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff172601),
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: () => controller.refreshTimelineData(),
+                                child: Container(
+                                  padding: EdgeInsets.all(6.w),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff172601).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                  child: Icon(
+                                    Icons.refresh,
+                                    size: 16.r,
+                                    color: Color(0xff172601),
+                                  ),
+                                ),
                               ),
-                            )),
+                              SizedBox(width: 12.w),
+                              GestureDetector(
+                                onTap: controller.toggleTimelineShowAll,
+                                child: Obx(() => Text(
+                                  controller.showTimelineAll.value ? "View less" : "View more",
+                                  style: TextStyle(
+                                    fontFamily: "SFPro",
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xff172601),
+                                  ),
+                                )),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -346,8 +437,11 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               child: Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: AssetImage(item['image']),
+                                    backgroundImage: _getImageProvider(item['image']),
                                     radius: 25.r,
+                                    onBackgroundImageError: (exception, stackTrace) {
+                                      debugPrint('Error loading image: $exception');
+                                    },
                                   ),
                                   SizedBox(width: 15.w),
                                   Expanded(
@@ -448,10 +542,39 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                         SizedBox(
                           height: 230.h,
                           child: Obx(() {
-                            // Combine captured images with static fallback images
-                            List<Widget> images = [];
+                            // Show message if no images captured
+                            if (controller.leftProgressImages.isEmpty) {
+                              return SizedBox(
+                                width: double.infinity,
+                                height: 220.h,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        'No left side photos yet',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Take photos to see progress',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
                             
-                            // Add all captured left images
+                            // Build list of image widgets
+                            List<Widget> images = [];
                             for (int i = 0; i < controller.leftProgressImages.length; i++) {
                               final imagePath = controller.leftProgressImages[i];
                               if (imagePath.isNotEmpty) {
@@ -469,42 +592,12 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               }
                             }
                             
-                            // Show message if no images captured
-                            if (images.isEmpty) {
-                              images.add(
-                                Container(
-                                  width: double.infinity,
-                                  height: 220.h,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
-                                        SizedBox(height: 8.h),
-                                        Text(
-                                          'No left side photos yet',
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Take photos to see progress',
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            
-                            return ListView(
+                            return ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              children: images,
+                              itemCount: images.length,
+                              itemBuilder: (context, index) {
+                                return images[index];
+                              },
                             );
                           }),
                         ),////right side
@@ -529,10 +622,39 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                           SizedBox(
                             height: 230.h,
                             child: Obx(() {
-                              // Combine captured images with static fallback images
-                              List<Widget> images = [];
+                              // Show message if no images captured
+                              if (controller.rightProgressImages.isEmpty) {
+                                return Container(
+                                  width: double.infinity,
+                                  height: 220.h,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                        SizedBox(height: 8.h),
+                                        Text(
+                                          'No right side photos yet',
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Take photos to see progress',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
                               
-                              // Add all captured right images
+                              // Build list of image widgets
+                              List<Widget> images = [];
                               for (int i = 0; i < controller.rightProgressImages.length; i++) {
                                 final imagePath = controller.rightProgressImages[i];
                                 if (imagePath.isNotEmpty) {
@@ -550,42 +672,12 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                                 }
                               }
                               
-                              // Show message if no images captured
-                              if (images.isEmpty) {
-                                images.add(
-                                  Container(
-                                    width: double.infinity,
-                                    height: 220.h,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
-                                          SizedBox(height: 8.h),
-                                          Text(
-                                            'No right side photos yet',
-                                            style: TextStyle(
-                                              fontSize: 16.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Take photos to see progress',
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              
-                              return ListView(
+                              return ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                children: images,
+                                itemCount: images.length,
+                                itemBuilder: (context, index) {
+                                  return images[index];
+                                },
                               );
                             }),
                           ),
@@ -626,10 +718,39 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                         SizedBox(
                           height: 230.h,
                           child: Obx(() {
-                            // Combine captured images with static fallback images
-                            List<Widget> images = [];
+                            // Show message if no images captured
+                            if (controller.frontProgressImages.isEmpty) {
+                              return Container(
+                                width: double.infinity,
+                                height: 220.h,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        'No front photos yet',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Take photos to see progress',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
                             
-                            // Add all captured front images
+                            // Build list of image widgets
+                            List<Widget> images = [];
                             for (int i = 0; i < controller.frontProgressImages.length; i++) {
                               final imagePath = controller.frontProgressImages[i];
                               if (imagePath.isNotEmpty) {
@@ -647,42 +768,12 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                               }
                             }
                             
-                            // Show message if no images captured
-                            if (images.isEmpty) {
-                              images.add(
-                                Container(
-                                  width: double.infinity,
-                                  height: 220.h,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.camera_alt, size: 48.sp, color: Colors.grey),
-                                        SizedBox(height: 8.h),
-                                        Text(
-                                          'No front photos yet',
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Take photos to see progress',
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            
-                            return ListView(
+                            return ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              children: images,
+                              itemCount: images.length,
+                              itemBuilder: (context, index) {
+                                return images[index];
+                              },
                             );
                           }),
                         ),

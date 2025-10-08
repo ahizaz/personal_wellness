@@ -20,6 +20,9 @@ class ProgressController extends GetxController{
   var leftProgressImages = <String>[].obs;  // Left side images
   var rightProgressImages = <String>[].obs; // Right side images  
   var frontProgressImages = <String>[].obs; // Front images
+  
+  // Loading state for images
+  var isLoadingImages = false.obs;
   @override
   void onInit() {
    
@@ -28,26 +31,92 @@ class ProgressController extends GetxController{
     loadGraphData();
     getAllPhotoProgress(showLoading: true); // Load photo progress from API
   }
-  void loadData(){
-    progressItems.value=[
-     {
-        'title':'Day 1 Starting point',
-         'date':'15 Jan,2025',
-         'week': 'Week 1',
-         'image':"assets/icons/progresshistory.png",
-     },
-       {
-        'title':'Week 2 Progress',
-         'date':'29 Jan, 2025',
-         'week': 'Week 2',
-         'image':"assets/icons/progresshistory.png",
-     },
-       {
-        'title':'Month 1 Milestone',
-         'date':'15 Feb, 2025',
-         'week': 'Week 4',
-         'image':"assets/icons/progresshistory.png",
-     },
+  
+  // Load timeline data from API
+  Future<void> loadData() async {
+    try {
+      EasyLoading.show(status: "Loading timeline...", maskType: EasyLoadingMaskType.black);
+      
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.photoProgressTimeline),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"] != null && data["data"]["result"] != null) {
+          List<dynamic> results = data["data"]["result"];
+          
+          // Get latest 3 items (reversed to show most recent first)
+          if (results.length > 3) {
+            results = results.reversed.take(3).toList();
+          } else {
+            results = results.reversed.toList();
+          }
+          
+          // Transform API data to match expected format
+          progressItems.value = results.map((item) => {
+            'title': item["label"] ?? "Progress Photo",
+            'date': item["date"] ?? "",
+            'week': item["label"] ?? "Day 1", // Use label as week
+            'image': "${Urls.imageurl}${item["image"]}", // Full image URL
+            'type': item["type"] ?? "",
+            'id': item["_id"] ?? "",
+          }).toList().cast<Map<String, dynamic>>();
+          
+          debugPrint("Timeline data loaded: ${progressItems.length} items");
+          EasyLoading.dismiss();
+        } else {
+          debugPrint("Timeline API returned success=false or no data");
+          // Load fallback static data
+          _loadFallbackData();
+          EasyLoading.showError("No timeline data available");
+        }
+      } else {
+        debugPrint("Timeline API Error - Status: ${response.statusCode}");
+        // Load fallback static data
+        _loadFallbackData();
+        EasyLoading.showError("Failed to load timeline data");
+      }
+    } catch (e) {
+      debugPrint("Error loading timeline data: $e");
+      // Load fallback static data
+      _loadFallbackData();
+      EasyLoading.showError("Error loading timeline data");
+    }
+  }
+  
+  // Fallback static data in case API fails
+  void _loadFallbackData() {
+    progressItems.value = [
+      {
+        'title': 'Day 1 Starting point',
+        'date': '15 Jan,2025',
+        'week': 'Week 1',
+        'image': "assets/icons/progresshistory.png",
+      },
+      {
+        'title': 'Week 2 Progress',
+        'date': '29 Jan, 2025',
+        'week': 'Week 2',
+        'image': "assets/icons/progresshistory.png",
+      },
+      {
+        'title': 'Month 1 Milestone',
+        'date': '15 Feb, 2025',
+        'week': 'Week 4',
+        'image': "assets/icons/progresshistory.png",
+      },
     ];
   }
       void loadGraphData() {
@@ -249,7 +318,7 @@ class ProgressController extends GetxController{
       }
       
       // Small delay between uploads to prevent server overload
-      await Future.delayed(Duration(milliseconds: 300));
+      await Future.delayed(Duration(milliseconds: 100));
     }
     
     debugPrint('=== Upload Summary ===');
@@ -257,11 +326,11 @@ class ProgressController extends GetxController{
     
     if (successCount == 3) {
       // Show success message briefly
-      EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(seconds: 2));
+      EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(microseconds: 2));
       debugPrint('=== All Photos Uploaded Successfully ===');
       
       // Wait for success message to show, then refresh data and auto-navigate back
-      Future.delayed(Duration(seconds: 2), () async {
+      Future.delayed(Duration(microseconds: 2), () async {
         debugPrint('=== Starting Auto Refresh and Navigation ===');
         
         // Refresh all photo progress silently
@@ -276,7 +345,7 @@ class ProgressController extends GetxController{
         Get.back(); // Go back from GoPicture to Progress screen
       });
     } else if (successCount > 0) {
-      EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
+      EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(microseconds: 2));
     } else {
       EasyLoading.showError('Failed to upload photos', duration: Duration(seconds: 2));
     }
@@ -475,5 +544,11 @@ class ProgressController extends GetxController{
     // For now, we'll just refresh the data from database
     debugPrint('=== Upload Photos Via Refresh Button ===');
     await getAllPhotoProgress();
+  }
+  
+  // Method to refresh timeline data
+  Future<void> refreshTimelineData() async {
+    debugPrint('=== Refreshing Timeline Data ===');
+    await loadData();
   }
 }

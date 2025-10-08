@@ -81,6 +81,14 @@ class ViewProductController extends GetxController {
   // Relevant products list
   final RxList<Map<String, dynamic>> relevantProducts = <Map<String, dynamic>>[].obs;
 
+  // Timeline data
+  final RxList<Map<String, dynamic>> timelineData = <Map<String, dynamic>>[].obs;
+  
+  // Method to refresh timeline data
+  Future<void> refreshTimelineData() async {
+    await fetchTimelineData();
+  }
+
   Future<void> fetchProductDetails(String id) async {
     try {
       EasyLoading.show(status: "Loading product...", maskType: EasyLoadingMaskType.black);
@@ -120,6 +128,9 @@ class ViewProductController extends GetxController {
 
           // Fetch relevant products using product name
           await fetchRelevantProducts(data["data"]["productName"] ?? "");
+          
+          // Fetch timeline data
+          await fetchTimelineData();
 
           EasyLoading.dismiss();
         } else {
@@ -261,6 +272,62 @@ class ViewProductController extends GetxController {
       EasyLoading.showError("Error loading product details");
     } finally {
       EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> fetchTimelineData() async {
+    try {
+      EasyLoading.show(status: "Loading timeline...", maskType: EasyLoadingMaskType.black);
+      
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.photoProgressTimeline),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"] != null && data["data"]["result"] != null) {
+          List<dynamic> results = data["data"]["result"];
+          // Get latest 3 items (reversed to show most recent first)
+          if (results.length > 3) {
+            results = results.reversed.take(3).toList();
+          } else {
+            results = results.reversed.toList();
+          }
+          
+          timelineData.value = results.map((item) => {
+            "id": item["_id"],
+            "image": "${Urls.imageurl}${item["image"]}",
+            "type": item["type"],
+            "date": item["date"],
+            "label": item["label"] ?? "Day 1",
+          }).toList().cast<Map<String, dynamic>>();
+          
+          debugPrint("Timeline data fetched: ${timelineData.length} items");
+          EasyLoading.dismiss();
+        } else {
+          debugPrint("Timeline API returned success=false or no data");
+          EasyLoading.showError("No timeline data available");
+        }
+      } else {
+        debugPrint("Timeline API Error - Status: ${response.statusCode}");
+        EasyLoading.showError("Failed to load timeline data");
+      }
+    } catch (e) {
+      debugPrint("Error fetching timeline data: $e");
+      EasyLoading.showError("Error loading timeline data");
     }
   }
 }

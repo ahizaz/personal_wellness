@@ -56,16 +56,19 @@ class ViewProduct extends StatelessWidget {
                           children: [
                             Padding(
                               padding: EdgeInsets.only(bottom: 12.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: List.generate(controller.imagePath.length, (i) {
-                                  return Container(
-                                    width: 28.w,
-                                    height: 2.h,
-                                    margin: EdgeInsets.symmetric(horizontal: 4.w),
-                                    color: controller.currentIndex.value == i ? Color(0xffFFFFFF) : Color(0xffEDEEE6),
-                                  );
-                                }),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(controller.imagePath.length, (i) {
+                                    return Container(
+                                      width: 28.w,
+                                      height: 2.h,
+                                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                      color: controller.currentIndex.value == i ? Color(0xffFFFFFF) : Color(0xffEDEEE6),
+                                    );
+                                  }),
+                                ),
                               ),
                             ),
                           ],
@@ -181,6 +184,175 @@ class ViewProduct extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.h),
+                  
+                  // Timeline Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Timeline", style: TextStyle(
+                        fontFamily: "SFPro",
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff172601)
+                      )),
+                      InkWell(
+                        onTap: () => controller.refreshTimelineData(),
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: Color(0xff172601).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Icon(
+                            Icons.refresh,
+                            size: 20.r,
+                            color: Color(0xff172601),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  Obx(() {
+                    if (controller.timelineData.isEmpty) {
+                      return Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Color(0xffF5F6F0),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(color: Color(0xffE0E0E0), width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.photo_camera,
+                              color: Color(0xff3E4B2C),
+                              size: 24.r,
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Text(
+                                "No progress photos yet. Start tracking your journey!",
+                                style: TextStyle(
+                                  fontFamily: "SFPro",
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff3E4B2C),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    
+                    return Column(
+                      children: [
+                        // Display latest 3 timeline images in a row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: controller.timelineData.take(3).map((item) => Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 6.w),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.1),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      child: Image.network(
+                                        item["image"],
+                                        width: double.infinity,
+                                        height: 120.h,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Container(
+                                            width: double.infinity,
+                                            height: 120.h,
+                                            color: Color(0xffF5F6F0),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: Color(0xff172601),
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            width: double.infinity,
+                                            height: 120.h,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xffF5F6F0),
+                                              borderRadius: BorderRadius.circular(12.r),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 32.r,
+                                                  color: Color(0xff3E4B2C),
+                                                ),
+                                                SizedBox(height: 4.h),
+                                                Text(
+                                                  "Image not\navailable",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontFamily: "SFPro",
+                                                    fontSize: 10.sp,
+                                                    color: Color(0xff3E4B2C),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  Text(
+                                    item["label"] ?? "Day 1",
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xff172601),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Text(
+                                    item["date"] ?? "",
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff3E4B2C),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )).toList(),
+                        ),
+                      ],
+                    );
+                  }),
+                  SizedBox(height: 24.h),
+                  
                   Text("Relevant products", style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 28.sp,
