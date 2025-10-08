@@ -121,19 +121,16 @@ class ViewProduct extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 16.h),
-                  FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Text(
-                      controller.productDataview["productName"] ?? "",
-                      style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 30.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff172601)),
-                      maxLines: 2,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                    ),
+                  Text(
+                    controller.productDataview["productName"] ?? "",
+                    style: TextStyle(
+                        fontFamily: "SFPro",
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff172601)),
+                    maxLines: 2,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 16.h),
                   Text(
