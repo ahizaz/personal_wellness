@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:personal_wellness/core/services/notification_services.dart';
 import 'package:personal_wellness/core/utils/constants/colors.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
@@ -25,11 +26,20 @@ class Today extends StatefulWidget {
 class _TodayState extends State<Today> with WidgetsBindingObserver {
   final TodayController controller = Get.put(TodayController());
   final GlobalKey _fabKey = GlobalKey();
+   final NotificationServices notificationServices = NotificationServices();
+
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+       notificationServices.requestNotificationPermission();
+      // notificationServices.isTokenRefresh();
+       notificationServices.getDeviceToken().then((value){
+        print('devicetoken');
+        print(value);
+
+       });
   }
 
   @override
