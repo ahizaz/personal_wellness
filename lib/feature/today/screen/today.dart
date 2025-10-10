@@ -41,6 +41,11 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
         print(value);
 
        });
+
+     // পোস্ট ফ্রেম কলব্যাক দিয়ে ইনিশিয়ালাইজ করো
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       notificationServices.initLocalNotifications(context);
+     });
   }
 
   @override

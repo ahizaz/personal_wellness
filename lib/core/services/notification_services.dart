@@ -1,5 +1,3 @@
-
-
 import 'dart:math';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -52,7 +50,7 @@ class NotificationServices {
     });
 
   }
-  void initLocalNotifications(BuildContext context,RemoteMessage message)async{
+  void initLocalNotifications(BuildContext context)async{
      var androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var iosInitializationSettings = const DarwinInitializationSettings();
 
