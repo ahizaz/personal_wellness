@@ -1,10 +1,19 @@
 
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart' as AppSettings;
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+  void firebaseInit(){
+    FirebaseMessaging.onMessage.listen((message){
+      debugPrint(message.notification!.title.toString());
+      debugPrint(message.notification!.body.toString());
+
+
+    });
+  }
   void requestNotificationPermission()async{
     NotificationSettings settings =await messaging.requestPermission(
    alert: true,
@@ -16,12 +25,12 @@ class NotificationServices {
    sound: true
     );
     if(settings.authorizationStatus == AuthorizationStatus.authorized){
-     print('user granted permission');
+     debugPrint('user granted permission');
     }else if(settings.authorizationStatus==AuthorizationStatus.provisional){
-     print('user granted provisional permission');
+     debugPrint('user granted provisional permission');
     }else{
     AppSettings.openAppSettings();
-      print('Please enable notifications from your device settings.');
+      debugPrint('Please enable notifications from your device settings.');
     }
   }
   Future<String>getDeviceToken()async{

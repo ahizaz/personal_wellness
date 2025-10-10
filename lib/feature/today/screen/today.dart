@@ -34,6 +34,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
        notificationServices.requestNotificationPermission();
+       notificationServices.firebaseInit();
       // notificationServices.isTokenRefresh();
        notificationServices.getDeviceToken().then((value){
         print('devicetoken');

@@ -3,8 +3,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+
+
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
