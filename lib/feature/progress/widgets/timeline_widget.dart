@@ -13,7 +13,7 @@ class TimelineWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.8),
+        color: Colors.white.withValues(alpha: .8),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
@@ -38,7 +38,7 @@ class TimelineWidget extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(6.w),
                       decoration: BoxDecoration(
-                        color: Color(0xff172601).withOpacity(0.1),
+                        color: Color(0xff172601).withValues(alpha: .1),
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Icon(

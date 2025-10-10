@@ -113,7 +113,7 @@ class RoutineConsistencyChart extends StatelessWidget {
             child: Container(
               height: showGraph ? 80.h : 20.h,
               decoration: showGraph ? BoxDecoration(
-                color: Colors.grey.withOpacity(0.05),
+                color: Colors.grey.withValues(alpha: .05),
                 borderRadius: BorderRadius.circular(8.r),
               ) : null,
               child: showGraph 

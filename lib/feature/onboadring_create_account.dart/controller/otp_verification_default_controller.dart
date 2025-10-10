@@ -1,34 +1,5 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:get/get.dart';
-// import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
 
-// class OtpVerificationDefaultController extends GetxController{
-//   final otpController = TextEditingController();
-//   final isOtpFocused = false.obs;
-//   final isOtpValid = false.obs;
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     otpController.addListener((){
-//      isOtpValid.value = otpController.text.length==6;
-//     });
-//   }
-//   Future<void>verifyOtp()async{
-//     if (!isOtpValid.value) return;
-//     final SignInController = Get.find<SignInController>();
-//   }
-//   void clearOtp(){
-//     otpController.clear();
-//     isOtpValid.value=false;
-//   }
-//   @override
-//   void onClose() {
-// otpController.dispose();
-//     super.onClose();
-//   }
-// } 
-// Updated OtpVerificationDefaultController to use EasyLoading instead of Get.snackbar
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
