@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -357,7 +356,6 @@ class Routine extends StatelessWidget {
                                                           fontSize: 14.sp,
                                                           fontWeight: FontWeight.w600,
                                                           color: isCompleted ? Colors.green.shade700 : const Color(0xff172601),
-                                                          decoration: isCompleted ? TextDecoration.lineThrough : null,
                                                         ),
                                                         maxLines: 2,
                                                         overflow: TextOverflow.ellipsis,
