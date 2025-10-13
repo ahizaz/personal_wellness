@@ -1,9 +1,22 @@
-
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:personal_wellness/core/utils/constants/image_path.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InventoryController extends GetxController{
-   final RxList<Map<String, String>> products = <Map<String, String>>[].obs;
+  void applyFilters() {
+    isFilterActive.value = selectedBrands.isNotEmpty || selectedCategories.isNotEmpty;
+  }
+
+  void resetFilters() {
+    selectedBrands.clear();
+    selectedCategories.clear();
+    isFilterActive.value = false;
+  }
+  final RxList<Map<String, dynamic>> products = <Map<String, dynamic>>[].obs;
     final RxString searchTerm = ''.obs;
     final RxList<String> selectedBrands = <String>[].obs;
     final RxList<String> selectedCategories = <String>[].obs;
@@ -23,60 +36,85 @@ class InventoryController extends GetxController{
       "Foundation",
       "Mascara",
       "Hair Color",
-      
       "Blush",
       "Anti-Aging Serums",
     ];
 
-      @override
+  @override
   void onInit() {
-
     super.onInit();
-    // Populate with static data for now (JSON-like structure)
-
-    
-    products.addAll([
-      {"image": ImagePath.product2, "title": "Vitamin C Serum \n50mg", "brand": "Clinique", "category": "Anti-Aging Serums"},
-      {"image": ImagePath.product3, "title": "Whitening night\ncream", "brand": "L'Oréal Paris", "category": "Anti-Aging Serums"},
-      {"image": ImagePath.product1, "title": "Essence Sun’s\nCream SPF45", "brand": "Estée Lauder", "category": "Foundation"},
-      {"image": ImagePath.product4, "title": "The Ordinary Anti-\n aging serum ", "brand": "The Ordinary", "category": "Anti-Aging Serums"},
-    ]);
+    fetchProducts();
   }
 
-  void applyFilters() {
-    isFilterActive.value = selectedBrands.isNotEmpty || selectedCategories.isNotEmpty;
-  }
+Future<void> fetchProducts() async {
+  try {
+    EasyLoading.show(status: 'Loading...', maskType: EasyLoadingMaskType.black);
 
-  void resetFilters() {
-    selectedBrands.clear();
-    selectedCategories.clear();
-    isFilterActive.value = false;
-  }
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
 
-   List<Map<String, String>> get sortedProducts {
-    var filtered = products.where((p) {
-      bool brandMatch = selectedBrands.isEmpty || selectedBrands.contains(p["brand"]);
-      bool catMatch = selectedCategories.isEmpty || selectedCategories.contains(p["category"]);
-      return brandMatch && catMatch;
-    }).toList();
-
-    if (searchTerm.value.isEmpty) return filtered;
-    
-    final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
-    final List<Map<String, String>> matching = [];
-    final List<Map<String, String>> others = [];
-    
-    for (var product in filtered) {
-      final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
-      if (titleFirstWord.startsWith(firstWord)) {
-        matching.add(product);
-      } else {
-        others.add(product);
-      }
+    if (accessToken == null) {
+      EasyLoading.showError("Please login again");
+      return;
     }
-    
-    return [...matching, ...others];
+
+    final response = await http.get(
+      Uri.parse(Urls.getallproduct),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data["success"] == true && data["data"] != null) {
+        final List<dynamic> result = data["data"]["result"] ?? [];
+        products.clear();
+
+        for (var item in result) {
+          products.add({
+            'title': item['productName'] ?? '',
+            'image': List<String>.from(
+              (item['image'] ?? []).map((img) => "${Urls.imageurl}$img"),
+            ),
+          });
+        }
+
+        EasyLoading.dismiss();
+      } else {
+        EasyLoading.showError("Failed to load products");
+      }
+    } else {
+      EasyLoading.showError("Server error: ${response.statusCode}");
+    }
+  } catch (e) {
+    EasyLoading.showError("Error loading products");
+    debugPrint("Error fetching products: $e");
+  } finally {
+    EasyLoading.dismiss();
   }
+}
 
+  // Removed duplicate/invalid code
 
+  List<Map<String, dynamic>> get sortedProducts {
+    var filtered = products;
+    if (searchTerm.value.isNotEmpty) {
+      final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
+      final List<Map<String, dynamic>> matching = [];
+      final List<Map<String, dynamic>> others = [];
+      for (var product in filtered) {
+        final String titleFirstWord = (product['title'] ?? '').toString().trim().split(' ').first.toLowerCase();
+        if (titleFirstWord.startsWith(firstWord)) {
+          matching.add(product);
+        } else {
+          others.add(product);
+        }
+      }
+      return [...matching, ...others];
+    }
+    return filtered;
+  }
 }

@@ -133,8 +133,10 @@ class Inventory extends StatelessWidget {
                               aspectRatio: 178 / 170,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8.r),
-                                child: Image.asset(
-                                  product["image"]!,
+                                child: Image.network(
+                                  (product["image"] is List<String> && product["image"].isNotEmpty)
+                                    ? product["image"][0]
+                                    : '',
                                   fit: BoxFit.cover,
                                 ),
                               ),
