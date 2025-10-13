@@ -9,36 +9,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 class InventoryController extends GetxController{
   void applyFilters() {
     isFilterActive.value = selectedBrands.isNotEmpty || selectedCategories.isNotEmpty;
+    update(); // To trigger rebuild if needed
   }
 
   void resetFilters() {
     selectedBrands.clear();
     selectedCategories.clear();
     isFilterActive.value = false;
+    update(); // To trigger rebuild if needed
   }
   final RxList<Map<String, dynamic>> products = <Map<String, dynamic>>[].obs;
-    final RxString searchTerm = ''.obs;
-    final RxList<String> selectedBrands = <String>[].obs;
-    final RxList<String> selectedCategories = <String>[].obs;
-    final RxBool isFilterActive = false.obs;
+  final RxString searchTerm = ''.obs;
+  final RxList<String> selectedBrands = <String>[].obs;
+  final RxList<String> selectedCategories = <String>[].obs;
+  final RxBool isFilterActive = false.obs;
 
-    final List<String> brands = [
-      "L'Oréal Paris",
-      "Estée Lauder",
-      "MAC Cosmetics",
-      "Fenty Beauty",
-      "Clinique",
-      "NARS",
-      "The Ordinary",
-    ];
+  final RxList<String> brands = <String>[].obs;
 
-    final List<String> categories = [
-      "Foundation",
-      "Mascara",
-      "Hair Color",
-      "Blush",
-      "Anti-Aging Serums",
-    ];
+  final List<String> categories = [
+    "Foundation",
+    "Mascara",
+    "Hair Color",
+    "Blush",
+    "Anti-Aging Serums",
+  ];
 
   @override
   void onInit() {
@@ -72,15 +66,20 @@ Future<void> fetchProducts() async {
       if (data["success"] == true && data["data"] != null) {
         final List<dynamic> result = data["data"]["result"] ?? [];
         products.clear();
+        Set<String> uniqueBrands = {};
 
         for (var item in result) {
+          final String productName = item['productName'] ?? '';
           products.add({
-            'title': item['productName'] ?? '',
+            'title': productName,
             'image': List<String>.from(
               (item['image'] ?? []).map((img) => "${Urls.imageurl}$img"),
             ),
           });
+          uniqueBrands.add(productName);
         }
+
+        brands.assignAll(uniqueBrands.toList());
 
         EasyLoading.dismiss();
       } else {
@@ -97,10 +96,16 @@ Future<void> fetchProducts() async {
   }
 }
 
-  // Removed duplicate/invalid code
-
   List<Map<String, dynamic>> get sortedProducts {
-    var filtered = products;
+    var filtered = products.toList();
+
+    if (selectedBrands.isNotEmpty) {
+      filtered = filtered.where((product) => selectedBrands.contains(product['title'])).toList();
+    }
+
+    // For categories, since no category data in products, skipping filtering for now.
+    // If category is available in API, add it to products map and filter similarly.
+
     if (searchTerm.value.isNotEmpty) {
       final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
       final List<Map<String, dynamic>> matching = [];

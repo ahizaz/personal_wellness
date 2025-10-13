@@ -185,35 +185,7 @@ class Account extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 16.h,),
-                        Row(
-                        children: [
-                         Image(image: AssetImage(IconPath.profilestatus),width: 24.w,height: 24.h,fit: BoxFit.cover,),
-                         SizedBox(width: 16.w,),
-                         Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Profile status",style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000)
-                            ),),
-                            SizedBox(height: 4.h,),
-                            Text("Your profile is 72% completed",style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff3E4B2C)
-                            ),)
-
-                          ],
-                         ),
-                         Spacer(),
-                         InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,))
-                        ],
-                      ),
-                      SizedBox(height: 16.h,),
+                    
                         Row(
                         children: [
                          Image(image: AssetImage(IconPath.notification),width: 24.w,height: 24.h,fit: BoxFit.cover,),
@@ -288,13 +260,7 @@ class Account extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                               color: Color(0xff000000)
                             ),),
-                            SizedBox(height: 4.h,),
-                            Text("lorem ipsum",style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff3E4B2C)
-                            ),)
+                        
 
                           ],
                          ),
