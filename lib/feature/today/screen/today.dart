@@ -8,6 +8,7 @@ import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
 import 'package:personal_wellness/feature/explore/screen/explore.dart';
+import 'package:personal_wellness/feature/notification/screen/notification_screen.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/account.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
@@ -320,8 +321,13 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                     ],
                   )),
               const Spacer(),
-              Image.asset(IconPath.notificationhome,
-                  height: 48.h, width: 48.w, fit: BoxFit.cover),
+              InkWell(
+                onTap: (){
+                  Get.to(()=>NotificationScreen());
+                },
+                child: Image.asset(IconPath.notificationhome,
+                    height: 48.h, width: 48.w, fit: BoxFit.cover),
+              ),
               SizedBox(width: 5.w),
               Image.asset(IconPath.search,
                   height: 48.h, width: 48.w, fit: BoxFit.cover),
