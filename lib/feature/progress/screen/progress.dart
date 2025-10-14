@@ -396,19 +396,9 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                   ),
                 ),
 
-                SizedBox(height: 16.h),
-                Center(
-                  child: Text(
-                    "Share Progress",
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff121221),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 43.h),
+ 
+              
+                SizedBox(height: 20.h),
               ],
             ),
           ),
