@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
+import 'package:personal_wellness/core/services/notification_services.dart';
 
 
 class SignInController extends GetxController {
@@ -81,12 +82,19 @@ class SignInController extends GetxController {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
 
+      // Get current FCM token to send with Google login
+      String? fcmToken;
+      try {
+        fcmToken = await NotificationServices().getDeviceToken();
+      } catch (_) {}
+
       final body = {
         "email": googleUser.email,
         "firstName": googleUser.displayName ?? "",
         "image": googleUser.photoUrl ??
             "https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg",
         "uid": "google_${googleUser.id}",
+        if (fcmToken != null) "fcmToken": fcmToken,
       };
 
       final response = await http.post(

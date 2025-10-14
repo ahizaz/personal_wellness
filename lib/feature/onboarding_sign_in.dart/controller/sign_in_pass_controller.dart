@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:personal_wellness/core/services/notification_services.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 
@@ -32,12 +33,22 @@ class SignInPassController extends GetxController {
         maskType: EasyLoadingMaskType.black,
       );
 
+      // Fetch current FCM token before login
+      final NotificationServices notificationServices = NotificationServices();
+      String? fcmToken;
+      try {
+        fcmToken = await notificationServices.getDeviceToken();
+      } catch (e) {
+        fcmToken = null; // proceed without token if retrieval fails
+      }
+
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,
           'password': password,
+          if (fcmToken != null) 'fcmToken': fcmToken,
         }),
       );
 
