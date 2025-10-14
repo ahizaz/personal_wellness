@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:intl/intl.dart';
 
 class TodayController extends GetxController {
   var userName = "Liana".obs; // Default username
@@ -110,6 +111,19 @@ class TodayController extends GetxController {
 
       debugPrint('Found ${routinesList.length} routines in SharedPreferences');
 
+      // Exclude routines already completed today so they don't reappear
+      final String todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final List<Map<String, dynamic>> notCompletedToday =
+          List<Map<String, dynamic>>.from(routinesList.cast<Map<String, dynamic>>())
+              .where((routineJson) {
+        final String id = (routineJson['id'] ?? '').toString();
+        if (id.isEmpty) return true;
+        final completionKey = 'completed_${id}_$todayStr';
+        final bool isCompleted = prefs.getBool(completionKey) ?? false;
+        return !isCompleted;
+      }).toList();
+      debugPrint('Filtered not completed today: ${notCompletedToday.length}');
+
       // Sort by creation time descending using timestamp embedded in the id
       // id format: `${productId}_<period>_<time>_<timestamp>_<index>`
       int _extractTimestamp(Map<String, dynamic> json) {
@@ -128,7 +142,7 @@ class TodayController extends GetxController {
       }
 
       final List<Map<String, dynamic>> sortedByLatest =
-          List<Map<String, dynamic>>.from(routinesList.cast<Map<String, dynamic>>())
+          List<Map<String, dynamic>>.from(notCompletedToday)
             ..sort((a, b) => _extractTimestamp(b).compareTo(_extractTimestamp(a)));
 
       // Deduplicate by productId preserving latest first
