@@ -10,6 +10,7 @@ import 'package:personal_wellness/feature/today/screen/go_picture.dart';
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:http/http.dart' as http;
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 import 'package:personal_wellness/feature/progress/widgets/timeline_widget.dart';
@@ -70,12 +71,19 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
     Future<void> exportToPDF() async {
       final pdf = pw.Document();
       try {
-        // Load images for Before & After section
-        final beforeImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
-        final afterImage = await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        // Load images dynamically (fallback to assets if network not available)
+        final leftUrl = controller.getLatestLeftImage();
+        final rightUrl = controller.getLatestRightImage();
+        final frontUrl = controller.getLatestFrontImage();
+
+        final leftImage = await networkImageProvider(leftUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        final rightImage = await networkImageProvider(rightUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        final frontImage = await networkImageProvider(frontUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
         final bambooImage = await imageFromAssetBundle(ImagePath.bamboo);
-        final afterImage2 = await imageFromAssetBundle(ImagePath.beforeafterimage1);
         final progressImage = await imageFromAssetBundle(ImagePath.progressimageback);
+
+        final prevCounts = controller.getPreviousMonthCounts();
+        final currCounts = controller.getCurrentMonthCounts();
 
         // Add a page to the PDF
         pdf.addPage(
@@ -140,18 +148,19 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Image(beforeImage, width: 100, height: 200),
-                  pw.Image(bambooImage, width: 20, height: 200),
-                  pw.Image(afterImage, width: 100, height: 200),
-                  pw.Image(afterImage2, width: 100, height: 200),
+                  pw.Image(leftImage, width: 100, height: 160, fit: pw.BoxFit.cover),
+                  pw.Image(bambooImage, width: 20, height: 160, fit: pw.BoxFit.cover),
+                  pw.Image(frontImage, width: 100, height: 160, fit: pw.BoxFit.cover),
+                  pw.Image(rightImage, width: 100, height: 160, fit: pw.BoxFit.cover),
                 ],
               ),
               pw.SizedBox(height: 8),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Text("Before - 15 Jan 2025", style: pw.TextStyle(fontSize: 12)),
-                  pw.Text("After - 15 Mar 2025", style: pw.TextStyle(fontSize: 12)),
+                  pw.Text("Left", style: pw.TextStyle(fontSize: 12)),
+                  pw.Text("Front", style: pw.TextStyle(fontSize: 12)),
+                  pw.Text("Right", style: pw.TextStyle(fontSize: 12)),
                 ],
               ),
               pw.SizedBox(height: 16),
@@ -187,13 +196,12 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                 style: pw.TextStyle(fontSize: 12),
               ),
               pw.SizedBox(height: 8),
-              // Note: For the chart, you can add a text-based summary or capture the chart as an image
               pw.Text(
-                "${controller.getPreviousMonthName()} Data: ${controller.getPreviousMonthData().map((e) => '(${e.x}, ${e.y})').join(', ')}",
+                "${controller.getPreviousMonthName()} - Completed: ${prevCounts['completed']}, Pending: ${prevCounts['pending']}",
                 style: pw.TextStyle(fontSize: 12),
               ),
               pw.Text(
-                "${controller.getCurrentMonthName()} Data: ${controller.getCurrentMonthData().map((e) => '(${e.x}, ${e.y})').join(', ')}",
+                "${controller.getCurrentMonthName()} - Completed: ${currCounts['completed']}, Pending: ${currCounts['pending']}",
                 style: pw.TextStyle(fontSize: 12),
               ),
               ];
@@ -201,26 +209,62 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
           ),
         );
 
-        // Try showing print preview (allows Save as PDF on many devices)
-        await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+        // Let user choose what to do with the PDF
+        if (!mounted) return;
+        await showModalBottomSheet(
+          context: context,
+          builder: (_) {
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: const Text('Preview / Print'),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Share PDF'),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await Printing.sharePdf(bytes: await pdf.save(), filename: 'progress_report.pdf');
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Save PDF'),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      try {
+                        final dir = await getApplicationDocumentsDirectory();
+                        final ts = DateTime.now().millisecondsSinceEpoch;
+                        final filePath = '${dir.path}/progress_report_$ts.pdf';
+                        final file = await File(filePath).writeAsBytes(await pdf.save(), flush: true);
+                        Get.snackbar('Saved', 'PDF saved to: $filePath');
+                        await OpenFilex.open(file.path);
+                      } catch (e) {
+                        Get.snackbar('Save failed', e.toString());
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       } catch (e) {
         Get.snackbar('Print preview failed', e.toString());
+        // Last resort: save locally
         try {
-          // Fallback to share if print preview isn't available on emulator
-          await Printing.sharePdf(bytes: await pdf.save(), filename: 'progress_report.pdf');
-        } catch (e2) {
-          Get.snackbar('Share failed', e2.toString());
-          try {
-            // Final fallback: save to app documents and open
-            final dir = await getApplicationDocumentsDirectory();
-            final filePath = '${dir.path}/progress_report.pdf';
-            final bytes = await pdf.save();
-            final file = await File(filePath).writeAsBytes(bytes, flush: true);
-            Get.snackbar('Saved', 'PDF saved to: $filePath');
-            await OpenFilex.open(file.path);
-          } catch (e3) {
-            Get.snackbar('Open failed', e3.toString());
-          }
+          final dir = await getApplicationDocumentsDirectory();
+          final filePath = '${dir.path}/progress_report.pdf';
+          final bytes = await pdf.save();
+          final file = await File(filePath).writeAsBytes(bytes, flush: true);
+          Get.snackbar('Saved', 'PDF saved to: $filePath');
+          await OpenFilex.open(file.path);
+        } catch (e3) {
+          Get.snackbar('Open failed', e3.toString());
         }
       }
     }
@@ -377,5 +421,17 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
   Future<pw.ImageProvider> imageFromAssetBundle(String path) async {
     final byteData = await rootBundle.load(path);
     return pw.MemoryImage(byteData.buffer.asUint8List());
+  }
+
+  // Load image from network (for PDF)
+  Future<pw.ImageProvider?> networkImageProvider(String? url) async {
+    if (url == null || url.isEmpty) return null;
+    try {
+      final resp = await http.get(Uri.parse(url));
+      if (resp.statusCode == 200) {
+        return pw.MemoryImage(resp.bodyBytes);
+      }
+    } catch (_) {}
+    return null;
   }
 }
