@@ -33,6 +33,10 @@ class ProgressController extends GetxController{
   
   // Loading state for images
   var isLoadingImages = false.obs;
+
+  // Routine consistency chart raw data from API: {"MM-YYYY": {"pending": x, "completed": y}}
+  final RxMap<String, dynamic> routineChartRaw = <String, dynamic>{}.obs;
+  final RxBool isLoadingRoutineChart = false.obs;
   @override
   void onInit() {
    
@@ -40,6 +44,7 @@ class ProgressController extends GetxController{
     loadData();
     loadGraphData();
     getAllPhotoProgress(showLoading: true); // Load photo progress from API
+    fetchRoutineChartData();
   }
   
   // Load timeline data from API
@@ -104,6 +109,109 @@ class ProgressController extends GetxController{
       _loadFallbackData();
       EasyLoading.showError("Error loading timeline data");
     }
+  }
+
+  // ================= Routine Consistency Chart (API) =================
+  Future<void> fetchRoutineChartData() async {
+    try {
+      isLoadingRoutineChart.value = true;
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        EasyLoading.showError("Please login again");
+        isLoadingRoutineChart.value = false;
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.routineconsistencyChart),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body is Map && body['success'] == true && body['data'] is Map) {
+          routineChartRaw.assignAll(Map<String, dynamic>.from(body['data'] as Map));
+        } else {
+          debugPrint('Routine chart API returned unexpected payload: ${response.body}');
+        }
+      } else {
+        debugPrint('Routine chart API error ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('Routine chart fetch error: $e');
+    } finally {
+      isLoadingRoutineChart.value = false;
+    }
+  }
+
+  // Parse key like "10-2025" to month index (0-11) and year
+  ({int monthIndex, int year}) _parseMonthYearKey(String key) {
+    try {
+      final parts = key.split('-');
+      if (parts.length == 2) {
+        final month = int.tryParse(parts[0]) ?? 0; // 1-12
+        final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+        return (monthIndex: (month - 1).clamp(0, 11), year: year);
+      }
+    } catch (_) {}
+    return (monthIndex: DateTime.now().month - 1, year: DateTime.now().year);
+  }
+
+  // Get counts for a given month index and (optional) year preference
+  Map<String, int> getCountsForMonthIndex(int monthIndex, {int? preferYear}) {
+    int? bestYear;
+    Map<String, int> result = { 'pending': 0, 'completed': 0 };
+    routineChartRaw.forEach((k, v) {
+      final parsed = _parseMonthYearKey(k);
+      if (parsed.monthIndex == monthIndex) {
+        if (preferYear == null || parsed.year == preferYear) {
+          bestYear = parsed.year;
+          final map = (v is Map) ? v : <String, dynamic>{};
+          result = {
+            'pending': (map['pending'] is num) ? (map['pending'] as num).toInt() : 0,
+            'completed': (map['completed'] is num) ? (map['completed'] as num).toInt() : 0,
+          };
+        }
+      }
+    });
+    // If not found with preferYear, try any year
+    if (bestYear == null && preferYear != null) {
+      routineChartRaw.forEach((k, v) {
+        final parsed = _parseMonthYearKey(k);
+        if (parsed.monthIndex == monthIndex) {
+          final map = (v is Map) ? v : <String, dynamic>{};
+          result = {
+            'pending': (map['pending'] is num) ? (map['pending'] as num).toInt() : 0,
+            'completed': (map['completed'] is num) ? (map['completed'] as num).toInt() : 0,
+          };
+        }
+      });
+    }
+    return result;
+  }
+
+  Map<String, int> getCurrentMonthCounts() {
+    final now = DateTime.now();
+    return getCountsForMonthIndex(getCurrentMonthIndex(), preferYear: now.year);
+  }
+
+  Map<String, int> getPreviousMonthCounts() {
+    final now = DateTime.now();
+    // If previous month is December, prefer previous year
+    final prevMonthIndex = getPreviousMonthIndex();
+    final preferYear = (getCurrentMonthIndex() == 0) ? now.year - 1 : now.year;
+    return getCountsForMonthIndex(prevMonthIndex, preferYear: preferYear);
+  }
+
+  double getMaxRoutineChartY() {
+    final c = getCurrentMonthCounts();
+    final p = getPreviousMonthCounts();
+    final maxVal = [c['pending'] ?? 0, c['completed'] ?? 0, p['pending'] ?? 0, p['completed'] ?? 0].reduce((a, b) => a > b ? a : b);
+    // Ensure a minimum headroom
+    return (maxVal <= 0) ? 5 : (maxVal + 1).toDouble();
   }
   
   // Fallback static data in case API fails

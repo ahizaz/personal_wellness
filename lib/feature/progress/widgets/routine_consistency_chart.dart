@@ -111,64 +111,75 @@ class RoutineConsistencyChart extends StatelessWidget {
           // Graph area
           Expanded(
             child: Container(
-              height: showGraph ? 80.h : 20.h,
+              height: showGraph ? 90.h : 20.h,
               decoration: showGraph ? BoxDecoration(
                 color: Colors.grey.withValues(alpha: .05),
                 borderRadius: BorderRadius.circular(8.r),
               ) : null,
               child: showGraph 
-                  ? LineChart(
-                      LineChartData(
-                        gridData: FlGridData(show: false),
-                        titlesData: FlTitlesData(
-                          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        ),
-                        borderData: FlBorderData(show: false),
-                        minX: 0,
-                        maxX: 11,
-                        minY: 2,
-                        maxY: 5,
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: [
-                              FlSpot(0, 3),
-                              FlSpot(1, 4),
-                              FlSpot(2, 2),
-                              FlSpot(3, 5),
-                              FlSpot(4, 3.5),
-                              FlSpot(5, 4.5),
-                              FlSpot(6, 3.8),
-                              FlSpot(7, 4.2),
-                              FlSpot(8, 3.9),
-                              FlSpot(9, 4.7),
-                              FlSpot(10, 3.6),
-                              FlSpot(11, 4.1),
-                            ],
-                            isCurved: true,
-                            color: isCurrentMonth 
-                                ? Color(0xff1A5D1A)
-                                : Colors.grey,
-                            barWidth: 3,
-                            dotData: FlDotData(
-                              show: true,
-                              getDotPainter: (spot, percent, barData, index) {
-                                return FlDotCirclePainter(
-                                  radius: 4,
-                                  color: isCurrentMonth 
-                                      ? Color(0xff1A5D1A)
-                                      : Colors.grey,
-                                  strokeWidth: 2,
-                                  strokeColor: Colors.white,
-                                );
-                              },
+                  ? Obx(() {
+                      // Build simple two-point lines: x=0 pending, x=1 completed
+                      final counts = isCurrentMonth
+                          ? controller.getCurrentMonthCounts()
+                          : controller.getPreviousMonthCounts();
+                      final color = isCurrentMonth ? const Color(0xff1A5D1A) : Colors.grey;
+                      final maxY = controller.getMaxRoutineChartY();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            height: 64.h,
+                            child: LineChart(
+                              LineChartData(
+                                gridData: FlGridData(show: false),
+                                titlesData: FlTitlesData(
+                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                minX: -0.2,
+                                maxX: 1.2,
+                                minY: 0,
+                                maxY: maxY,
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots: [
+                                      FlSpot(0, (counts['pending'] ?? 0).toDouble()),
+                                      FlSpot(1, (counts['completed'] ?? 0).toDouble()),
+                                    ],
+                                    isCurved: true,
+                                    color: color,
+                                    barWidth: 3,
+                                    dotData: FlDotData(
+                                      show: true,
+                                      getDotPainter: (spot, percent, barData, idx) {
+                                        return FlDotCirclePainter(
+                                          radius: 4,
+                                          color: color,
+                                          strokeWidth: 2,
+                                          strokeColor: Colors.white,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
+                          SizedBox(height: 6.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Pending', style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
+                              Text('Completed', style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
+                            ],
+                          ),
                         ],
-                      ),
-                    )
+                      );
+                    })
                   : Container(
                       alignment: Alignment.centerLeft,
                       child: Text(
