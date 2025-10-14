@@ -6,6 +6,7 @@ import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/explore/screen/explore.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
+import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
 import 'package:personal_wellness/feature/routine/screen/reoutine.dart';
 import 'package:personal_wellness/feature/today/screen/today.dart';
 

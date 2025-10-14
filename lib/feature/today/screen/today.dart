@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:personal_wellness/core/services/notification_services.dart';
 import 'package:personal_wellness/core/utils/constants/colors.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
+import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
 import 'package:personal_wellness/feature/explore/screen/explore.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
@@ -100,7 +101,15 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
       items: [
         PopupMenuItem(
           onTap: () {
-            Get.off(() => Explore());
+            // Switch to Explore tab within BottomNavbar so the bottom bar stays visible
+            Future.microtask(() {
+              try {
+                Get.find<BottomNavcontroller>().changeIndex(1);
+              } catch (_) {
+                // If controller isn't available for some reason, fall back to pushing Explore
+                Get.to(() => Explore());
+              }
+            });
           },
           child: Row(
             children: const [
@@ -134,7 +143,15 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
         ),
         PopupMenuItem(
           onTap: () {
-            Get.off(() => AddToRoutine());
+            // Switch to Routine tab within BottomNavbar so the bottom bar stays visible
+            Future.microtask(() {
+              try {
+                Get.find<BottomNavcontroller>().changeIndex(2);
+              } catch (_) {
+                // Fallback if controller isn't available
+                Get.to(() => AddToRoutine());
+              }
+            });
           },
           child: Row(
             children: const [
@@ -168,7 +185,15 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
         ),
         PopupMenuItem(
           onTap: () {
-            Get.off(() => ProgressData());
+            // Switch to Progress tab within BottomNavbar so the bottom bar stays visible
+            Future.microtask(() {
+              try {
+                Get.find<BottomNavcontroller>().changeIndex(3);
+              } catch (_) {
+                // Fallback if controller isn't available
+                Get.to(() => ProgressData());
+              }
+            });
           },
           child: Row(
             children: const [
@@ -234,41 +259,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
             ],
           ),
         ),
-        PopupMenuItem(
-          onTap: () {
-            // Debug authentication and routine data
-            controller.debugAuthenticationState();
-          },
-          child: Row(
-            children: const [
-              Icon(Icons.bug_report, color: Color(0xFF485908)),
-              SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Debug',
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontWeight: FontWeight.w400,
-                      fontSize: 17,
-                      color: Color(0xff172601),
-                    ),
-                  ),
-                  Text(
-                    'Check routine data',
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontWeight: FontWeight.w400,
-                      fontSize: 13,
-                      color: Color(0xff78816C),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+       
       ],
       elevation: 8.0,
       shape: const RoundedRectangleBorder(
