@@ -92,16 +92,48 @@ class TodayController extends GetxController {
       }
 
       debugPrint('Found ${routinesList.length} routines in SharedPreferences');
-      
-      // Take only the most recent 3 items for today view
-      final recentRoutines = routinesList.take(3).toList();
-      
+
+      // Sort by creation time descending using timestamp embedded in the id
+      // id format: `${productId}_<period>_<time>_<timestamp>_<index>`
+      int _extractTimestamp(Map<String, dynamic> json) {
+        try {
+          final String id = (json['id'] ?? '').toString();
+          final parts = id.split('_');
+          // timestamp is the second last segment
+          if (parts.length >= 2) {
+            final tsStr = parts[parts.length - 2];
+            return int.tryParse(tsStr) ?? 0;
+          }
+          return 0;
+        } catch (_) {
+          return 0;
+        }
+      }
+
+      final List<Map<String, dynamic>> sortedByLatest =
+          List<Map<String, dynamic>>.from(routinesList.cast<Map<String, dynamic>>())
+            ..sort((a, b) => _extractTimestamp(b).compareTo(_extractTimestamp(a)));
+
+      // Deduplicate by productId preserving latest first
+      final seenProductIds = <String>{};
+      final List<Map<String, dynamic>> uniqueLatestFirst = [];
+      for (final routineJson in sortedByLatest) {
+        final productId = (routineJson['productId'] ?? '').toString();
+        if (productId.isEmpty) continue;
+        if (seenProductIds.add(productId)) {
+          uniqueLatestFirst.add(routineJson);
+        }
+      }
+
+      // Take only the most recent 3 unique items for today view
+      final recentRoutines = uniqueLatestFirst.take(3).toList();
+
       // Convert JSON data to the format expected by the UI
       final formattedData = recentRoutines.map((routineJson) {
         final productName = routineJson['productName'] ?? '';
         final time = routineJson['time'] ?? '';
         final productId = routineJson['productId'] ?? '';
-        
+
         debugPrint('Adding routine: $productName at $time');
         return {
           'icon': _getCategoryIcon('skincare'), // Default category
@@ -112,7 +144,7 @@ class TodayController extends GetxController {
           'productId': productId,
         };
       }).toList();
-      
+
       routineData.assignAll(formattedData);
       debugPrint('Today view updated with ${routineData.length} items');
     } catch (e) {
