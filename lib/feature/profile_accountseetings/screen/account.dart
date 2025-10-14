@@ -78,11 +78,15 @@ class Account extends StatelessWidget {
                 ),
                SizedBox(height: 15.h,),
                Center(
-                child: Text("LANA YOLO",style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 28.sp,
-                  color: Color(0xff000000),
-                ),),
+                 child: Obx(() => Text(
+                   controller.userName.value,
+                   style: TextStyle(
+                     fontFamily: "SFPro",
+                     fontSize: 28.sp,
+                     fontWeight: FontWeight.w500,
+                     color: Color(0xff000000),
+                   ),
+                 )),
                ),
                SizedBox(height: 48.h,),
                Container(
