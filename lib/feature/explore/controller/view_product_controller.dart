@@ -91,6 +91,11 @@ class ViewProductController extends GetxController {
 
   Future<void> fetchProductDetails(String id) async {
     try {
+      if (id.trim().isEmpty) {
+        debugPrint('fetchProductDetails: empty product id, aborting request');
+        EasyLoading.showError("Invalid product ID");
+        return;
+      }
       EasyLoading.show(status: "Loading product...", maskType: EasyLoadingMaskType.black);
 
       final prefs = await SharedPreferences.getInstance();
@@ -102,7 +107,7 @@ class ViewProductController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse("${Urls.baseUrl}/product/details/$id"),
+        Uri.parse("${Urls.getProductDetails}/${id.trim()}"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $accessToken",
@@ -137,6 +142,7 @@ class ViewProductController extends GetxController {
           EasyLoading.showError("Failed to load product details");
         }
       } else {
+        debugPrint('fetchProductDetails: server error ${response.statusCode} for id=$id');
         EasyLoading.showError("Server error: ${response.statusCode}");
       }
     } catch (e) {
@@ -189,9 +195,14 @@ class ViewProductController extends GetxController {
   // New method for fetching routine product details
   Future<void> fetchRoutineProductDetails(String id) async {
     try {
+      if (id.trim().isEmpty) {
+        debugPrint('fetchRoutineProductDetails: empty product id, aborting request');
+        EasyLoading.showError("Invalid product ID");
+        return;
+      }
       debugPrint('=== Fetching Routine Product Details ===');
       debugPrint('Product ID: $id');
-      debugPrint('API URL: ${Urls.baseUrl}/product/details/$id');
+      debugPrint('API URL: ${Urls.getProductDetails}/${id.trim()}');
       
       EasyLoading.show(status: "Loading product details...", maskType: EasyLoadingMaskType.black);
 
@@ -207,7 +218,7 @@ class ViewProductController extends GetxController {
       debugPrint('Access Token: $accessToken');
 
       final response = await http.get(
-        Uri.parse("${Urls.baseUrl}/product/details/$id"),
+        Uri.parse("${Urls.getProductDetails}/${id.trim()}"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $accessToken",

@@ -15,8 +15,10 @@ class ViewProduct extends StatelessWidget {
 
     // Get productId from arguments and fetch product details
     final String? productId = Get.arguments as String?;
-    if (productId != null) {
-      controller.fetchProductDetails(productId);
+    if (productId != null && productId.trim().isNotEmpty) {
+      controller.fetchProductDetails(productId.trim());
+    } else {
+      debugPrint('ViewProduct: Missing or empty productId in navigation arguments.');
     }
 
     return Scaffold(

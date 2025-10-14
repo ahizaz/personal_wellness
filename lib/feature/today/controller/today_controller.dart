@@ -20,7 +20,8 @@ class TodayController extends GetxController {
     // Load personalization data
     loadPersonalizationData();
     // Add a small delay to ensure SharedPreferences is ready
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Duration(milliseconds: 500), () async {
+      await _runOneTimeMigrationIfNeeded();
       fetchHomeRoutineData();
     });
   }
@@ -74,6 +75,22 @@ class TodayController extends GetxController {
   // Public method to refresh personalization data
   Future<void> refreshPersonalizationData() async {
     await loadPersonalizationData();
+  }
+
+  // One-time migration: clear all old routines so app starts fresh
+  Future<void> _runOneTimeMigrationIfNeeded() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const migrationFlag = 'migration_clear_routines_v1';
+      final hasRun = prefs.getBool(migrationFlag) ?? false;
+      if (!hasRun) {
+        await prefs.setString('saved_routines', '[]');
+        await prefs.setBool(migrationFlag, true);
+        debugPrint('TodayController migration v1 applied: cleared all saved routines');
+      }
+    } catch (e) {
+      debugPrint('TodayController migration v1 error: $e');
+    }
   }
 
   Future<void> fetchHomeRoutineData() async {

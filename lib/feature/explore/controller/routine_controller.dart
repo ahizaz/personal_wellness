@@ -229,6 +229,10 @@ void submitRoutine() async {
           .map((json) => RoutineItem.fromJson(json))
           .toList();
 
+      // 1) Purge expired items (older than their endDate)
+      final DateTime now = DateTime.now();
+      existingRoutines.removeWhere((r) => r.endDate.isBefore(now));
+
       // Create color palette
       final colors = [
         const Color(0xffFFF8E6),
@@ -241,34 +245,43 @@ void submitRoutine() async {
       List<RoutineItem> newRoutines = [];
       
       // Add morning routines
-      for (String morningTime in selectedTimes) {
-        final newRoutine = RoutineItem(
-          productName: '${productName.value} (Morning)',
-          backgroundColor: colors[newRoutines.length % colors.length],
-          time: morningTime,
-          productId: productId.value,
-          startDate: startDate.value ?? DateTime.now(),
-          endDate: endDate.value ?? DateTime.now().add(Duration(days: 30)),
-          id: '${productId.value}_morning_${morningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
-        );
-        newRoutines.add(newRoutine);
-        debugPrint('Created morning routine: ${productName.value} at $morningTime');
-      }
+        // Add morning routines (valid for only one day)
+        for (String morningTime in selectedTimes) {
+          // Remove older items for the same time slot so only the latest stays
+          existingRoutines.removeWhere((r) => _isSameTimeSlot(r.time, morningTime));
+          final start = startDate.value ?? DateTime.now();
+          final end = start.add(Duration(days: 1));
+          final newRoutine = RoutineItem(
+            productName: '${productName.value} (Morning)',
+            backgroundColor: colors[newRoutines.length % colors.length],
+            time: morningTime,
+            productId: productId.value,
+            startDate: start,
+            endDate: end,
+            id: '${productId.value}_morning_${morningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+          );
+          newRoutines.add(newRoutine);
+          debugPrint('Created morning routine: ${productName.value} at $morningTime');
+        }
 
-      // Add evening routines  
-      for (String eveningTime in selectedEveningTimes) {
-        final newRoutine = RoutineItem(
-          productName: '${productName.value} (Evening)',
-          backgroundColor: colors[newRoutines.length % colors.length],
-          time: eveningTime,
-          productId: productId.value,
-          startDate: startDate.value ?? DateTime.now(),
-          endDate: endDate.value ?? DateTime.now().add(Duration(days: 30)),
-          id: '${productId.value}_evening_${eveningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
-        );
-        newRoutines.add(newRoutine);
-        debugPrint('Created evening routine: ${productName.value} at $eveningTime');
-      }
+        // Add evening routines (valid for only one day)
+        for (String eveningTime in selectedEveningTimes) {
+          // Remove older items for the same time slot so only the latest stays
+          existingRoutines.removeWhere((r) => _isSameTimeSlot(r.time, eveningTime));
+          final start = startDate.value ?? DateTime.now();
+          final end = start.add(Duration(days: 1));
+          final newRoutine = RoutineItem(
+            productName: '${productName.value} (Evening)',
+            backgroundColor: colors[newRoutines.length % colors.length],
+            time: eveningTime,
+            productId: productId.value,
+            startDate: start,
+            endDate: end,
+            id: '${productId.value}_evening_${eveningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+          );
+          newRoutines.add(newRoutine);
+          debugPrint('Created evening routine: ${productName.value} at $eveningTime');
+        }
 
       // Add new routines to existing ones (don't replace, add to the list)
       existingRoutines.addAll(newRoutines);
@@ -312,6 +325,28 @@ void submitRoutine() async {
           .toList();
 
       debugPrint('Loaded ${loadedRoutines.length} routines from SharedPreferences');
+
+      // Purge expired items and save back if any were removed
+      final int beforePurge = loadedRoutines.length;
+      loadedRoutines.removeWhere((r) => r.endDate.isBefore(DateTime.now()));
+      // Extra cleanup: remove legacy items older than 24 hours based on timestamp in id
+      final int beforeLegacyCleanup = loadedRoutines.length;
+      final DateTime cutoff = DateTime.now().subtract(const Duration(hours: 24));
+      loadedRoutines.removeWhere((r) {
+        final ts = _extractTimestampFromId(r.id);
+        // If timestamp is missing/unparsable (legacy), drop it; else keep only newer than cutoff
+        return ts == null || ts.isBefore(cutoff);
+      });
+      if (loadedRoutines.length != beforePurge) {
+        final purgedJson = jsonEncode(loadedRoutines.map((r) => r.toJson()).toList());
+        await prefs.setString('saved_routines', purgedJson);
+        debugPrint('Purged ${beforePurge - loadedRoutines.length} expired routines');
+      }
+      if (loadedRoutines.length != beforeLegacyCleanup) {
+        final cleanedJson = jsonEncode(loadedRoutines.map((r) => r.toJson()).toList());
+        await prefs.setString('saved_routines', cleanedJson);
+        debugPrint('Removed ${beforeLegacyCleanup - loadedRoutines.length} legacy routines older than 24h');
+      }
 
       // Sort routines by time (no more time-based filtering)
       loadedRoutines.sort((a, b) {
@@ -405,6 +440,29 @@ void submitRoutine() async {
       debugPrint('Error parsing time for sorting: $timeStr, error: $e');
       // Fallback: return a high number for unparseable times so they appear at end
       return 9999;
+    }
+  }
+
+  // Helper: check if two time strings point to the same slot (minute precision)
+  bool _isSameTimeSlot(String a, String b) {
+    try {
+      return _parseTimeForSorting(a) == _parseTimeForSorting(b);
+    } catch (_) {
+      return a.trim().toLowerCase() == b.trim().toLowerCase();
+    }
+  }
+
+  // Extract timestamp (as DateTime) from our id format `${productId}_<period>_<time>_<timestamp>_<index>`
+  DateTime? _extractTimestampFromId(String id) {
+    try {
+      final parts = id.split('_');
+      if (parts.length < 2) return null;
+      final tsStr = parts[parts.length - 2];
+      final ts = int.tryParse(tsStr);
+      if (ts == null || ts <= 0) return null;
+      return DateTime.fromMillisecondsSinceEpoch(ts);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -538,6 +596,39 @@ void submitRoutine() async {
     // Product name will be set via setProductName() from AddToRoutine
     
     // Load routines from SharedPreferences when controller initializes
-    loadRoutinesFromSharedPreferences();
+    _runOneTimeMigrationIfNeeded().then((_) => loadRoutinesFromSharedPreferences());
+  }
+
+  // Clear all routines from SharedPreferences
+  Future<void> clearAllRoutines() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_routines', '[]');
+    debugPrint('All routines cleared from SharedPreferences');
+    // Optionally refresh controllers to update UI
+    try {
+      final todayController = Get.find<TodayController>();
+      await todayController.refreshRoutineData();
+    } catch (e) {
+      debugPrint('Today controller not found or error refreshing: $e');
+    }
+    routines.clear();
+    allDayRoutines.clear();
+    timeSlotRoutines.clear();
+  }
+
+  // One-time migration: clear all old routines so app starts fresh
+  Future<void> _runOneTimeMigrationIfNeeded() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const migrationFlag = 'migration_clear_routines_v1';
+      final hasRun = prefs.getBool(migrationFlag) ?? false;
+      if (!hasRun) {
+        await prefs.setString('saved_routines', '[]');
+        await prefs.setBool(migrationFlag, true);
+        debugPrint('Migration v1 applied: cleared all saved routines');
+      }
+    } catch (e) {
+      debugPrint('Migration v1 error: $e');
+    }
   }
 }
