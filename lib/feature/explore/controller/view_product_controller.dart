@@ -131,9 +131,9 @@ class ViewProductController extends GetxController {
           // Reset the current image index
           currentIndex.value = 0;
 
-          // Fetch relevant products using product name
-          await fetchRelevantProducts(data["data"]["productName"] ?? "");
-          
+          // Fetch relevant products using ingredients
+          await fetchRelevantProducts(data["data"]["ingredients"] ?? "");
+
           // Fetch timeline data
           await fetchTimelineData();
 
@@ -153,7 +153,7 @@ class ViewProductController extends GetxController {
     }
   }
 
-  Future<void> fetchRelevantProducts(String productName) async {
+  Future<void> fetchRelevantProducts(String ingredients) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
@@ -161,8 +161,10 @@ class ViewProductController extends GetxController {
         return;
       }
 
+      // Encode the ingredients string to handle special characters in the URL
+      final encodedIngredients = Uri.encodeComponent(ingredients);
       final response = await http.get(
-        Uri.parse("${Urls.baseUrl}/product/get-relevant?searchTerm=$productName"),
+        Uri.parse("${Urls.baseUrl}/product/get-relevant?searchTerm=$encodedIngredients"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $accessToken",
@@ -186,13 +188,14 @@ class ViewProductController extends GetxController {
         }
       } else {
         relevantProducts.value = [];
+        debugPrint('fetchRelevantProducts: server error ${response.statusCode}');
       }
     } catch (e) {
       relevantProducts.value = [];
+      debugPrint("Error fetching relevant products: $e");
     }
   }
 
-  // New method for fetching routine product details
   Future<void> fetchRoutineProductDetails(String id) async {
     try {
       if (id.trim().isEmpty) {
