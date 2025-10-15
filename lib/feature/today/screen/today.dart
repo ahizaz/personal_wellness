@@ -228,7 +228,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
         ),
         PopupMenuItem(
           onTap: () {
-            // Will handle reminders
+           Get.to(()=>NotificationScreen());
           },
           child: Row(
             children: const [
