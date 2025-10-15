@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
@@ -80,9 +79,18 @@ class UpdatePasswordController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        // Clear text fields after successful update
+        passwordController.clear();
+        newpasswordController.clear();
+        confirmnewController.clear();
+        hasText.value = false;
+        hasNewConfirmText.value = false;
+        allFieldsFilled.value = false;
+        passwordStrength.value = 'none';
+
         await prefs.remove('accessToken');
         await prefs.remove('userId');
-       Get.offAll(()=>SignInForm()); // Assuming '/login' is the route name for the login screen
+        Get.offAll(() => SignInForm()); // Assuming SignInForm is the login screen
       } else {
         Get.snackbar('Error', 'Failed to update password: ${response.body}');
       }

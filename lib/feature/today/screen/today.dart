@@ -328,9 +328,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                 child: Image.asset(IconPath.notificationhome,
                     height: 48.h, width: 48.w, fit: BoxFit.cover),
               ),
-              SizedBox(width: 5.w),
-              Image.asset(IconPath.search,
-                  height: 48.h, width: 48.w, fit: BoxFit.cover),
+            
             ],
           ),
         ],
