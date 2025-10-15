@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -68,11 +69,21 @@ class NotificationController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final notifications = <NotificationItem>[].obs;
+  late Timer _timer;
 
   @override
   void onInit() {
     super.onInit();
     fetchNotifications();
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      notifications.refresh();
+    });
+  }
+
+  @override
+  void onClose() {
+    _timer.cancel();
+    super.onClose();
   }
 
   Future<void> fetchNotifications() async {
@@ -203,5 +214,3 @@ class NotificationController extends GetxController {
     ];
   }
 }
-
-
