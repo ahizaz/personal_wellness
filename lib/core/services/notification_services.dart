@@ -51,7 +51,7 @@ class NotificationServices {
 
   }
   void initLocalNotifications(BuildContext context)async{
-     var androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
+var androidInitializationSettings = const AndroidInitializationSettings('@drawable/notification_icon');
     var iosInitializationSettings = const DarwinInitializationSettings();
 
     var initializationSettings = InitializationSettings(
