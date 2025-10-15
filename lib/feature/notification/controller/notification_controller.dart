@@ -69,11 +69,13 @@ class NotificationController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final notifications = <NotificationItem>[].obs;
+  final readNotificationIds = <String>{}.obs;
   late Timer _timer;
 
   @override
   void onInit() {
     super.onInit();
+    loadReadIds();
     fetchNotifications();
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       notifications.refresh();
@@ -84,6 +86,26 @@ class NotificationController extends GetxController {
   void onClose() {
     _timer.cancel();
     super.onClose();
+  }
+
+  Future<void> loadReadIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList('read_notification_ids') ?? [];
+    readNotificationIds.assignAll(list.toSet());
+  }
+
+  Future<void> saveReadIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('read_notification_ids', readNotificationIds.toList());
+  }
+
+  void _updateReadStatus() {
+    for (int i = 0; i < notifications.length; i++) {
+      if (readNotificationIds.contains(notifications[i].id)) {
+        notifications[i] = notifications[i].copyWith(isRead: true);
+      }
+    }
+    notifications.refresh();
   }
 
   Future<void> fetchNotifications() async {
@@ -128,6 +150,7 @@ class NotificationController extends GetxController {
         } else {
           notifications.assignAll(items);
         }
+        _updateReadStatus();
       } else if (response.statusCode == 401) {
         errorMessage.value = 'Session expired. Please sign in again.';
         notifications.clear();
@@ -145,6 +168,8 @@ class NotificationController extends GetxController {
   }
 
   void markAsRead(String notificationId) {
+    readNotificationIds.add(notificationId);
+    saveReadIds();
     final index = notifications.indexWhere((n) => n.id == notificationId);
     if (index != -1) {
       notifications[index] = notifications[index].copyWith(isRead: true);
@@ -152,12 +177,18 @@ class NotificationController extends GetxController {
   }
 
   void markAllAsRead() {
+    for (var n in notifications) {
+      readNotificationIds.add(n.id);
+    }
+    saveReadIds();
     for (int i = 0; i < notifications.length; i++) {
       notifications[i] = notifications[i].copyWith(isRead: true);
     }
   }
 
   void removeNotification(String notificationId) {
+    readNotificationIds.remove(notificationId);
+    saveReadIds();
     notifications.removeWhere((n) => n.id == notificationId);
   }
 
