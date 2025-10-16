@@ -6,6 +6,7 @@ import 'package:personal_wellness/core/common/widgets/custom_button.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/controller/profile_account_controller.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/widget/custom_account_field.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class AccountSeetings extends StatelessWidget {
   const AccountSeetings({super.key});
@@ -236,11 +237,11 @@ class AccountSeetings extends StatelessWidget {
                                   ? const Color(0xFFFFFFFF)
                                   : const Color(0xFF999999),
                             ),
-                            onTap: () {
-                              profileController.firstNameController.clear();
-                              profileController.lastNameController.clear();
-                              Get.back();
-                            },
+                            onTap: profileController.isFormValid.value
+                                ? () {
+                                    profileController.updateProfile();
+                                  }
+                                : (){},
                           ),
                         ),
                         SizedBox(height: 24.h),
