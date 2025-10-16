@@ -366,7 +366,7 @@ class _EmptyState extends StatelessWidget {
                 Text(
                   'When you get notifications, they\'ll appear here',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16,///
                     color: Colors.grey[500],
                   ),
                   textAlign: TextAlign.center,
