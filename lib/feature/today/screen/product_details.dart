@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/today/controller/product_details_controller_new.dart';
 import 'package:personal_wellness/feature/today/widget/how_to_use.dart';
@@ -133,56 +134,62 @@ class ProductDetails extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   color: Color(0xff172601)
                 ),),
-                SizedBox(height: 16.h,),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset(ImagePath.product4,width: 177.w,height: 182.h,fit: BoxFit.cover,),
-                        SizedBox(height: 8.h,),
-                        Text("The Ordinary Anti-\naging Serum",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                      ],
-                    ),
-                      SizedBox(width: 16.w,),
-                         Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset(ImagePath.product3,width: 177.w,height: 182.h,fit: BoxFit.cover,),
-                        SizedBox(height: 8.h,),
-                        Text("Whitening Night\nCream",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                      ],
-                    ),
+               SizedBox(height: 24.h),
 
-                  ],
-                ),
-                SizedBox(height: 16.h,),
-                    Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset(ImagePath.product2,width: 177.w,height: 182.h,fit: BoxFit.cover,),
-                        SizedBox(height: 8.h,),
-                        Text("Vitamin C Serum\n50g",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                      ],
-                    ),
-                      SizedBox(width: 16.w,),
-                         Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset(ImagePath.product1,width: 177.w,height: 182.h,fit: BoxFit.cover,),
-                        SizedBox(height: 8.h,),
-                        Text("Essence Sun’s\nCream SPF45 ",style: TextStyle(fontFamily:"SFPro",fontSize: 17.sp,fontWeight: FontWeight.w600,color:Color(0xff000000)),)
-                      ],
-                    ),
+Obx(() {
+  if (controller.relevantProducts.isEmpty) {
+    return Center(
+      child: Text(
+        "No relevant products found.",
+        style: TextStyle(
+          fontFamily: "SFPro",
+          fontSize: 16.sp,
+          color: Color(0xff3E4B2C),
+        ),
+      ),
+    );
+  }
 
-                  ],
-                ),
+  return Wrap(
+    spacing: 16.w,
+    runSpacing: 16.h,
+    children: controller.relevantProducts.map((product) {
+      final imageUrl = '${Urls.imageurl}${product['image']}';
+      final name = product['productName'];
+      return Container(
+        width: 177.w,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              imageUrl,
+              width: 177.w,
+              height: 182.h,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Image.asset(
+                "assets/images/fallback.png",
+                width: 177.w,
+                height: 182.h,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              name,
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff000000),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}),
+
                   SizedBox(height: 14.h,),
 
               ],

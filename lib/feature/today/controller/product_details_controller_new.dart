@@ -1,43 +1,29 @@
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:personal_wellness/core/services/api_service.dart';
-import 'package:personal_wellness/core/models/product_details_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 
 class ProductDetailsController extends GetxController {
   final RxInt currentIndex = 0.obs;
-  final Rx<ProductDetails?> productDetails = Rx<ProductDetails?>(null);
   final RxBool isLoading = false.obs;
 
-  // Product images from API
+  // Product details
   RxList<String> productImages = <String>[].obs;
-  
-  // Product data from API
   RxString productName = ''.obs;
   RxString ingredients = ''.obs;
-  RxString description = ''.obs;
-  RxString note = ''.obs;
   RxList<String> howToUse = <String>[].obs;
+
+  // New: Relevant product list
+  RxList<Map<String, dynamic>> relevantProducts = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Get product ID from arguments if passed
     final productId = Get.arguments as String?;
     if (productId != null && productId.isNotEmpty) {
       fetchProductDetails(productId);
-    }
-  }
-
-  void nextImage() {
-    if (productImages.isNotEmpty) {
-      currentIndex.value = (currentIndex.value + 1) % productImages.length;
-    }
-  }
-
-  void previousImage() {
-    if (productImages.isNotEmpty) {
-      currentIndex.value = (currentIndex.value - 1 + productImages.length) % productImages.length;
     }
   }
 
@@ -45,50 +31,75 @@ class ProductDetailsController extends GetxController {
     try {
       isLoading.value = true;
       EasyLoading.show(status: 'Loading product details...');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
 
-      final result = await ApiService.getProductDetails(productId);
-      
-      if (result != null && result.success) {
-        productDetails.value = result.data;
-        
-        // Update reactive variables
-        productName.value = result.data.productName;
-        ingredients.value = result.data.ingredients;
-        description.value = result.data.description;
-        note.value = result.data.note;
-        howToUse.assignAll(result.data.howToUse);
-        
-        // Process images with full URL
+      final response = await http.get(
+        Uri.parse('${Urls.baseUrl}/product/details/$productId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final result = data['data'];
+
+        productName.value = result['productName'] ?? '';
+        ingredients.value = result['ingredients'] ?? '';
+        howToUse.assignAll(List<String>.from(result['howToUse'] ?? []));
         productImages.assignAll(
-          result.data.image.map((imagePath) => '${Urls.imageurl}$imagePath').toList()
+          (result['image'] as List).map((e) => '${Urls.imageurl}$e').toList(),
         );
-        
-        // Reset current index if images are available
-        if (productImages.isNotEmpty) {
-          currentIndex.value = 0;
-        }
-        
+
+        // Fetch relevant products after loading this one
+        await fetchRelevantProducts(ingredients.value);
+
         EasyLoading.dismiss();
       } else {
         EasyLoading.showError('Failed to load product details');
       }
     } catch (e) {
-      EasyLoading.showError('Error loading product details: $e');
+      EasyLoading.showError('Error: $e');
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Get full image URL
-  String getImageUrl(String imagePath) {
-    if (imagePath.startsWith('http')) {
-      return imagePath;
+  Future<void> fetchRelevantProducts(String searchTerm) async {
+    try {
+      EasyLoading.show(status: 'Loading relevant products...');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      final response = await http.get(
+        Uri.parse('${Urls.baseUrl}/product/get-relevant?searchTerm=$searchTerm'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final results = data['data']['result'] as List;
+        relevantProducts.assignAll(results.map((e) => {
+          'productName': e['productName'],
+          'image': e['image'][0],
+        }).toList());
+        EasyLoading.dismiss();
+      } else {
+        EasyLoading.showError('Failed to load relevant products');
+      }
+    } catch (e) {
+      EasyLoading.showError('Error loading relevant products: $e');
     }
-    return '${Urls.imageurl}$imagePath';
   }
 
-  // Method to call API with product ID
-  void loadProductDetails(String productId) {
-    fetchProductDetails(productId);
+  void nextImage() {
+    if (productImages.isNotEmpty) {
+      currentIndex.value = (currentIndex.value + 1) % productImages.length;
+    }
   }
 }
