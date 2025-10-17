@@ -9,34 +9,34 @@ class EmptyRoutineView extends StatelessWidget {
   Widget build(BuildContext context) {
    return Padding(
      padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 30.h),
-     child: Column(
-    
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      Text("Today",style: TextStyle(
-        fontFamily: "SFPro",
-        fontSize: 34.sp,
-        fontWeight: FontWeight.w500,
-        color: Color(0xff172601)
-      ),),
-      SizedBox(height: 40.h,),
-      Center(child: Image.asset(ImagePath.homenodata,width: 162.w,height: 164.h,fit: BoxFit.cover,),),
-      SizedBox(height: 40.h,),
-      Center(child: Text("Let's build your new routine to get started\n     on your skin care journey",textAlign: TextAlign.center,style: TextStyle(
-        fontFamily: "SFPro",
-        fontSize: 17.sp,
-        fontWeight: FontWeight.w400,
-        color: Color(0xff172601)
-      ),)),
-      SizedBox(height: 24.h,),
-      Center(child: Text("Explore",style: TextStyle(
-        fontFamily: "SFPro",
-        fontSize: 17.sp,
-        fontWeight: FontWeight.w600,
-        color: Color(0xff121221)
-      ),),),
-      
-      ],
+     child: SingleChildScrollView(
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: [
+           Text("Today",style: TextStyle(
+             fontFamily: "SFPro",
+             fontSize: 34.sp,
+             fontWeight: FontWeight.w500,
+             color: Color(0xff172601)
+           ),),
+           SizedBox(height: 40.h,),
+           Center(child: Image.asset(ImagePath.homenodata,width: 162.w,height: 164.h,fit: BoxFit.cover,),),
+           SizedBox(height: 40.h,),
+           Center(child: Text("Let's build your new routine to get started\n     on your skin care journey",textAlign: TextAlign.center,style: TextStyle(
+             fontFamily: "SFPro",
+             fontSize: 17.sp,
+             fontWeight: FontWeight.w400,
+             color: Color(0xff172601)
+           ),)),
+           SizedBox(height: 24.h,),
+           Center(child: Text("Explore",style: TextStyle(
+             fontFamily: "SFPro",
+             fontSize: 17.sp,
+             fontWeight: FontWeight.w600,
+             color: Color(0xff121221)
+           ),),),
+         ],
+       ),
      ),
    );
   }

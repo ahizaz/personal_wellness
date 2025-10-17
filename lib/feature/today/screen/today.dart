@@ -340,30 +340,33 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Column(
-        children: [
-          _buildProfileHeader(),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xff485908),
-                  ),
-                );
-              }
-              if (controller.routineData.isEmpty) {
-                return const EmptyRoutineView();
-              }
-              bool allCompleted = controller.routineData
-                  .every((data) => data['isCompleted'].value == true);
-              if (allCompleted) {
-                return const RoutineCompletedView();
-              }
-              return RoutineInProgressview();
-            }),
-          ),
-        ],
+      body: SafeArea(
+        bottom: true,
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xff485908),
+                    ),
+                  );
+                }
+                if (controller.routineData.isEmpty) {
+                  return const EmptyRoutineView();
+                }
+                bool allCompleted = controller.routineData
+                    .every((data) => data['isCompleted'].value == true);
+                if (allCompleted) {
+                  return const RoutineCompletedView();
+                }
+                return RoutineInProgressview();
+              }),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Obx(
         () => FloatingActionButton(
