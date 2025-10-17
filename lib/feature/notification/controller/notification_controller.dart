@@ -78,7 +78,7 @@ class NotificationController extends GetxController {
     loadReadIds();
     fetchNotifications();
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
-      notifications.refresh();
+      fetchNotifications();
     });
   }
 

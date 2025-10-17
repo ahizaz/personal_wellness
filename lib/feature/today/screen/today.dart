@@ -8,6 +8,7 @@ import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/explore/screen/add_to_routine.dart';
 import 'package:personal_wellness/feature/explore/screen/explore.dart';
+import 'package:personal_wellness/feature/notification/controller/notification_controller.dart';
 import 'package:personal_wellness/feature/notification/screen/notification_screen.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/account.dart';
@@ -28,26 +29,25 @@ class Today extends StatefulWidget {
 class _TodayState extends State<Today> with WidgetsBindingObserver {
   final TodayController controller = Get.put(TodayController());
   final GlobalKey _fabKey = GlobalKey();
-   final NotificationServices notificationServices = NotificationServices();
-
+  final NotificationServices notificationServices = NotificationServices();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-       notificationServices.requestNotificationPermission();
-       notificationServices.firebaseInit();
-      // notificationServices.isTokenRefresh();
-       notificationServices.getDeviceToken().then((value){
-        print('devicetoken');
-        print(value);
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit();
+    // notificationServices.isTokenRefresh();
+    notificationServices.getDeviceToken().then((value){
+      print('devicetoken');
+      print(value);
+    });
 
-       });
+    Get.put(NotificationController()); // Initialize NotificationController here
 
-  
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-       notificationServices.initLocalNotifications(context);
-     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notificationServices.initLocalNotifications(context);
+    });
   }
 
   @override
@@ -275,6 +275,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
   }
 
   Widget _buildProfileHeader() {
+    final notificationController = Get.find<NotificationController>();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 30.h),
       child: Column(
@@ -325,10 +326,40 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                 onTap: (){
                   Get.to(()=>NotificationScreen());
                 },
-                child: Image.asset(IconPath.notificationhome,
-                    height: 48.h, width: 48.w, fit: BoxFit.cover),
+                child: Obx(() {
+                  final unread = notificationController.unreadCount;
+                  return Stack(
+                    children: [
+                      Image.asset(
+                        IconPath.notificationhome,
+                        height: 48.h,
+                        width: 48.w,
+                        fit: BoxFit.cover,
+                      ),
+                      if (unread > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Text(
+                              '$unread',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
               ),
-            
             ],
           ),
         ],
