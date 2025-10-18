@@ -96,7 +96,7 @@ class ProgressPhotosWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Front Side",
+                            "Left Side",
                             style: TextStyle(
                               fontFamily: "SFPro",
                               fontSize: 17.sp,
@@ -108,7 +108,20 @@ class ProgressPhotosWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 8.h),
                       _buildPhotoSection("Front Side", controller.frontProgressImages),
-                      
+                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Font  Side",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xff172601),
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 4.h),
                       Row(
                         children: [
@@ -137,7 +150,10 @@ class ProgressPhotosWidget extends StatelessWidget {
                       Row(
                         children: [
                           Obx(() {
-                            final earliest = controller.frontEarliestDate;
+                            // If server didn't provide parsable dates but we have images,
+                            // fall back to showing the current date so the UI is not blank.
+                            final earliest = controller.frontEarliestDate ??
+                                (controller.frontImagesCount > 0 ? DateTime.now() : null);
                             return Text(
                               earliest != null ? formatDate(earliest) : '',
                               style: TextStyle(
@@ -150,7 +166,8 @@ class ProgressPhotosWidget extends StatelessWidget {
                           }),
                           Spacer(),
                           Obx(() {
-                            final latest = controller.frontLatestDate;
+                            final latest = controller.frontLatestDate ??
+                                (controller.frontImagesCount > 0 ? DateTime.now() : null);
                             return Text(
                               latest != null ? formatDate(latest) : '',
                               style: TextStyle(
