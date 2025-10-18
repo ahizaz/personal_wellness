@@ -30,6 +30,11 @@ class ProgressController extends GetxController{
   var leftProgressImages = <String>[].obs;  // Left side images
   var rightProgressImages = <String>[].obs; // Right side images  
   var frontProgressImages = <String>[].obs; // Front images
+
+  // Store corresponding createdAt timestamps (nullable when unknown)
+  var leftProgressDates = <DateTime?>[].obs;
+  var rightProgressDates = <DateTime?>[].obs;
+  var frontProgressDates = <DateTime?>[].obs;
   
   // Loading state for images
   var isLoadingImages = false.obs;
@@ -794,17 +799,43 @@ class ProgressController extends GetxController{
             final createdAt = item['createdAt'];
             
             debugPrint('Processing: Type=$itemType, Date=$date, Created=$createdAt, Image=$imageUrl');
-            
+
+            // Try to parse createdAt into DateTime; fall back to parsing 'date' or null
+            DateTime? parsed;
+            try {
+              if (createdAt != null) {
+                parsed = DateTime.tryParse(createdAt.toString());
+              }
+              if (parsed == null && date != null) {
+                // API sometimes returns a human-readable date like 'Sat Oct 18 2025'
+                try {
+                  parsed = DateTime.parse(date.toString());
+                } catch (_) {
+                  // Try parsing common human format
+                  try {
+                    parsed = DateTime.parse(DateTime.tryParse(date.toString())?.toIso8601String() ?? '');
+                  } catch (_) {
+                    parsed = null;
+                  }
+                }
+              }
+            } catch (e) {
+              parsed = null;
+            }
+
             if (itemType == type) {
               switch (type) {
                 case 'left':
                   leftProgressImages.add(imageUrl);
+                  leftProgressDates.add(parsed);
                   break;
                 case 'right':
                   rightProgressImages.add(imageUrl);
+                  rightProgressDates.add(parsed);
                   break;
                 case 'front':
                   frontProgressImages.add(imageUrl);
+                  frontProgressDates.add(parsed);
                   break;
               }
             }
@@ -897,6 +928,31 @@ class ProgressController extends GetxController{
   int get leftImagesCount => leftProgressImages.length;
   int get rightImagesCount => rightProgressImages.length;
   int get frontImagesCount => frontProgressImages.length;
+
+  // Helper to get earliest and latest dates for a given list of DateTime? entries
+  DateTime? _earliestFromList(List<DateTime?> list) {
+    final nonNull = list.where((e) => e != null).map((e) => e!).toList();
+    if (nonNull.isEmpty) return null;
+    nonNull.sort();
+    return nonNull.first;
+  }
+
+  DateTime? _latestFromList(List<DateTime?> list) {
+    final nonNull = list.where((e) => e != null).map((e) => e!).toList();
+    if (nonNull.isEmpty) return null;
+    nonNull.sort();
+    return nonNull.last;
+  }
+
+  // Public getters for front image date range (null if unavailable)
+  DateTime? get frontEarliestDate => _earliestFromList(frontProgressDates);
+  DateTime? get frontLatestDate => _latestFromList(frontProgressDates);
+
+  // Similarly for left/right if needed
+  DateTime? get leftEarliestDate => _earliestFromList(leftProgressDates);
+  DateTime? get leftLatestDate => _latestFromList(leftProgressDates);
+  DateTime? get rightEarliestDate => _earliestFromList(rightProgressDates);
+  DateTime? get rightLatestDate => _latestFromList(rightProgressDates);
   
   // Method to refresh photo progress data
   Future<void> refreshPhotoProgress() async {

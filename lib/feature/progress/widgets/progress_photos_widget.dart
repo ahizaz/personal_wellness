@@ -10,6 +10,12 @@ class ProgressPhotosWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProgressController controller = Get.find<ProgressController>();
+    String formatDate(DateTime? dt) {
+      if (dt == null) return '';
+      // e.g. 19 Jan 2025
+      final months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+    }
     
     return Container(
       width: double.infinity,
@@ -130,25 +136,31 @@ class ProgressPhotosWidget extends StatelessWidget {
                       SizedBox(height: 4.h),
                       Row(
                         children: [
-                          Text(
-                            "19 Jan 2025",
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff3E4B2C),
-                            ),
-                          ),
+                          Obx(() {
+                            final earliest = controller.frontEarliestDate;
+                            return Text(
+                              earliest != null ? formatDate(earliest) : '',
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff3E4B2C),
+                              ),
+                            );
+                          }),
                           Spacer(),
-                          Text(
-                            "15 Mar 2025",
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff3E4B2C),
-                            ),
-                          ),
+                          Obx(() {
+                            final latest = controller.frontLatestDate;
+                            return Text(
+                              latest != null ? formatDate(latest) : '',
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff3E4B2C),
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     ],
