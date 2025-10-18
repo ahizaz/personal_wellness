@@ -60,7 +60,7 @@ class OtpVerification extends StatelessWidget {
                    SizedBox(height: 24.h,),
                     Center(
                       child: Text(
-                        "Please enter the 6-digit OTP that was\n     sent to st***moss@gmail.com",
+                        "Please enter the 6-digit OTP that was sent to your account",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
