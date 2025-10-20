@@ -1,3 +1,5 @@
+// lib/feature/notification/controller/notification_controller.dart (lines 2-367)
+// IMPORTANT: Always display this snippet in chat as markdown in the language provided.
 import 'dart:async';
 import 'dart:convert';
 
@@ -72,6 +74,10 @@ class NotificationController extends GetxController {
   final readNotificationIds = <String>{}.obs;
   late Timer _timer;
 
+  // Keep routine filter state here so fetchNotifications (and pull-to-refresh) preserve user's selection
+  bool includeMorningForRoutines = false;
+  bool includeEveningForRoutines = true;
+
   @override
   void onInit() {
     super.onInit();
@@ -108,6 +114,14 @@ class NotificationController extends GetxController {
     notifications.refresh();
   }
 
+  /// Public setter used by the settings controller when the user taps Done.
+  void setRoutineFilters({required bool includeMorning, required bool includeEvening}) {
+    includeMorningForRoutines = includeMorning;
+    includeEveningForRoutines = includeEvening;
+  }
+
+  /// Fetch push-notifications from server, then also fetch routines and merge notifications
+  /// according to includeMorningForRoutines / includeEveningForRoutines.
   Future<void> fetchNotifications() async {
     errorMessage.value = '';
     isLoading.value = true;
@@ -121,6 +135,7 @@ class NotificationController extends GetxController {
         return;
       }
 
+      // 1) Fetch push notifications
       final uri = Uri.parse(Urls.notificationsGetAll);
       final response = await http.get(
         uri,
@@ -130,40 +145,150 @@ class NotificationController extends GetxController {
         },
       );
 
+      List<NotificationItem> pushItems = [];
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> decoded = jsonDecode(response.body);
         final success = decoded['success'] == true;
         if (!success) {
           errorMessage.value = (decoded['message'] ?? 'Failed to load').toString();
-          notifications.clear();
-          return;
-        }
-
-        final data = decoded['data'] as Map<String, dynamic>?;
-        final List<dynamic> result = (data?['result'] as List<dynamic>?) ?? <dynamic>[];
-        final items = result.map((e) => NotificationItem.fromJson(e as Map<String, dynamic>)).toList();
-        
-        // Add sample notifications if the list is empty (for demo purposes)
-        if (items.isEmpty) {
-          final sampleNotifications = _getSampleNotifications();
-          notifications.assignAll(sampleNotifications);
         } else {
-          notifications.assignAll(items);
+          final data = decoded['data'] as Map<String, dynamic>?;
+          final List<dynamic> result = (data?['result'] as List<dynamic>?) ?? <dynamic>[];
+          pushItems = result.map((e) => NotificationItem.fromJson(e as Map<String, dynamic>)).toList();
         }
-        _updateReadStatus();
       } else if (response.statusCode == 401) {
         errorMessage.value = 'Session expired. Please sign in again.';
-        notifications.clear();
       } else {
         errorMessage.value = 'Server error: ${response.statusCode}';
-        notifications.clear();
       }
+
+      // 2) Fetch routines and build routine notifications according to user's selection
+      final routineItems = await _fetchRoutinesAndBuildNotifications(
+        includeMorning: includeMorningForRoutines,
+        includeEvening: includeEveningForRoutines,
+        token: token,
+      );
+
+      // 3) Merge pushItems and routineItems, keep uniqueness by id (routine ids have suffixes)
+      final Map<String, NotificationItem> merged = {};
+
+      for (final n in pushItems) {
+        merged[n.id] = n;
+      }
+      for (final n in routineItems) {
+        // If a push notification has same id as constructed routine item we keep push version (push likely has metadata)
+        merged.putIfAbsent(n.id, () => n);
+      }
+
+      final List<NotificationItem> finalList = merged.values.toList()
+        ..sort((a, b) {
+          // Try to sort by timestamp desc (newest first)
+          try {
+            return DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp));
+          } catch (_) {
+            return 0;
+          }
+        });
+
+      // If still empty, add sample notifications for demo
+      if (finalList.isEmpty) {
+        finalList.addAll(_getSampleNotifications());
+      }
+
+      notifications.assignAll(finalList);
+      _updateReadStatus();
     } catch (e) {
       debugPrint('Notifications fetch error: $e');
       errorMessage.value = 'Something went wrong. Please try again.';
       notifications.clear();
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Internal helper - fetch routines and build NotificationItem list.
+  Future<List<NotificationItem>> _fetchRoutinesAndBuildNotifications({
+    required bool includeMorning,
+    required bool includeEvening,
+    required String token,
+  }) async {
+    try {
+      final uri = Uri.parse(Urls.addRoutineGetAll);
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        return [];
+      }
+
+      final Map<String, dynamic> decoded = jsonDecode(response.body);
+      final success = decoded['success'] == true;
+      if (!success) {
+        return [];
+      }
+
+      final data = decoded['data'] as Map<String, dynamic>?;
+      final List<dynamic> result = (data?['result'] as List<dynamic>?) ?? <dynamic>[];
+
+      final List<NotificationItem> built = [];
+
+      for (final raw in result) {
+        if (raw is! Map<String, dynamic>) continue;
+
+        final id = (raw['_id'] ?? '').toString();
+        final createdAt = (raw['createdAt'] ?? DateTime.now().toIso8601String()).toString();
+        final productName = (raw['product'] != null && raw['product']['productName'] != null)
+            ? raw['product']['productName'].toString()
+            : 'Product';
+
+        final List<dynamic> morningTimes = (raw['morningTimeOfDay'] as List<dynamic>?) ?? [];
+        final List<dynamic> eveningTimes = (raw['eveningTimeOfDay'] as List<dynamic>?) ?? [];
+
+        if (includeMorning) {
+          for (final t in morningTimes) {
+            final timeStr = t?.toString() ?? '';
+            built.add(NotificationItem(
+              id: '${id}_morning_${timeStr}',
+              title: productName,
+              body: timeStr.isNotEmpty
+                  ? 'Morning product scheduled at $timeStr'
+                  : 'Morning product scheduled',
+              timestamp: createdAt,
+              isRead: false,
+              type: 'reminder',
+              actionText: 'Start Routine',
+            ));
+          }
+        }
+
+        if (includeEvening) {
+          for (final t in eveningTimes) {
+            final timeStr = t?.toString() ?? '';
+            built.add(NotificationItem(
+              id: '${id}_evening_${timeStr}',
+              title: productName,
+              body: timeStr.isNotEmpty
+                  ? 'Evening product scheduled at $timeStr'
+                  : 'Evening product scheduled',
+              timestamp: createdAt,
+              isRead: false,
+              type: 'reminder',
+              actionText: 'Start Routine',
+            ));
+          }
+        }
+      }
+
+      return built;
+    } catch (e) {
+      debugPrint('Routines fetch error: $e');
+      return [];
     }
   }
 

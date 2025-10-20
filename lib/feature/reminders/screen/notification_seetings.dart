@@ -1,3 +1,4 @@
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class NotificationSeetings extends StatelessWidget {
         children: [
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(color: Colors.black.withOpacity(.3)),
+            child: Container(color: Colors.black.withValues(alpha: .3)),
           ),
           SafeArea(
             child: Center(
@@ -274,8 +275,8 @@ class NotificationSeetings extends StatelessWidget {
                               child: ElevatedButton(
                                 onPressed: enabled
                                     ? () {
-                                        // You can return result or perform save here.
-                                        Navigator.pop(context);
+                                        // Now call controller to fetch routines and show notifications
+                                        controller.applySettingsAndShowNotifications(context);
                                       }
                                     : null,
                                 style: ButtonStyle(

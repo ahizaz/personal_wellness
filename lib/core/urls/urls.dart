@@ -1,6 +1,6 @@
 class Urls{
-   static const String baseUrl = "http://10.10.12.25:5005/api/v1";
- // static const String baseUrl = "http://69.62.70.69:5005/api/v1";
+  // static const String baseUrl = "http://10.10.12.25:5005/api/v1";
+  static const String baseUrl = "http://69.62.70.69:5005/api/v1";
   
   static const String register ="$baseUrl/user/create-user";
   static const String forgetpassword = "$baseUrl/auth/forgot-password";
@@ -8,7 +8,7 @@ class Urls{
   static const String verifyemail = "$baseUrl/auth/verify-email";
   static const String googlesignin = "$baseUrl/auth/google-login";
   static const String getallskinconditon = "$baseUrl/skin-condition/get-all";
-  static const String imageurl = "http://10.10.12.25:5005";
+  static const String imageurl = "http://69.62.70.69:5005";
   static const String getallproduct = "$baseUrl/product/get-all";
   static const String getProductDetails = "$baseUrl/product/details"; // Added product details endpoint
   static const String changepassword = "$baseUrl/auth/change-password";
@@ -19,5 +19,7 @@ class Urls{
   static const String routineconsistencyChart = "$baseUrl/add-routine/get-data-chart";
   static const String notificationsGetAll = "$baseUrl/push-notification/get-all";
   static const String updateProfile ="$baseUrl/user/update-profile";
+    static const String addRoutineGetAll = "$baseUrl/add-routine/get-all";
+  
  
 }
