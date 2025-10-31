@@ -329,6 +329,7 @@ class Explore extends StatelessWidget {
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              
                               children: [
                                 Text(
                                   product["title"] ?? "",
