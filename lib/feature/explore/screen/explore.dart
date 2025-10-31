@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -79,8 +78,6 @@ class Explore extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
               SizedBox(
-                
-                
                 height: 200.h, // Set a fixed height to limit the container
                 child: Obx(() => ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -88,17 +85,17 @@ class Explore extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = controller.sortedSkinConditions[index];
                         return InkWell(
-                            onTap:(){
-                                Get.to(()=>SkinCondition(
+                          onTap: () {
+                            Get.to(() => SkinCondition(
                                   imagePath: item['image']!,
                                   title: item['title']!,
                                   id: item['id'],
                                 ));
-                            },
-                            child: Container(
-                              width: 160.h,
-                              margin: EdgeInsets.only(right: 16.w),
-                              child: Column(
+                          },
+                          child: Container(
+                            width: 160.h,
+                            margin: EdgeInsets.only(right: 16.w),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -119,7 +116,8 @@ class Explore extends StatelessWidget {
                                             children: [
                                               Icon(Icons.broken_image, color: Colors.grey[600], size: 24),
                                               SizedBox(height: 4),
-                                              Text('Image failed', 
+                                              Text(
+                                                'Image failed',
                                                 style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
                                                 textAlign: TextAlign.center,
                                               ),
@@ -144,8 +142,8 @@ class Explore extends StatelessWidget {
                                                       : null,
                                                 ),
                                                 SizedBox(height: 4),
-                                                Text('Loading...', 
-                                                  style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
+                                                Text('Loading...',
+                                                    style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
                                               ],
                                             ),
                                           ),
@@ -170,10 +168,9 @@ class Explore extends StatelessWidget {
                         );
                       },
                     )),
-              ),///
-            
+              ), ///
               SizedBox(height: 12.h),
-              //2nd one 
+              //2nd one
               SizedBox(
                 height: 220.h, // Set a fixed height to limit the container
                 child: Obx(() => ListView.builder(
@@ -182,12 +179,12 @@ class Explore extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = controller.sortedSkinTypes[index];
                         return InkWell(
-                          onTap: (){
-                              Get.to(()=>SkinCondition(
-                                imagePath: item['image']!,
-                                title: item['title']!,
-                                id: item['id'],
-                              ));
+                          onTap: () {
+                            Get.to(() => SkinCondition(
+                                  imagePath: item['image']!,
+                                  title: item['title']!,
+                                  id: item['id'],
+                                ));
                           },
                           child: Container(
                             width: 160.h,
@@ -247,241 +244,102 @@ class Explore extends StatelessWidget {
               ),
               SizedBox(height: 24.h,),
               Text("Products",style: TextStyle(
-                fontFamily: "SFPro",
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff000000)
+                  fontFamily: "SFPro",
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff000000)
               ),),
               SizedBox(height: 12.h,),
 
-            //products
+              // ---- Updated products section: show ALL products horizontally scrollable ----
               Obx(() {
                 final products = controller.sortedProducts;
 
-                if (products.length < 4) {
-                  // Show loader or empty state if less than 4 products
-                  return const Center(child: Text("Not enough products"));
+                if (products.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.h),
+                      child: Text("No products found",
+                          style: TextStyle(fontSize: 16.sp, color: Colors.grey[700])),
+                    ),
+                  );
                 }
 
-                return Container(
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // First Row - Product 1 & 2
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Product 1
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => ViewProduct(), arguments: products[0]["id"]);
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 182.h,
+                return SizedBox(
+                  height: 260.h, // height to accommodate image + title
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: products.length,
+                    padding: EdgeInsets.only(right: 16.w),
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return Container(
+                        width: 200.w,
+                        margin: EdgeInsets.only(right: 16.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Get.to(() => ViewProduct(), arguments: product["id"]);
+                              },
+                              child: Container(
+                                height: 182.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.network(
+                                    product["image"] ?? "",
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (context, error, stackTrace) => Container(
                                       decoration: BoxDecoration(
+                                        color: Colors.grey[200],
                                         borderRadius: BorderRadius.circular(8.r),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.network(
-                                          products[0]["image"] ?? "",
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius: BorderRadius.circular(8.r),
-                                            ),
-                                            child: const Icon(Icons.broken_image),
+                                      child: const Icon(Icons.broken_image),
+                                    ),
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                    loadingProgress.expectedTotalBytes!
+                                                : null,
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Text(
-                                    products[0]["title"] ?? "",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          // Product 2
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => ViewProduct(), arguments: products[1]["id"]);
+                                      );
                                     },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 182.h,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.network(
-                                          products[1]["image"] ?? "",
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius: BorderRadius.circular(8.r),
-                                            ),
-                                            child: const Icon(Icons.broken_image),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
                                   ),
-                                  SizedBox(height: 8.h),
-                                  Text(
-                                    products[1]["title"] ?? "",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20.h),
-                      // Second Row - Product 3 & 4
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Product 3
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => ViewProduct(), arguments: products[2]["id"]);
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 182.h,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.network(
-                                          products[2]["image"] ?? "",
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius: BorderRadius.circular(8.r),
-                                            ),
-                                            child: const Icon(Icons.broken_image),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Text(
-                                    products[2]["title"] ?? "",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                            SizedBox(height: 8.h),
+                            Text(
+                              product["title"] ?? "",
+                              style: TextStyle(
+                                fontFamily: "SFPro",
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          SizedBox(width: 12.w),
-                          // Product 4
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => ViewProduct(), arguments: products[3]["id"]);
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 182.h,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        child: Image.network(
-                                          products[3]["image"] ?? "",
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius: BorderRadius.circular(8.r),
-                                            ),
-                                            child: const Icon(Icons.broken_image),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Text(
-                                    products[3]["title"] ?? "",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 );
               }),
 
+              SizedBox(height: 24.h),
             ],
           ),
         ),
