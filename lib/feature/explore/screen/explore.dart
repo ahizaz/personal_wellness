@@ -243,15 +243,18 @@ class Explore extends StatelessWidget {
                     )),
               ),
               SizedBox(height: 24.h,),
-              Text("Products",style: TextStyle(
+            Text(
+                "Products",
+                style: TextStyle(
                   fontFamily: "SFPro",
-                  fontSize: 20.sp,
+                  fontSize: 34.sp,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xff000000)
-              ),),
+                  color: Color(0xff172601),
+                ),
+              ),
               SizedBox(height: 12.h,),
 
-              // ---- Updated products section: show ALL products horizontally scrollable ----
+              // ---- Updated products section: show ALL products vertically (changed from horizontal) ----
               Obx(() {
                 final products = controller.sortedProducts;
 
@@ -265,77 +268,94 @@ class Explore extends StatelessWidget {
                   );
                 }
 
-                return SizedBox(
-                  height: 260.h, // height to accommodate image + title
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: products.length,
-                    padding: EdgeInsets.only(right: 16.w),
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return Container(
-                        width: 200.w,
-                        margin: EdgeInsets.only(right: 16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Get.to(() => ViewProduct(), arguments: product["id"]);
-                              },
-                              child: Container(
-                                height: 182.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  child: Image.network(
-                                    product["image"] ?? "",
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    errorBuilder: (context, error, stackTrace) => Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(8.r),
-                                      ),
-                                      child: const Icon(Icons.broken_image),
+                // Because the parent is a SingleChildScrollView (vertical), we must
+                // make the inner ListView non-scrolling and let the outer scroll view handle it.
+                return ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: products.length,
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.only(bottom: 16.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Get.to(() => ViewProduct(), arguments: product["id"]);
+                            },
+                            child: Container(
+                              width: 120.w,
+                              height: 100.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.r),
+                                child: Image.network(
+                                  product["image"] ?? "",
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(8.r),
                                     ),
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Container(
-                                        color: Colors.grey[200],
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            value: loadingProgress.expectedTotalBytes != null
-                                                ? loadingProgress.cumulativeBytesLoaded /
-                                                    loadingProgress.expectedTotalBytes!
-                                                : null,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                    child: const Icon(Icons.broken_image),
                                   ),
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      color: Colors.grey[200],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              product["title"] ?? "",
-                              style: TextStyle(
-                                fontFamily: "SFPro",
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product["title"] ?? "",
+                                  style: TextStyle(
+                                    fontFamily: "SFPro",
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 8.h),
+                                // If you have a short description or price, show here.
+                                if ((product["description"] ?? "").isNotEmpty)
+                                  Text(
+                                    product["description"] ?? "",
+                                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[700]),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               }),
 
