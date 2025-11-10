@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +14,11 @@ class ExploreController extends GetxController {
   final RxString currentSkinId = ''.obs;
   final RxString searchTerm = ''.obs;
   final RxBool isLoading = false.obs;
+  
+  // Pagination variables
+  final RxInt currentPage = 1.obs;
+  final RxInt itemsPerPage = 10.obs;
+  final RxBool isLoadingMore = false.obs;
   final RxMap<String, dynamic> skinDetails = <String, dynamic>{
     "symptoms": "Consists of pimples, blackheads, and cysts,\n"
         "often caused by blocked pores, bacteria, and\n"
@@ -30,6 +34,9 @@ class ExploreController extends GetxController {
     super.onInit();
     fetchSkinData();
     fetchProducts();
+    
+    // Reset pagination when search term changes
+    ever(searchTerm, (_) => resetPagination());
   }
   
   Future<void> fetchProducts() async {
@@ -280,18 +287,53 @@ class ExploreController extends GetxController {
   }
 
   List<Map<String, String>> get sortedProducts {
-    if (searchTerm.value.isEmpty) return products;
-    final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
-    final List<Map<String, String>> matching = [];
-    final List<Map<String, String>> others = [];
-    for (var product in products) {
-      final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
-      if (titleFirstWord.startsWith(firstWord)) {
-        matching.add(product);
-      } else {
-        others.add(product);
+    List<Map<String, String>> allProducts;
+    
+    if (searchTerm.value.isEmpty) {
+      allProducts = products;
+    } else {
+      final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
+      final List<Map<String, String>> matching = [];
+      final List<Map<String, String>> others = [];
+      for (var product in products) {
+        final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
+        if (titleFirstWord.startsWith(firstWord)) {
+          matching.add(product);
+        } else {
+          others.add(product);
+        }
       }
+      allProducts = [...matching, ...others];
     }
-    return [...matching, ...others];
+    
+    // Apply pagination
+    final int endIndex = currentPage.value * itemsPerPage.value;
+    if (endIndex >= allProducts.length) {
+      return allProducts;
+    }
+    return allProducts.sublist(0, endIndex);
+  }
+  
+  bool get hasMoreProducts {
+    final int totalProducts = searchTerm.value.isEmpty 
+        ? products.length 
+        : products.where((product) {
+            final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
+            final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
+            return titleFirstWord.startsWith(firstWord);
+          }).length;
+    return currentPage.value * itemsPerPage.value < totalProducts;
+  }
+  
+  void loadMoreProducts() {
+    if (!isLoadingMore.value && hasMoreProducts) {
+      isLoadingMore.value = true;
+      currentPage.value++;
+      isLoadingMore.value = false;
+    }
+  }
+  
+  void resetPagination() {
+    currentPage.value = 1;
   }
 }
