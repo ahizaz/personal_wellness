@@ -15,10 +15,6 @@ class ExploreController extends GetxController {
   final RxString searchTerm = ''.obs;
   final RxBool isLoading = false.obs;
   
-  // Pagination variables
-  final RxInt currentPage = 1.obs;
-  final RxInt itemsPerPage = 10.obs;
-  final RxBool isLoadingMore = false.obs;
   final RxMap<String, dynamic> skinDetails = <String, dynamic>{
     "symptoms": "Consists of pimples, blackheads, and cysts,\n"
         "often caused by blocked pores, bacteria, and\n"
@@ -34,9 +30,6 @@ class ExploreController extends GetxController {
     super.onInit();
     fetchSkinData();
     fetchProducts();
-    
-    // Reset pagination when search term changes
-    ever(searchTerm, (_) => resetPagination());
   }
   
   Future<void> fetchProducts() async {
@@ -52,7 +45,7 @@ class ExploreController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse(Urls.getallproduct),
+        Uri.parse("${Urls.getallproduct}?limit=1000"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $accessToken",
@@ -287,10 +280,8 @@ class ExploreController extends GetxController {
   }
 
   List<Map<String, String>> get sortedProducts {
-    List<Map<String, String>> allProducts;
-    
     if (searchTerm.value.isEmpty) {
-      allProducts = products;
+      return products;
     } else {
       final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
       final List<Map<String, String>> matching = [];
@@ -303,37 +294,7 @@ class ExploreController extends GetxController {
           others.add(product);
         }
       }
-      allProducts = [...matching, ...others];
+      return [...matching, ...others];
     }
-    
-    // Apply pagination
-    final int endIndex = currentPage.value * itemsPerPage.value;
-    if (endIndex >= allProducts.length) {
-      return allProducts;
-    }
-    return allProducts.sublist(0, endIndex);
-  }
-  
-  bool get hasMoreProducts {
-    final int totalProducts = searchTerm.value.isEmpty 
-        ? products.length 
-        : products.where((product) {
-            final String firstWord = searchTerm.value.trim().split(' ').first.toLowerCase();
-            final String titleFirstWord = product['title']!.trim().split(' ').first.toLowerCase();
-            return titleFirstWord.startsWith(firstWord);
-          }).length;
-    return currentPage.value * itemsPerPage.value < totalProducts;
-  }
-  
-  void loadMoreProducts() {
-    if (!isLoadingMore.value && hasMoreProducts) {
-      isLoadingMore.value = true;
-      currentPage.value++;
-      isLoadingMore.value = false;
-    }
-  }
-  
-  void resetPagination() {
-    currentPage.value = 1;
   }
 }

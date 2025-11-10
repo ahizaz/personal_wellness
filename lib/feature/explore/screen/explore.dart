@@ -366,36 +366,6 @@ class Explore extends StatelessWidget {
                         );
                       },
                     ),
-                    // Load More Button
-                    if (controller.hasMoreProducts)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Obx(() => controller.isLoadingMore.value
-                            ? CircularProgressIndicator(
-                                color: Color(0xff3E4B2C),
-                              )
-                            : ElevatedButton(
-                                onPressed: () {
-                                  controller.loadMoreProducts();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xff3E4B2C),
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Load More',
-                                  style: TextStyle(
-                                    fontFamily: "SFPro",
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              )),
-                      ),
                   ],
                 );
               }),
