@@ -110,6 +110,7 @@ class SignInController extends GetxController {
           final accessToken = data["data"]["accessToken"];
           final userData = data["data"]["user"] ?? {};
           final userId = userData["_id"] ?? userData["id"];
+          final firstName = userData["firstName"] ?? googleUser.displayName?.split(' ').first ?? "";
 
           final prefs = await SharedPreferences.getInstance();
           if (accessToken is String) {
@@ -117,6 +118,11 @@ class SignInController extends GetxController {
           }
           if (userId is String) {
             await prefs.setString("userId", userId);
+          }
+          // Save firstName for display in app
+          if (firstName.isNotEmpty) {
+            await prefs.setString("personalization_firstName", firstName);
+            debugPrint("Saved Google firstName: $firstName");
           }
 
           Get.offAll(() => BottomNavbar());
