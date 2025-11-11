@@ -20,6 +20,31 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
+    
+    // Apply configurations after project evaluation to ensure they override plugin defaults
+    afterEvaluate {
+        // Apply Java 17 to all Android subprojects
+        plugins.withId("com.android.application") {
+            configure<com.android.build.gradle.AppExtension> {
+                compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+                compileOptions.targetCompatibility = JavaVersion.VERSION_17
+            }
+        }
+        
+        plugins.withId("com.android.library") {
+            configure<com.android.build.gradle.LibraryExtension> {
+                compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+                compileOptions.targetCompatibility = JavaVersion.VERSION_17
+            }
+        }
+        
+        // Apply Kotlin JVM target to all Kotlin projects
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
 }
 
 subprojects {

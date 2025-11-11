@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 
 class ProgressPhotosWidget extends StatelessWidget {
@@ -272,43 +273,41 @@ class ProgressPhotosWidget extends StatelessWidget {
     }
     
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      // Remote URL
-      return Image.network(
-        imagePath,
+      // Remote URL with caching
+      return CachedNetworkImage(
+        imageUrl: imagePath,
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.grey[300],
-            child: Center(
+        placeholder: (context, url) => Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.grey[300],
+          child: Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        (loadingProgress.expectedTotalBytes ?? 1)
-                    : null,
+                color: Color(0xff172601),
               ),
             ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.grey[300],
-            child: Center(
-              child: Icon(
-                Icons.error,
-                size: 32,
-                color: Colors.grey[600],
-              ),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.grey[300],
+          child: Center(
+            child: Icon(
+              Icons.error,
+              size: 32,
+              color: Colors.grey[600],
             ),
-          );
-        },
+          ),
+        ),
+        memCacheWidth: 200, // Resize in memory for better performance
+        maxWidthDiskCache: 400, // Limit disk cache size
       );
     } else {
       // Local file
@@ -334,6 +333,7 @@ class ProgressPhotosWidget extends StatelessWidget {
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
+          cacheWidth: 200, // Resize for better performance
           errorBuilder: (context, error, stackTrace) {
             return Container(
               width: double.infinity,

@@ -38,6 +38,10 @@ class ProgressController extends GetxController{
   
   // Loading state for images
   var isLoadingImages = false.obs;
+  
+  // Cache timestamps to avoid unnecessary reloads
+  DateTime? lastPhotoLoadTime;
+  final Duration cacheExpiry = Duration(minutes: 5); // Cache for 5 minutes
 
   // Routine consistency chart raw data from API: {"MM-YYYY": {"pending": x, "completed": y}}
   final RxMap<String, dynamic> routineChartRaw = <String, dynamic>{}.obs;
@@ -703,18 +707,19 @@ class ProgressController extends GetxController{
     
     if (successCount == 3) {
       // Show success message briefly
-      EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(microseconds: 2));
+      EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(seconds: 2));
       debugPrint('=== All Photos Uploaded Successfully ===');
       
       // Wait for success message to show, then refresh data and auto-navigate back
-      Future.delayed(Duration(microseconds: 2), () async {
+      Future.delayed(Duration(seconds: 2), () async {
         debugPrint('=== Starting Auto Refresh and Navigation ===');
         
-        // Refresh all photo progress silently
+        // Force refresh all photo progress (clears cache)
+        lastPhotoLoadTime = null; // Clear cache to force fresh data
         await getAllPhotoProgress(showLoading: false);
         
-        // Wait a bit more for data to sync properly
-        await Future.delayed(Duration(seconds: 1));
+        // Wait a bit for data to load
+        await Future.delayed(Duration(milliseconds: 500));
         
         // Auto-navigate back to progress screen
         debugPrint('=== Auto Navigation Back ===');
@@ -722,7 +727,7 @@ class ProgressController extends GetxController{
         Get.back(); // Go back from GoPicture to Progress screen
       });
     } else if (successCount > 0) {
-      EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(microseconds: 2));
+      EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
     } else {
       EasyLoading.showError('Failed to upload photos', duration: Duration(seconds: 2));
     }
@@ -863,21 +868,32 @@ class ProgressController extends GetxController{
   // Get all photo progress from API (loads all types)
   Future<void> getAllPhotoProgress({int page = 1, int limit = 20, bool showLoading = false}) async {
     try {
+      // Check cache first to avoid unnecessary API calls
+      if (lastPhotoLoadTime != null && 
+          DateTime.now().difference(lastPhotoLoadTime!) < cacheExpiry &&
+          leftProgressImages.isNotEmpty) {
+        debugPrint('=== Using cached photo data (${DateTime.now().difference(lastPhotoLoadTime!).inSeconds}s old) ===');
+        return;
+      }
+      
       if (showLoading) {
+        isLoadingImages.value = true;
         EasyLoading.show(status: 'Loading photos...');
       }
       debugPrint('=== Getting All Photo Progress ===');
       
-      // Load each type separately for better organization
-      await getPhotoProgressByType('left', page: page, limit: limit, showLoading: false);
-      await Future.delayed(Duration(milliseconds: 200)); // Small delay between requests
+      // Load all types in parallel for faster loading
+      await Future.wait([
+        getPhotoProgressByType('left', page: page, limit: limit, showLoading: false),
+        getPhotoProgressByType('right', page: page, limit: limit, showLoading: false),
+        getPhotoProgressByType('front', page: page, limit: limit, showLoading: false),
+      ]);
       
-      await getPhotoProgressByType('right', page: page, limit: limit, showLoading: false);
-      await Future.delayed(Duration(milliseconds: 200)); // Small delay between requests
-      
-      await getPhotoProgressByType('front', page: page, limit: limit, showLoading: false);
+      // Update cache timestamp
+      lastPhotoLoadTime = DateTime.now();
       
       if (showLoading) {
+        isLoadingImages.value = false;
         EasyLoading.dismiss();
       }
       debugPrint('=== All Photo Types Loaded ===');
@@ -888,6 +904,7 @@ class ProgressController extends GetxController{
     } catch (e) {
       debugPrint('Exception during getting all photo progress: $e');
       if (showLoading) {
+        isLoadingImages.value = false;
         EasyLoading.dismiss();
       }
     }
@@ -956,13 +973,15 @@ class ProgressController extends GetxController{
   
   // Method to refresh photo progress data
   Future<void> refreshPhotoProgress() async {
-    debugPrint('=== Refreshing Photo Progress ===');
-    await getAllPhotoProgress();
+    debugPrint('=== Force Refreshing Photo Progress ===');
+    lastPhotoLoadTime = null; // Clear cache
+    await getAllPhotoProgress(showLoading: true);
   }
   
   // Method to refresh specific type photo progress
   Future<void> refreshPhotoProgressByType(String type) async {
     debugPrint('=== Refreshing $type Photo Progress ===');
+    lastPhotoLoadTime = null; // Clear cache
     await getPhotoProgressByType(type);
   }
   

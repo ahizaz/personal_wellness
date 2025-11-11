@@ -51,14 +51,14 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
   @override
   void didPopNext() {
     // Called when user returns to this screen from another screen
-    controller.getAllPhotoProgress();
+    controller.refreshPhotoProgress(); // Force refresh to get latest uploads
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // Automatically refresh when app comes to foreground
-      controller.getAllPhotoProgress();
+      controller.refreshPhotoProgress(); // Force refresh
     }
   }
 
