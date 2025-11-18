@@ -91,44 +91,126 @@ class ViewRoutingProduct extends StatelessWidget {
                 Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Reactive image container
-                    Obx(() => Container(
+                    // Reactive image container with fallback
+                    Obx(() {
+                      if (controller.imagePath.isEmpty) {
+                        // Show placeholder when no images
+                        return Container(
                           width: double.infinity,
                           height: 298.h,
                           decoration: BoxDecoration(
-                            image: controller.imagePath.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(controller
-                                        .imagePath[controller.currentIndex.value]),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+                            color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 12.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List.generate(controller.imagePath.length, (i) {
-                                    return Container(
-                                      width: 28.w,
-                                      height: 2.h,
-                                      margin: EdgeInsets.symmetric(horizontal: 4.w),
-                                      color: controller.currentIndex.value == i 
-                                          ? const Color(0xffFFFFFF) 
-                                          : const Color(0xffEDEEE6),
-                                    );
-                                  }),
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 64.r,
+                                color: Colors.grey[400],
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                'No image available',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[600],
+                                  fontFamily: 'SFPro',
                                 ),
                               ),
                             ],
                           ),
-                        )),
-                    // Left arrow - only show if not on first image
-                    Obx(() => controller.currentIndex.value > 0
+                        );
+                      }
+                      
+                      return Container(
+                        width: double.infinity,
+                        height: 298.h,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Stack(
+                            children: [
+                              // Network image with error handling
+                              Image.network(
+                                controller.imagePath[controller.currentIndex.value],
+                                width: double.infinity,
+                                height: 298.h,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: double.infinity,
+                                    height: 298.h,
+                                    color: Colors.grey[200],
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.broken_image,
+                                          size: 64.r,
+                                          color: Colors.grey[400],
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Text(
+                                          'Failed to load image',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey[600],
+                                            fontFamily: 'SFPro',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    width: double.infinity,
+                                    height: 298.h,
+                                    color: Colors.grey[100],
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                        color: Color(0xff485908),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Image indicators overlay
+                              if (controller.imagePath.length > 1)
+                                Positioned(
+                                  bottom: 12.h,
+                                  left: 0,
+                                  right: 0,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(controller.imagePath.length, (i) {
+                                      return Container(
+                                        width: 28.w,
+                                        height: 2.h,
+                                        margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                        color: controller.currentIndex.value == i
+                                            ? const Color(0xffFFFFFF)
+                                            : const Color(0xffEDEEE6),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                    // Left arrow - only show if images exist and not on first image
+                    Obx(() => controller.imagePath.isNotEmpty && controller.currentIndex.value > 0
                         ? Positioned(
                             left: 16.w,
                             child: InkWell(
@@ -138,7 +220,7 @@ class ViewRoutingProduct extends StatelessWidget {
                                 height: 182.h,
                                 decoration: BoxDecoration(
                                   color:
-                                      const Color(0xffFFFFFF).withAlpha(102), // withValues is deprecated
+                                      const Color(0xffFFFFFF).withAlpha(102),
                                   borderRadius: BorderRadius.circular(11.r),
                                 ),
                                 child: Icon(
@@ -150,9 +232,9 @@ class ViewRoutingProduct extends StatelessWidget {
                             ),
                           )
                         : const SizedBox()),
-                    // Right arrow - only show if not on last image
-                    Obx(() => controller.currentIndex.value <
-                            controller.imagePath.length - 1
+                    // Right arrow - only show if images exist and not on last image
+                    Obx(() => controller.imagePath.isNotEmpty &&
+                            controller.currentIndex.value < controller.imagePath.length - 1
                         ? Positioned(
                             right: 16.w,
                             child: InkWell(
@@ -162,7 +244,7 @@ class ViewRoutingProduct extends StatelessWidget {
                                 height: 182.h,
                                 decoration: BoxDecoration(
                                   color: const Color(0xffFFFFFF)
-                                      .withAlpha(102), // withValues is deprecated
+                                      .withAlpha(102),
                                   borderRadius: BorderRadius.circular(11.r),
                                 ),
                                 child: Icon(

@@ -145,25 +145,39 @@ class TodayController extends GetxController {
           List<Map<String, dynamic>>.from(notCompletedToday)
             ..sort((a, b) => _extractTimestamp(b).compareTo(_extractTimestamp(a)));
 
-      // Deduplicate by productId preserving latest first
-      final seenProductIds = <String>{};
+      // Deduplicate by unique routine ID (productId + time) to allow same product at different times
+      final seenRoutineIds = <String>{};
       final List<Map<String, dynamic>> uniqueLatestFirst = [];
       for (final routineJson in sortedByLatest) {
-        final productId = (routineJson['productId'] ?? '').toString();
-        if (productId.isEmpty) continue;
-        if (seenProductIds.add(productId)) {
+        final id = (routineJson['id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        // Use the full id as the unique key to allow same product at different times
+        if (seenRoutineIds.add(id)) {
           uniqueLatestFirst.add(routineJson);
         }
       }
 
-      // Take only the most recent 3 unique items for today view
-      final recentRoutines = uniqueLatestFirst.take(3).toList();
+      // Take the most recent items for today view (up to all available)
+      final recentRoutines = uniqueLatestFirst.toList();
 
       // Convert JSON data to the format expected by the UI
       final formattedData = recentRoutines.map((routineJson) {
         final productName = routineJson['productName'] ?? '';
         final time = routineJson['time'] ?? '';
         final productId = routineJson['productId'] ?? '';
+        final id = routineJson['id'] ?? '';
+        final startDateStr = routineJson['startDate'] ?? '';
+        final endDateStr = routineJson['endDate'] ?? '';
+        
+        // Parse dates if available
+        DateTime? startDate;
+        DateTime? endDate;
+        try {
+          if (startDateStr.isNotEmpty) startDate = DateTime.parse(startDateStr);
+          if (endDateStr.isNotEmpty) endDate = DateTime.parse(endDateStr);
+        } catch (e) {
+          debugPrint('Error parsing dates: $e');
+        }
 
         debugPrint('Adding routine: $productName at $time');
         return {
@@ -173,6 +187,9 @@ class TodayController extends GetxController {
           'time': time,
           'isCompleted': RxBool(false),
           'productId': productId,
+          'id': id,
+          'startDate': startDate,
+          'endDate': endDate,
         };
       }).toList();
 

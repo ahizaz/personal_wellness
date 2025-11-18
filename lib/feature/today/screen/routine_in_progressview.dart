@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/feature/today/screen/go_picture.dart';
-import 'package:personal_wellness/feature/today/screen/product_details.dart';
+import 'package:personal_wellness/feature/routine/screen/view_routing_product.dart';
 import 'package:personal_wellness/feature/explore/controller/routine_controller.dart';
 
 class RoutineInProgressview extends StatelessWidget {
@@ -54,12 +54,18 @@ class RoutineInProgressview extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 4.h), // Space between containers
                       child: InkWell(
                         onTap:(){
+                          final productName = data['description'] as String? ?? '';
                           final productId = data['productId'] as String?;
-                          if (productId != null && productId.isNotEmpty) {
-                            Get.to(()=>ProductDetails(), arguments: productId);
-                          } else {
-                            Get.to(()=>ProductDetails());
-                          }
+                          final startDate = data['startDate'] as DateTime?;
+                          final endDate = data['endDate'] as DateTime?;
+                          
+                          // Navigate to ViewRoutingProduct to show mark as complete button
+                          Get.to(() => ViewRoutingProduct(
+                            productName: productName,
+                            productId: productId,
+                            startDate: startDate,
+                            endDate: endDate,
+                          ));
                         },
                         child: Container(
                           width: double.infinity,

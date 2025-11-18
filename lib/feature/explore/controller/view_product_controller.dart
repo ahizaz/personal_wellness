@@ -241,12 +241,16 @@ class ViewProductController extends GetxController {
           // Update productDataview with API response
           productDataview.value = data["data"];
 
-          // Update images
-          if (data["data"]["image"] != null) {
+          // Update images with proper validation
+          if (data["data"]["image"] != null && data["data"]["image"] is List && (data["data"]["image"] as List).isNotEmpty) {
             imagePath.value = List<String>.from(
               data["data"]["image"].map((img) => "${Urls.imageurl}$img")
             );
-            debugPrint('Images: ${imagePath.toString()}');
+            debugPrint('Images loaded: ${imagePath.length} images');
+            debugPrint('Image URLs: ${imagePath.toString()}');
+          } else {
+            imagePath.value = [];
+            debugPrint('No images available for this product');
           }
 
           // Update how to use instructions
