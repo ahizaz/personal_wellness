@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -132,6 +133,7 @@ class NotificationScreen extends StatelessWidget {
                 child: _FacebookStyleNotificationTile(
                   notification: item,
                   onTap: () => controller.markAsRead(item.id),
+                  onActionTap: () => controller.handleNotificationAction(item),
                 ),
               );
             },
@@ -165,10 +167,12 @@ class NotificationScreen extends StatelessWidget {
 class _FacebookStyleNotificationTile extends StatelessWidget {
   final NotificationItem notification;
   final VoidCallback onTap;
+  final VoidCallback onActionTap;
 
   const _FacebookStyleNotificationTile({
     required this.notification,
     required this.onTap,
+    required this.onActionTap,
   });
 
   @override
@@ -210,7 +214,10 @@ class _FacebookStyleNotificationTile extends StatelessWidget {
                               style: TextStyle(
                                 color: Colors.blue[600],
                                 fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
                               ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = onActionTap,
                             ),
                           ],
                         ],
