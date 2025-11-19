@@ -369,4 +369,26 @@ class NotificationController extends GetxController {
       ),
     ];
   }
+
+  void handleNotificationAction(NotificationItem item) {
+    markAsRead(item.id);
+
+    final actionMessage = item.actionText?.isNotEmpty == true
+        ? item.actionText!
+        : 'View details';
+
+    switch (item.type) {
+      case 'reminder':
+      case 'routine':
+        Get.snackbar('Routine', '$actionMessage for ${item.title}');
+        break;
+      case 'like':
+      case 'comment':
+      case 'follow':
+        Get.snackbar('Activity', '$actionMessage for ${item.title}');
+        break;
+      default:
+        Get.snackbar('Notification', actionMessage);
+    }
+  }
 }
