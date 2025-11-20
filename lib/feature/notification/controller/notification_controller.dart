@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 
 class NotificationItem {
   final String id;
@@ -380,7 +381,16 @@ class NotificationController extends GetxController {
     switch (item.type) {
       case 'reminder':
       case 'routine':
-        Get.snackbar('Routine', '$actionMessage for ${item.title}');
+        // Navigate to Today screen (home page) where routines are shown
+        try {
+          // Try to find BottomNavcontroller to switch to Today tab
+          final bottomNavController = Get.find<BottomNavcontroller>();
+          bottomNavController.changeIndex(0); // 0 is typically the Today/Home tab
+          Get.back(); // Close notification screen if open
+        } catch (e) {
+          // Fallback: just show snackbar if navigation controller not found
+          Get.snackbar('Routine', '$actionMessage for ${item.title}');
+        }
         break;
       case 'like':
       case 'comment':

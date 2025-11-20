@@ -49,9 +49,19 @@ class ProductDetailsController extends GetxController {
         productName.value = result['productName'] ?? '';
         ingredients.value = result['ingredients'] ?? '';
         howToUse.assignAll(List<String>.from(result['howToUse'] ?? []));
-        productImages.assignAll(
-          (result['image'] as List).map((e) => '${Urls.imageurl}$e').toList(),
-        );
+        // Handle images - check if image exists and is a list
+        if (result['image'] != null && result['image'] is List) {
+          final imageList = result['image'] as List;
+          if (imageList.isNotEmpty) {
+            productImages.assignAll(
+              imageList.map((e) => '${Urls.imageurl}$e').toList(),
+            );
+          } else {
+            productImages.clear();
+          }
+        } else {
+          productImages.clear();
+        }
 
         // Fetch relevant products after loading this one
         await fetchRelevantProducts(ingredients.value);

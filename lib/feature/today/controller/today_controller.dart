@@ -145,16 +145,14 @@ class TodayController extends GetxController {
           List<Map<String, dynamic>>.from(notCompletedToday)
             ..sort((a, b) => _extractTimestamp(b).compareTo(_extractTimestamp(a)));
 
-      // Deduplicate by unique routine ID (productId + time) to allow same product at different times
-      final seenRoutineIds = <String>{};
+      // Don't deduplicate - show all routines including same product at different times (morning/evening)
+      // Each routine has a unique ID that includes productId, period (morning/evening), time, timestamp, and index
       final List<Map<String, dynamic>> uniqueLatestFirst = [];
       for (final routineJson in sortedByLatest) {
         final id = (routineJson['id'] ?? '').toString();
         if (id.isEmpty) continue;
-        // Use the full id as the unique key to allow same product at different times
-        if (seenRoutineIds.add(id)) {
-          uniqueLatestFirst.add(routineJson);
-        }
+        // Add all routines - they should all have unique IDs
+        uniqueLatestFirst.add(routineJson);
       }
 
       // Take the most recent items for today view (up to all available)

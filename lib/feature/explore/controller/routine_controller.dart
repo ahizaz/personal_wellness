@@ -10,6 +10,7 @@ import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_n
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -540,6 +541,15 @@ void submitRoutine() async {
         await todayController.refreshRoutineData();
       } catch (e) {
         debugPrint('Today controller not found: $e');
+      }
+      
+      // Refresh progress controller to update timeline and charts
+      try {
+        final progressController = Get.find<ProgressController>();
+        await progressController.fetchRoutineChartData();
+        await progressController.refreshTimelineData();
+      } catch (e) {
+        debugPrint('Progress controller not found: $e');
       }
       
     } catch (e) {
