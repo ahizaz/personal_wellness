@@ -122,6 +122,16 @@ class SignInController extends GetxController {
           // Save firstName for display in app
           if (firstName.isNotEmpty) {
             await prefs.setString("personalization_firstName", firstName);
+            // Also cache a quick local fallback and set Firebase displayName
+            await prefs.setString('user_name', firstName);
+            try {
+              final firebaseUser = FirebaseAuth.instance.currentUser;
+              if (firebaseUser != null) {
+                await firebaseUser.updateDisplayName(firstName);
+              }
+            } catch (e) {
+              debugPrint('Error updating Firebase displayName: $e');
+            }
             debugPrint("Saved Google firstName: $firstName");
           }
 

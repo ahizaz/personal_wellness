@@ -13,6 +13,8 @@ import 'package:personal_wellness/core/events/routine_events.dart';
 import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:personal_wellness/core/services/api_service.dart';
 
 class RoutineItem {
   final String productName;
@@ -74,6 +76,8 @@ class RoutineController extends GetxController {
   final TextEditingController instructionController = TextEditingController();
   final RxString productName = ''.obs;
   final RxString productId = ''.obs;
+  // Reactive user name (loaded from Firebase Auth / Firestore / local cache)
+  final RxString userName = ''.obs;
 
   var selectedOrder = 0.obs;
   var selectedEveningOrder = 0.obs;
@@ -163,9 +167,44 @@ void submitRoutine() async {
     debugPrint('Evening Times: ${selectedEveningTimes.toList()}');
     debugPrint('Instructions: ${instructionText.value}');
 
+
     await Future.delayed(const Duration(seconds: 1));
     progress.value = 50;
     progressMessage.value = 'Adding to routine';
+
+    // Call server API to add the routine as well
+    try {
+      // Convert times to server format (HH:mm)
+      List<String>? morningTimes;
+      List<String>? eveningTimes;
+      if (selectedTimes.isNotEmpty) {
+        morningTimes = selectedTimes.map((t) => _convertTo24Hour(t)).whereType<String>().toList();
+      }
+      if (selectedEveningTimes.isNotEmpty) {
+        eveningTimes = selectedEveningTimes.map((t) => _convertTo24Hour(t)).whereType<String>().toList();
+      }
+
+      final apiSuccess = await ApiService.addProductToRoutine(
+        productId: productId.value,
+        category: selectedCategory.value.isEmpty ? 'Skin Product' : selectedCategory.value,
+        startDate: startDate.value ?? DateTime.now(),
+        endDate: endDate.value ?? (DateTime.now().add(const Duration(days: 1))),
+        morningOrder: selectedOrder.value == 0 ? null : selectedOrder.value,
+        morningTimeOfDay: morningTimes,
+        eveningOrder: selectedEveningOrder.value == 0 ? null : selectedEveningOrder.value,
+        eveningTimeOfDay: eveningTimes,
+        additionalIntroduction: instructionText.value,
+      );
+
+      if (!apiSuccess) {
+        Get.snackbar('Routine', 'Failed to add routine to server. Saved locally.');
+        debugPrint('API returned failure, continuing to save locally');
+      } else {
+        debugPrint('Routine successfully added on server');
+      }
+    } catch (e) {
+      debugPrint('Exception while calling addProductToRoutine: $e');
+    }
 
     // Create routine items from selected times and save to SharedPreferences
     await _addRoutinesToSharedPreferences();
@@ -453,6 +492,22 @@ void submitRoutine() async {
     }
   }
 
+  // Convert time strings like '7:30 am' or '12:15 pm' to 'HH:mm' (24-hour) for API
+  String? _convertTo24Hour(String timeStr) {
+    try {
+      String normalized = timeStr.replaceAll('.', ':').trim().toUpperCase();
+      if (!normalized.contains('AM') && !normalized.contains('PM')) {
+        // If no AM/PM provided, assume AM
+        normalized = '$normalized AM';
+      }
+      final parsed = DateFormat('h:mm a').parse(normalized);
+      return DateFormat('HH:mm').format(parsed);
+    } catch (e) {
+      debugPrint('Error converting time to 24h: $timeStr -> $e');
+      return null;
+    }
+  }
+
   // Extract timestamp (as DateTime) from our id format `${productId}_<period>_<time>_<timestamp>_<index>`
   DateTime? _extractTimestampFromId(String id) {
     try {
@@ -606,7 +661,48 @@ void submitRoutine() async {
     // Product name will be set via setProductName() from AddToRoutine
     
     // Load routines from SharedPreferences when controller initializes
+    // Start migration + routines load
     _runOneTimeMigrationIfNeeded().then((_) => loadRoutinesFromSharedPreferences());
+
+    // Load current user's name from Firebase Auth / Firestore and cache locally
+    loadAndCacheUserName();
+  }
+
+  // Load user name from Firebase Auth first, fallback to Firestore, then to local cache.
+  // Cache the resolved name in SharedPreferences under key 'user_name'.
+  Future<void> loadAndCacheUserName() async {
+    try {
+      String? name;
+
+      // 1) Try current Firebase Auth user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        name = user.displayName;
+        // Note: Firestore fallback removed to avoid adding cloud_firestore dependency here.
+        // If you have Firestore in your project, you can fetch `users/{uid}.name` as a fallback.
+      }
+
+      // 3) Fallback to local cache
+      final prefs = await SharedPreferences.getInstance();
+      if (name == null || name.isEmpty) {
+        final cached = prefs.getString('user_name');
+        if (cached != null && cached.isNotEmpty) {
+          name = cached;
+        }
+      }
+
+      // If we found a name, update reactive field and cache it
+      if (name != null && name.isNotEmpty) {
+        userName.value = name;
+        try {
+          await prefs.setString('user_name', name);
+        } catch (e) {
+          debugPrint('Error caching user_name to SharedPreferences: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error in loadAndCacheUserName: $e');
+    }
   }
 
   // Clear all routines from SharedPreferences

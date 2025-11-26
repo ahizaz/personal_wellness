@@ -19,6 +19,7 @@ class Urls{
   static const String routineconsistencyChart = "$baseUrl/add-routine/get-data-chart";
   static const String notificationsGetAll = "$baseUrl/push-notification/get-all";
   static const String updateProfile ="$baseUrl/user/update-profile";
+  static const String addroutine = "$baseUrl/add-routine/add";
     static const String addRoutineGetAll = "$baseUrl/add-routine/get-all";
   
  

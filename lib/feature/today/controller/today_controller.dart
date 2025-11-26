@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
@@ -55,19 +56,40 @@ class TodayController extends GetxController {
   Future<void> loadPersonalizationData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final firstName = prefs.getString('personalization_firstName');
-      
+      // Priority:
+      // 1) personalization_firstName (server-side saved)
+      // 2) local cached 'user_name' (saved by Firebase or other flows)
+      // 3) FirebaseAuth currentUser.displayName (if available)
+      String? firstName = prefs.getString('personalization_firstName');
+      final cachedName = prefs.getString('user_name');
+
       if (firstName != null && firstName.isNotEmpty) {
         userName.value = firstName;
-        debugPrint('=== LOADED PERSONALIZATION DATA ===');
-        debugPrint('First Name: $firstName');
-        debugPrint('Updated userName to: ${userName.value}');
-        debugPrint('==================================');
-      } else {
-        debugPrint('=== NO PERSONALIZATION DATA FOUND ===');
-        debugPrint('Using default userName: ${userName.value}');
-        debugPrint('====================================');
+        debugPrint('Loaded personalization_firstName: $firstName');
+        return;
       }
+
+      if (cachedName != null && cachedName.isNotEmpty) {
+        userName.value = cachedName;
+        debugPrint('Loaded cached user_name from prefs: $cachedName');
+        return;
+      }
+
+      try {
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        final display = firebaseUser?.displayName;
+        if (display != null && display.isNotEmpty) {
+          userName.value = display.split(' ').first; // use first name
+          debugPrint('Loaded displayName from FirebaseAuth: ${userName.value}');
+          // Cache it locally for faster startup next time
+          await prefs.setString('user_name', userName.value);
+          return;
+        }
+      } catch (e) {
+        debugPrint('Error checking FirebaseAuth in loadPersonalizationData: $e');
+      }
+
+      debugPrint('No personalization data found; using default userName: ${userName.value}');
     } catch (e) {
       debugPrint('Error loading personalization data: $e');
     }

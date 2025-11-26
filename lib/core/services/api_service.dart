@@ -195,4 +195,49 @@ class ApiService {
       return null;
     }
   }
+
+  // Fetch user profile from backend and cache first name locally
+  static Future<bool> fetchAndCacheUserProfile() async {
+    try {
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found - cannot fetch profile');
+        return false;
+      }
+
+      final url = '${Urls.baseUrl}/user/get';
+      debugPrint('Fetching user profile from: $url');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      debugPrint('Profile fetch status: ${response.statusCode}');
+      debugPrint('Profile fetch body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Support a few common payload shapes: { data: { ... } } or { user: { ... } } or direct object
+        final userData = data['data'] ?? data['user'] ?? data;
+        final firstName = (userData is Map && (userData['firstName'] ?? userData['first_name']) != null)
+            ? (userData['firstName'] ?? userData['first_name']).toString()
+            : '';
+
+        if (firstName.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('personalization_firstName', firstName);
+          debugPrint('Cached personalization_firstName: $firstName');
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error fetching and caching user profile: $e');
+      return false;
+    }
+  }
 }

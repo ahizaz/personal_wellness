@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:get/get_core/src/get_main.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:personal_wellness/core/services/api_service.dart';
 
 class SplashController extends GetxController{
   @override
@@ -22,6 +24,14 @@ class SplashController extends GetxController{
     final accessToken =  prefs.getString("accessToken");
       final userId = prefs.getString("userId");
           if (accessToken != null && userId != null) {
+      // Try to fetch the server-side profile and cache the first name so
+      // it will be available even after an uninstall/reinstall.
+      try {
+        await ApiService.fetchAndCacheUserProfile();
+      } catch (e) {
+        debugPrint('Error fetching profile during splash: $e');
+      }
+
       Get.offAll(() => BottomNavbar());
     } else {
       Get.offAll(() => GetStarted());
