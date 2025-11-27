@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
@@ -89,15 +90,28 @@ class ProfileAccountController extends GetxController {
           
           debugPrint('New first name from response: $newFirstName');
           
-          // Save to SharedPreferences
+          // Save to SharedPreferences and update Firebase displayName
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('personalization_firstName', newFirstName);
+          // Also set a quick local fallback
+          await prefs.setString('user_name', newFirstName);
           debugPrint('Saved new first name to prefs');
 
           // Update TodayController
           final todayController = Get.find<TodayController>();
           todayController.setUserName(newFirstName);
           debugPrint('Updated TodayController userName');
+
+          // Try to update FirebaseAuth displayName so future installs/readers get the name
+          try {
+            final firebaseUser = FirebaseAuth.instance.currentUser;
+            if (firebaseUser != null) {
+              await firebaseUser.updateDisplayName(newFirstName);
+              debugPrint('Updated FirebaseAuth displayName: $newFirstName');
+            }
+          } catch (e) {
+            debugPrint('Error updating Firebase displayName: $e');
+          }
 
           // Refresh personalization in TodayController
           await todayController.refreshPersonalizationData();

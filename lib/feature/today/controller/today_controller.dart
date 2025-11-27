@@ -9,7 +9,7 @@ import 'package:personal_wellness/core/events/routine_events.dart';
 import 'package:intl/intl.dart';
 
 class TodayController extends GetxController {
-  var userName = "Liana".obs; // Default username
+  var userName = "".obs; // Username (empty by default)
   var profileImagePath = "".obs; // Default no image
   var routineData = <Map<String, dynamic>>[].obs; // Reactive list for routine data
   var isLoading = false.obs; // Loading state
@@ -75,6 +75,23 @@ class TodayController extends GetxController {
         return;
       }
 
+      // If we don't have a cached name, try to fetch profile from backend
+      try {
+        final fetched = await ApiService.fetchAndCacheUserProfile();
+        if (fetched) {
+          final newFirstName = prefs.getString('personalization_firstName');
+          if (newFirstName != null && newFirstName.isNotEmpty) {
+            userName.value = newFirstName;
+            debugPrint('Loaded personalization_firstName from backend: $newFirstName');
+            // Also cache a quick fallback
+            await prefs.setString('user_name', userName.value);
+            return;
+          }
+        }
+      } catch (e) {
+        debugPrint('Error fetching profile from backend: $e');
+      }
+
       try {
         final firebaseUser = FirebaseAuth.instance.currentUser;
         final display = firebaseUser?.displayName;
@@ -89,7 +106,7 @@ class TodayController extends GetxController {
         debugPrint('Error checking FirebaseAuth in loadPersonalizationData: $e');
       }
 
-      debugPrint('No personalization data found; using default userName: ${userName.value}');
+      debugPrint('No personalization data found; userName remains empty');
     } catch (e) {
       debugPrint('Error loading personalization data: $e');
     }
