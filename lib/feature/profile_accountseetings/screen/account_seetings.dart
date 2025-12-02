@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
@@ -225,6 +226,87 @@ class AccountSeetings extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
+                        
+                        // Age Field
+                        CustomProfileTextField(
+                          controller: profileController.ageController,
+                          isFocused: profileController.isAgeFocused,
+                          hintText: "Age",
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(3),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+                        
+                        // Gender Dropdown
+                        Obx(
+                          () => Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: profileController.selectedGender.value.isNotEmpty
+                                    ? const Color(0xff485908)
+                                    : const Color(0xffE8E9E6),
+                                width: profileController.selectedGender.value.isNotEmpty ? 3.w : 1.w,
+                              ),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: DropdownButtonFormField<String>(
+                              value: profileController.selectedGender.value.isEmpty
+                                  ? null
+                                  : profileController.selectedGender.value,
+                              hint: Text(
+                                'Gender',
+                                style: TextStyle(
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff999999),
+                                  fontFamily: 'SFPro',
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                              menuMaxHeight: 200.h,
+                              items: ['Male', 'Female', 'Other'].map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xff172601),
+                                      fontFamily: 'SFPro',
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  profileController.selectedGender.value = newValue;
+                                }
+                              },
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: const Color(0xff172601),
+                              ),
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: const Color(0xff172601),
+                                  size: 20.sp,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 16.h,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 24.h),
+                        
                         Obx(
                           () => CustomButton(
                             text: 'Save Changes',

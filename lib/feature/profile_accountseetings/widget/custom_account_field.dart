@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -6,12 +7,16 @@ class CustomProfileTextField extends StatelessWidget {
   final TextEditingController controller;
   final RxBool isFocused;
   final String hintText;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomProfileTextField({
     super.key,
     required this.controller,
     required this.isFocused,
     required this.hintText,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -33,6 +38,8 @@ class CustomProfileTextField extends StatelessWidget {
           ),
           child: TextField(
             controller: controller,
+            keyboardType: keyboardType ?? TextInputType.name,
+            inputFormatters: inputFormatters,
             style: TextStyle(
               fontSize: 17.sp,
               fontFamily: 'SFPro',
@@ -51,7 +58,6 @@ class CustomProfileTextField extends StatelessWidget {
               ),
               floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
-            keyboardType: TextInputType.name,
           ),
         );
       }),

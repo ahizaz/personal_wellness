@@ -195,6 +195,7 @@ class NameAgeGender extends StatelessWidget {
                               fontFamily: 'SFPro',
                             ),
                           ),
+                          menuMaxHeight: 200.h,
                           items: ['Male', 'Female', 'Other'].map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,

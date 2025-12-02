@@ -25,8 +25,16 @@ class ProfileAccountController extends GetxController {
   final RxBool isLastNameFocused = false.obs;
   final RxBool hasLastNameText = false.obs;
 
-  // ফর্ম ভ্যালিডেশন (দুটি ফিল্ডেই টেক্সট থাকতে হবে)
-  RxBool get isFormValid => (hasFirstNameText.value && hasLastNameText.value).obs;
+  // Age Controller এবং স্টেট
+  final TextEditingController ageController = TextEditingController();
+  final RxBool isAgeFocused = false.obs;
+  final RxBool hasAgeText = false.obs;
+
+  // Gender স্টেট
+  final RxString selectedGender = ''.obs;
+
+  // ফর্ম ভ্যালিডেশন (সব ফিল্ডেই টেক্সট থাকতে হবে)
+  RxBool get isFormValid => (hasFirstNameText.value && hasLastNameText.value && hasAgeText.value && selectedGender.value.isNotEmpty).obs;
 
   @override
   void onInit() {
@@ -41,6 +49,11 @@ class ProfileAccountController extends GetxController {
     lastNameController.addListener(() {
       hasLastNameText.value = lastNameController.text.isNotEmpty;
     });
+
+    // Age এর টেক্সট লিসেনার
+    ageController.addListener(() {
+      hasAgeText.value = ageController.text.isNotEmpty;
+    });
   }
 
   Future<void> updateProfile() async {
@@ -49,9 +62,13 @@ class ProfileAccountController extends GetxController {
 
     final String firstName = firstNameController.text.trim();
     final String lastName = lastNameController.text.trim();
+    final String age = ageController.text.trim();
+    final String gender = selectedGender.value.toLowerCase();
     
     debugPrint('First Name to update: $firstName');
     debugPrint('Last Name to update: $lastName');
+    debugPrint('Age to update: $age');
+    debugPrint('Gender to update: $gender');
 
     try {
       final String? token = await ApiService.getAccessToken();
@@ -72,6 +89,8 @@ class ProfileAccountController extends GetxController {
 
       request.fields['firstName'] = firstName;
       request.fields['lastName'] = lastName;
+      request.fields['age'] = age;
+      request.fields['gender'] = gender;
       debugPrint('Request fields: ${request.fields}');
 
       final streamedResponse = await request.send();
@@ -139,10 +158,12 @@ class ProfileAccountController extends GetxController {
     }
   }
 
-  // সব ডাটা ক্লিয়ার করার মেথড
+  // সব ডাটা ক্লিয়ার করার মেথড
   void clearAllData() {
     clearFirstName();
     clearLastName();
+    clearAge();
+    clearGender();
   }
 
   void clearFirstName() {
@@ -155,10 +176,20 @@ class ProfileAccountController extends GetxController {
     hasLastNameText.value = false;
   }
 
+  void clearAge() {
+    ageController.clear();
+    hasAgeText.value = false;
+  }
+
+  void clearGender() {
+    selectedGender.value = '';
+  }
+
   @override
   void onClose() {
     firstNameController.dispose();
     lastNameController.dispose();
+    ageController.dispose();
     super.onClose();
   }
 }
