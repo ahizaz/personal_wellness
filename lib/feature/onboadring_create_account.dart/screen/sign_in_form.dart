@@ -7,7 +7,7 @@ import 'package:personal_wellness/core/common/widgets/custom_textField.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
-import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/register_form.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/name_age_gender.dart';
 import 'package:personal_wellness/feature/onboarding_sign_in.dart/screen/sign_in_password.dart';
 
 class SignInForm extends StatelessWidget {
@@ -34,8 +34,7 @@ class SignInForm extends StatelessWidget {
 
           // Bottom Form Fixed
           Positioned(
-           
-            bottom:5.h,
+            bottom: 5.h,
             left: 16.w,
             right: 16.w,
             child: SafeArea(
@@ -47,7 +46,6 @@ class SignInForm extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
                 child: Column(
-                  
                   children: [
                     // Header
                     Row(
@@ -78,37 +76,38 @@ class SignInForm extends StatelessWidget {
                         ),
                       ],
                     ),
-              
+
                     SizedBox(height: 33.h),
-              
+
                     // Email Field
                     CustomEmailTextField(
                       controller: controller.emailController,
                       isFocused: controller.isEmailFocused,
                     ),
-              
+
                     SizedBox(height: 12.h),
-              
+
                     // Continue Button
-                    Obx(() => CustomButton(
-                          text: 'Continue',
-                          color: const Color(0xff172601),
-                          textStyle: TextStyle(
-                            fontSize: 17.sp,
-                            fontFamily: 'SFPro',
-                            fontWeight: FontWeight.w600,
-                            color: controller.hasText.value
-                                ? const Color(0xFFFFFFFF)
-                                : const Color(0xFF999999),
-                          ),
-                          onTap: () {
-                          
-                            Get.to(() => SignInPassword());
-                          },
-                        )),
-              
+                    Obx(
+                      () => CustomButton(
+                        text: 'Continue',
+                        color: const Color(0xff172601),
+                        textStyle: TextStyle(
+                          fontSize: 17.sp,
+                          fontFamily: 'SFPro',
+                          fontWeight: FontWeight.w600,
+                          color: controller.hasText.value
+                              ? const Color(0xFFFFFFFF)
+                              : const Color(0xFF999999),
+                        ),
+                        onTap: () {
+                          Get.to(() => SignInPassword());
+                        },
+                      ),
+                    ),
+
                     SizedBox(height: 12.h),
-              
+
                     // Create Account
                     CustomButton(
                       text: 'Create an account',
@@ -121,12 +120,12 @@ class SignInForm extends StatelessWidget {
                       ),
                       onTap: () {
                         controller.clearEmail();
-                        Get.to(() => RegisterForm());
+                        Get.to(() => NameAgeGender());
                       },
                     ),
-              
+
                     SizedBox(height: 24.h),
-              
+
                     // OR Divider
                     Row(
                       children: [
@@ -155,9 +154,9 @@ class SignInForm extends StatelessWidget {
                         ),
                       ],
                     ),
-              
+
                     SizedBox(height: 21.h),
-              
+
                     // Google Sign In
                     CustomButton(
                       text: "Continue with Google",
@@ -178,19 +177,15 @@ class SignInForm extends StatelessWidget {
                         controller.signInWithGoogle();
                       },
                     ),
-              
+
                     SizedBox(height: 24.h),
-              
+
                     CustomTermsText(),
-                    
-                    
                   ],
                 ),
-              
               ),
             ),
           ),
-          
         ],
       ),
     );

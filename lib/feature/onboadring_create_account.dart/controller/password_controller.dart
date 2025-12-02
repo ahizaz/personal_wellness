@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +7,7 @@ import 'package:personal_wellness/core/urls/urls.dart';
 
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/privacy_policy_terms.dart';
+
 //regester
 class PasswordController extends GetxController {
   RxBool isPasswordVisible = false.obs;
@@ -40,9 +40,17 @@ class PasswordController extends GetxController {
     final signInController = Get.find<SignInController>();
     final email = signInController.email.value;
     final password = passwordController.text;
+    final name = signInController.name.value;
+    final age = signInController.age.value;
+    final gender = signInController.selectedGender.value.toLowerCase();
 
     if (email.isEmpty || password.isEmpty) {
-    EasyLoading.showError('Email or password cannot be empty');
+      EasyLoading.showError('Email or password cannot be empty');
+      return;
+    }
+
+    if (name.isEmpty || age.isEmpty || gender.isEmpty) {
+      EasyLoading.showError('Name, age, and gender are required');
       return;
     }
 
@@ -56,6 +64,9 @@ class PasswordController extends GetxController {
         body: jsonEncode({
           'email': email,
           'password': password,
+          'name': name,
+          'age': int.tryParse(age) ?? 0,
+          'gender': gender,
         }),
       );
 
@@ -68,13 +79,13 @@ class PasswordController extends GetxController {
         Get.to(() => PrivacyPolicyTerms());
       } else {
         // Handle error response
-       EasyLoading.showError('Email or password cannot be empty');
+        EasyLoading.showError('Failed to create account');
       }
     } catch (e) {
       // Dismiss loading indicator on error
       await EasyLoading.dismiss();
       // Handle network or other errors
-     EasyLoading.showError('An error occurred: $e');
+      EasyLoading.showError('An error occurred: $e');
     }
   }
 
