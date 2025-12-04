@@ -163,26 +163,57 @@ class TodayController extends GetxController {
       }).toList();
       debugPrint('Filtered not completed today: ${notCompletedToday.length}');
 
-      // Sort by creation time descending using timestamp embedded in the id
-      // id format: `${productId}_<period>_<time>_<timestamp>_<index>`
-      int _extractTimestamp(Map<String, dynamic> json) {
+      // Sort by time of day (chronological order: morning -> afternoon -> evening)
+      int _parseTimeForSorting(String timeStr) {
         try {
-          final String id = (json['id'] ?? '').toString();
-          final parts = id.split('_');
-          // timestamp is the second last segment
-          if (parts.length >= 2) {
-            final tsStr = parts[parts.length - 2];
-            return int.tryParse(tsStr) ?? 0;
+          // Normalize time string format
+          String normalizedTime = timeStr.replaceAll('.', ':').trim();
+
+          // Ensure proper AM/PM formatting
+          if (!normalizedTime.toLowerCase().contains('am') &&
+              !normalizedTime.toLowerCase().contains('pm')) {
+            normalizedTime += ' am'; // Default to AM if no period specified
           }
-          return 0;
-        } catch (_) {
-          return 0;
+
+          // Convert to uppercase for proper parsing
+          String upperTime = normalizedTime.toUpperCase();
+
+          // Parse the time
+          DateFormat format;
+          if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
+            format = DateFormat('h:mm aa'); // For "6:30 AM" or "6:30 PM"
+          } else {
+            format = DateFormat('h:mm a'); // For "6:30 A" or "6:30 P"
+          }
+
+          try {
+            final parsedTime = format.parse(upperTime);
+            // Return minutes since midnight for sorting
+            return parsedTime.hour * 60 + parsedTime.minute;
+          } catch (e) {
+            // Try alternative formats
+            DateFormat alternativeFormat;
+            if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
+              alternativeFormat = DateFormat('h:m aa'); // For "6:3 AM" format
+            } else {
+              alternativeFormat = DateFormat('h:m a'); // For "6:3 A" format
+            }
+            final parsedTime = alternativeFormat.parse(upperTime);
+            return parsedTime.hour * 60 + parsedTime.minute;
+          }
+        } catch (e) {
+          debugPrint('Failed to parse time for sorting: $timeStr, error: $e');
+          return 0; // Default to start of day if parsing fails
         }
       }
 
       final List<Map<String, dynamic>> sortedByLatest =
           List<Map<String, dynamic>>.from(notCompletedToday)
-            ..sort((a, b) => _extractTimestamp(b).compareTo(_extractTimestamp(a)));
+            ..sort((a, b) {
+              final aTime = _parseTimeForSorting(a['time'] ?? '');
+              final bTime = _parseTimeForSorting(b['time'] ?? '');
+              return aTime.compareTo(bTime); // Ascending order: earliest first
+            });
 
       // Don't deduplicate - show all routines including same product at different times (morning/evening)
       // Each routine has a unique ID that includes productId, period (morning/evening), time, timestamp, and index

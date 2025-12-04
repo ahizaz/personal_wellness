@@ -1,9 +1,7 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
 
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,7 +13,9 @@ class GoPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ValueNotifier<int> stage = ValueNotifier(0); // 0: Left, 1: Right, 2: Front, 3: Text
+    final ValueNotifier<int> stage = ValueNotifier(
+      0,
+    ); // 0: Left, 1: Right, 2: Front, 3: Text
     final List<String> imagePaths = [];
 
     // Initialize camera
@@ -24,7 +24,9 @@ class GoPicture extends StatelessWidget {
       if (status.isDenied || status.isPermanentlyDenied) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Camera permission is required to proceed')),
+          const SnackBar(
+            content: Text('Camera permission is required to proceed'),
+          ),
         );
         return null;
       }
@@ -72,7 +74,6 @@ class GoPicture extends StatelessWidget {
             final screenHeight = MediaQuery.of(context).size.height;
 
             return Scaffold(
-              
               body: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -106,8 +107,8 @@ class GoPicture extends StatelessWidget {
                         currentStage == 0
                             ? 'Show the left side of your face'
                             : currentStage == 1
-                                ? 'Show the right side of your face'
-                                : 'Show the front of your face',
+                            ? 'Show the right side of your face'
+                            : 'Show the front of your face',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -122,7 +123,8 @@ class GoPicture extends StatelessWidget {
                 onPressed: () async {
                   try {
                     await controllerManager.initializeControllerFuture;
-                    final image = await controllerManager.controller.takePicture();
+                    final image = await controllerManager.controller
+                        .takePicture();
                     imagePaths.add(image.path);
                     transitionToNextStage(currentStage);
                   } catch (e) {
@@ -136,7 +138,8 @@ class GoPicture extends StatelessWidget {
                 shape: const CircleBorder(),
                 child: const Icon(Icons.camera_alt, color: Colors.white),
               ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
             );
           },
         );
@@ -152,10 +155,7 @@ class CameraControllerManager {
   final CameraDescription camera;
 
   CameraControllerManager(this.camera) {
-    _controller = CameraController(
-      camera,
-      ResolutionPreset.high,
-    );
+    _controller = CameraController(camera, ResolutionPreset.high);
     _initializeControllerFuture = _controller!.initialize();
   }
 
@@ -183,12 +183,21 @@ class OverlayPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final ovalSize = screenWidth * 0.85;
     final center = Offset(screenWidth / 2, screenHeight / 3);
-    final rect = Rect.fromCenter(center: center, width: ovalSize, height: ovalSize);
+    final rect = Rect.fromCenter(
+      center: center,
+      width: ovalSize,
+      height: ovalSize,
+    );
 
     // বাইরের Dim অংশ
     final ovalPath = Path()..addOval(rect);
-    final outerPath = Path()..addRect(Rect.fromLTWH(0, 0, screenWidth, screenHeight));
-    final overlayPath = Path.combine(PathOperation.difference, outerPath, ovalPath);
+    final outerPath = Path()
+      ..addRect(Rect.fromLTWH(0, 0, screenWidth, screenHeight));
+    final overlayPath = Path.combine(
+      PathOperation.difference,
+      outerPath,
+      ovalPath,
+    );
 
     final dimPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.7)
@@ -228,7 +237,10 @@ class _TextPageState extends State<TextPage> {
     super.initState();
     // Save images to ProgressController after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ProgressController progressController = Get.put(ProgressController());
+      final ProgressController progressController = Get.put(
+        ProgressController(),
+        tag: 'progress',
+      );
       progressController.saveCapturedImages(widget.imagePaths);
     });
   }
@@ -240,10 +252,7 @@ class _TextPageState extends State<TextPage> {
         children: [
           // Background Image
           Positioned.fill(
-            child: Image.asset(
-              ImagePath.takingpicture,
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(ImagePath.takingpicture, fit: BoxFit.cover),
           ),
           // Content
           Positioned.fill(
@@ -299,7 +308,9 @@ class _TextPageState extends State<TextPage> {
                 Column(
                   children: [
                     const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xff485908)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xff485908),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -314,10 +325,7 @@ class _TextPageState extends State<TextPage> {
                     const SizedBox(height: 8),
                     const Text(
                       'You will be redirected automatically',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -332,7 +340,10 @@ class _TextPageState extends State<TextPage> {
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -359,4 +370,3 @@ class _TextPageState extends State<TextPage> {
     );
   }
 }
-                

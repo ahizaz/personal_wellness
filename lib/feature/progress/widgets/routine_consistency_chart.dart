@@ -9,8 +9,11 @@ class RoutineConsistencyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProgressController controller = Get.find<ProgressController>();
-    
+    final ProgressController controller = Get.put(
+      ProgressController(),
+      tag: 'progress',
+    );
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -78,14 +81,26 @@ class RoutineConsistencyChart extends StatelessWidget {
   }
 
   Widget _buildMonthRow(ProgressController controller, int index) {
-    List<String> monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
+    List<String> monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
     // Check if this is current or previous month
     bool isCurrentMonth = index == controller.getCurrentMonthIndex();
     bool isPreviousMonth = index == controller.getPreviousMonthIndex();
     bool showGraph = isCurrentMonth || isPreviousMonth;
-    
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 2.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -99,11 +114,11 @@ class RoutineConsistencyChart extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: showGraph ? FontWeight.bold : FontWeight.normal,
-                color: isCurrentMonth 
+                color: isCurrentMonth
                     ? Color(0xff1A5D1A)
-                    : isPreviousMonth 
-                        ? Colors.grey[700]!
-                        : Colors.grey[400]!,
+                    : isPreviousMonth
+                    ? Colors.grey[700]!
+                    : Colors.grey[400]!,
               ),
             ),
           ),
@@ -112,17 +127,21 @@ class RoutineConsistencyChart extends StatelessWidget {
           Expanded(
             child: Container(
               height: showGraph ? 90.h : 20.h,
-              decoration: showGraph ? BoxDecoration(
-                color: Colors.grey.withValues(alpha: .05),
-                borderRadius: BorderRadius.circular(8.r),
-              ) : null,
-              child: showGraph 
+              decoration: showGraph
+                  ? BoxDecoration(
+                      color: Colors.grey.withValues(alpha: .05),
+                      borderRadius: BorderRadius.circular(8.r),
+                    )
+                  : null,
+              child: showGraph
                   ? Obx(() {
                       // Build simple two-point lines: x=0 pending, x=1 completed
                       final counts = isCurrentMonth
                           ? controller.getCurrentMonthCounts()
                           : controller.getPreviousMonthCounts();
-                      final color = isCurrentMonth ? const Color(0xff1A5D1A) : Colors.grey;
+                      final color = isCurrentMonth
+                          ? const Color(0xff1A5D1A)
+                          : Colors.grey;
                       final maxY = controller.getMaxRoutineChartY();
 
                       return Column(
@@ -134,10 +153,18 @@ class RoutineConsistencyChart extends StatelessWidget {
                               LineChartData(
                                 gridData: FlGridData(show: false),
                                 titlesData: FlTitlesData(
-                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
                                 ),
                                 borderData: FlBorderData(show: false),
                                 minX: -0.2,
@@ -147,22 +174,29 @@ class RoutineConsistencyChart extends StatelessWidget {
                                 lineBarsData: [
                                   LineChartBarData(
                                     spots: [
-                                      FlSpot(0, (counts['pending'] ?? 0).toDouble()),
-                                      FlSpot(1, (counts['completed'] ?? 0).toDouble()),
+                                      FlSpot(
+                                        0,
+                                        (counts['completed'] ?? 0).toDouble(),
+                                      ),
+                                      FlSpot(
+                                        1,
+                                        (counts['pending'] ?? 0).toDouble(),
+                                      ),
                                     ],
                                     isCurved: true,
                                     color: color,
                                     barWidth: 3,
                                     dotData: FlDotData(
                                       show: true,
-                                      getDotPainter: (spot, percent, barData, idx) {
-                                        return FlDotCirclePainter(
-                                          radius: 4,
-                                          color: color,
-                                          strokeWidth: 2,
-                                          strokeColor: Colors.white,
-                                        );
-                                      },
+                                      getDotPainter:
+                                          (spot, percent, barData, idx) {
+                                            return FlDotCirclePainter(
+                                              radius: 4,
+                                              color: color,
+                                              strokeWidth: 2,
+                                              strokeColor: Colors.white,
+                                            );
+                                          },
                                     ),
                                   ),
                                 ],
@@ -173,8 +207,20 @@ class RoutineConsistencyChart extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Pending', style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
-                              Text('Completed', style: TextStyle(fontSize: 10.sp, color: Colors.grey[600])),
+                              Text(
+                                'Completed',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              Text(
+                                'Pending',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                             ],
                           ),
                         ],

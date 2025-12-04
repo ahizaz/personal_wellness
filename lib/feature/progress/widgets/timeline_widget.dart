@@ -8,8 +8,12 @@ class TimelineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProgressController controller = Get.find<ProgressController>();
-    
+    // Use Get.put with tag to avoid duplicate instances, or find if exists
+    final ProgressController controller = Get.put(
+      ProgressController(),
+      tag: 'progress',
+    );
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -51,15 +55,19 @@ class TimelineWidget extends StatelessWidget {
                   SizedBox(width: 12.w),
                   GestureDetector(
                     onTap: controller.toggleTimelineShowAll,
-                    child: Obx(() => Text(
-                      controller.showTimelineAll.value ? "View less" : "View more",
-                      style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xff172601),
+                    child: Obx(
+                      () => Text(
+                        controller.showTimelineAll.value
+                            ? "View less"
+                            : "View more",
+                        style: TextStyle(
+                          fontFamily: "SFPro",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff172601),
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                 ],
               ),
@@ -69,8 +77,8 @@ class TimelineWidget extends StatelessWidget {
           Divider(thickness: 1),
           Obx(
             () => ListView.builder(
-              itemCount: controller.showTimelineAll.value 
-                  ? controller.progressItems.length 
+              itemCount: controller.showTimelineAll.value
+                  ? controller.progressItems.length
                   : (controller.progressItems.length > 0 ? 1 : 0),
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,

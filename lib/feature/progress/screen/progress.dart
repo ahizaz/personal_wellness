@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,14 +23,16 @@ class ProgressData extends StatefulWidget {
   State<ProgressData> createState() => _ProgressDataState();
 }
 
-class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver, RouteAware {
+class _ProgressDataState extends State<ProgressData>
+    with WidgetsBindingObserver, RouteAware {
   late ProgressController controller;
-  static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
 
   @override
   void initState() {
     super.initState();
-    controller = Get.put(ProgressController());
+    controller = Get.put(ProgressController(), tag: 'progress');
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -62,11 +63,8 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     // Function to generate and export PDF
     Future<void> exportToPDF() async {
       final pdf = pw.Document();
@@ -76,11 +74,19 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
         final rightUrl = controller.getLatestRightImage();
         final frontUrl = controller.getLatestFrontImage();
 
-        final leftImage = await networkImageProvider(leftUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
-        final rightImage = await networkImageProvider(rightUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
-        final frontImage = await networkImageProvider(frontUrl) ?? await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        final leftImage =
+            await networkImageProvider(leftUrl) ??
+            await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        final rightImage =
+            await networkImageProvider(rightUrl) ??
+            await imageFromAssetBundle(ImagePath.beforeafterimage1);
+        final frontImage =
+            await networkImageProvider(frontUrl) ??
+            await imageFromAssetBundle(ImagePath.beforeafterimage1);
         final bambooImage = await imageFromAssetBundle(ImagePath.bamboo);
-        final progressImage = await imageFromAssetBundle(ImagePath.progressimageback);
+        final progressImage = await imageFromAssetBundle(
+          ImagePath.progressimageback,
+        );
 
         final prevCounts = controller.getPreviousMonthCounts();
         final currCounts = controller.getCurrentMonthCounts();
@@ -92,118 +98,135 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
             margin: pw.EdgeInsets.all(16),
             build: (pw.Context context) {
               return [
-              // Title
-              pw.Text(
-                "Progress & History",
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 16),
-
-              // Timeline Section
-              pw.Text(
-                "Timeline",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Divider(),
-              pw.SizedBox(height: 8),
-              ...controller.progressItems.map((item) {
-                return pw.Padding(
-                  padding: pw.EdgeInsets.symmetric(vertical: 8),
-                  child: pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        "${item['title']} - ${item['date']} - ${item['week']}",
-                        style: pw.TextStyle(fontSize: 14),
-                      ),
-                    ],
+                // Title
+                pw.Text(
+                  "Progress & History",
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
                   ),
-                );
-              }).toList(),
-              pw.SizedBox(height: 16),
-
-              // Before & After Section
-              pw.Text(
-                "Before & After",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
                 ),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Text(
-                "Slide to compare your transformation",
-                style: pw.TextStyle(fontSize: 12),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Divider(),
-              pw.SizedBox(height: 8),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Image(leftImage, width: 100, height: 160, fit: pw.BoxFit.cover),
-                  pw.Image(bambooImage, width: 20, height: 160, fit: pw.BoxFit.cover),
-                  pw.Image(frontImage, width: 100, height: 160, fit: pw.BoxFit.cover),
-                  pw.Image(rightImage, width: 100, height: 160, fit: pw.BoxFit.cover),
-                ],
-              ),
-              pw.SizedBox(height: 8),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text("Left", style: pw.TextStyle(fontSize: 12)),
-                  pw.Text("Front", style: pw.TextStyle(fontSize: 12)),
-                  pw.Text("Right", style: pw.TextStyle(fontSize: 12)),
-                ],
-              ),
-              pw.SizedBox(height: 16),
+                pw.SizedBox(height: 16),
 
-              // Update Progress Section
-              pw.Text(
-                "Update your Progress",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
+                // Timeline Section
+                pw.Text(
+                  "Timeline",
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Text(
-                "Take your progress photo to track your skin journey",
-                style: pw.TextStyle(fontSize: 12),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Image(progressImage, width: 100, height: 100),
-              pw.SizedBox(height: 16),
+                pw.SizedBox(height: 8),
+                pw.Divider(),
+                pw.SizedBox(height: 8),
+                ...controller.progressItems.map((item) {
+                  return pw.Padding(
+                    padding: pw.EdgeInsets.symmetric(vertical: 8),
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "${item['title']} - ${item['date']} - ${item['week']}",
+                          style: pw.TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                pw.SizedBox(height: 16),
 
-              // Routine Consistency Section
-              pw.Text(
-                "Routine Consistency",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
+                // Before & After Section
+                pw.Text(
+                  "Before & After",
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Text(
-                "Last 2 months",
-                style: pw.TextStyle(fontSize: 12),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Text(
-                "${controller.getPreviousMonthName()} - Completed: ${prevCounts['completed']}, Pending: ${prevCounts['pending']}",
-                style: pw.TextStyle(fontSize: 12),
-              ),
-              pw.Text(
-                "${controller.getCurrentMonthName()} - Completed: ${currCounts['completed']}, Pending: ${currCounts['pending']}",
-                style: pw.TextStyle(fontSize: 12),
-              ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  "Slide to compare your transformation",
+                  style: pw.TextStyle(fontSize: 12),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Divider(),
+                pw.SizedBox(height: 8),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Image(
+                      leftImage,
+                      width: 100,
+                      height: 160,
+                      fit: pw.BoxFit.cover,
+                    ),
+                    pw.Image(
+                      bambooImage,
+                      width: 20,
+                      height: 160,
+                      fit: pw.BoxFit.cover,
+                    ),
+                    pw.Image(
+                      frontImage,
+                      width: 100,
+                      height: 160,
+                      fit: pw.BoxFit.cover,
+                    ),
+                    pw.Image(
+                      rightImage,
+                      width: 100,
+                      height: 160,
+                      fit: pw.BoxFit.cover,
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 8),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text("Left", style: pw.TextStyle(fontSize: 12)),
+                    pw.Text("Front", style: pw.TextStyle(fontSize: 12)),
+                    pw.Text("Right", style: pw.TextStyle(fontSize: 12)),
+                  ],
+                ),
+                pw.SizedBox(height: 16),
+
+                // Update Progress Section
+                pw.Text(
+                  "Update your Progress",
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  "Take your progress photo to track your skin journey",
+                  style: pw.TextStyle(fontSize: 12),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Image(progressImage, width: 100, height: 100),
+                pw.SizedBox(height: 16),
+
+                // Routine Consistency Section
+                pw.Text(
+                  "Routine Consistency",
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text("Last 2 months", style: pw.TextStyle(fontSize: 12)),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  "${controller.getPreviousMonthName()} - Completed: ${prevCounts['completed']}, Pending: ${prevCounts['pending']}",
+                  style: pw.TextStyle(fontSize: 12),
+                ),
+                pw.Text(
+                  "${controller.getCurrentMonthName()} - Completed: ${currCounts['completed']}, Pending: ${currCounts['pending']}",
+                  style: pw.TextStyle(fontSize: 12),
+                ),
               ];
             },
           ),
@@ -222,14 +245,19 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                     title: const Text('Preview / Print'),
                     onTap: () async {
                       Navigator.of(context).pop();
-                      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+                      await Printing.layoutPdf(
+                        onLayout: (PdfPageFormat format) async => pdf.save(),
+                      );
                     },
                   ),
                   ListTile(
                     title: const Text('Share PDF'),
                     onTap: () async {
                       Navigator.of(context).pop();
-                      await Printing.sharePdf(bytes: await pdf.save(), filename: 'progress_report.pdf');
+                      await Printing.sharePdf(
+                        bytes: await pdf.save(),
+                        filename: 'progress_report.pdf',
+                      );
                     },
                   ),
                   ListTile(
@@ -240,7 +268,9 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                         final dir = await getApplicationDocumentsDirectory();
                         final ts = DateTime.now().millisecondsSinceEpoch;
                         final filePath = '${dir.path}/progress_report_$ts.pdf';
-                        final file = await File(filePath).writeAsBytes(await pdf.save(), flush: true);
+                        final file = await File(
+                          filePath,
+                        ).writeAsBytes(await pdf.save(), flush: true);
                         Get.snackbar('Saved', 'PDF saved to: $filePath');
                         await OpenFilex.open(file.path);
                       } catch (e) {
@@ -273,7 +303,7 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
       backgroundColor: Color(0xffEDEEE6),
       body: SafeArea(
         child: SingleChildScrollView(
-            child: Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +336,10 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 14.h,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,8 +365,8 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                             ),
                             SizedBox(height: 16.h),
                             InkWell(
-                              onTap: (){
-                                Get.to(()=>GoPicture());
+                              onTap: () {
+                                Get.to(() => GoPicture());
                               },
                               child: Container(
                                 width: 141.w,
@@ -396,8 +429,6 @@ class _ProgressDataState extends State<ProgressData> with WidgetsBindingObserver
                   ),
                 ),
 
- 
-              
                 SizedBox(height: 20.h),
               ],
             ),

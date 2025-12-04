@@ -6,7 +6,8 @@ import 'package:permission_handler/permission_handler.dart' as AppSettings;
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   // 🔹 Call this in initState or at app start
   void requestNotificationPermission() async {
@@ -20,7 +21,8 @@ class NotificationServices {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('✅ User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       debugPrint('⚠️ User granted provisional permission');
     } else {
       AppSettings.openAppSettings();
@@ -28,18 +30,43 @@ class NotificationServices {
     }
   }
 
+  // Check if notifications are enabled from device settings
+  Future<bool> areNotificationsEnabled() async {
+    final NotificationSettings settings = await messaging
+        .getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
   void firebaseInit() {
-    FirebaseMessaging.onMessage.listen((message) {
+    FirebaseMessaging.onMessage.listen((message) async {
       debugPrint('🔔 Foreground Message: ${message.notification?.title}');
-      showNotification(message);
+
+      // Check if notifications are enabled before showing
+      final bool notificationsEnabled = await areNotificationsEnabled();
+      if (notificationsEnabled) {
+        showNotification(message);
+      } else {
+        debugPrint(
+          '🔕 Notifications disabled from device settings - not showing notification',
+        );
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      debugPrint('📲 Notification tapped (app opened): ${message.notification?.title}');
+      debugPrint(
+        '📲 Notification tapped (app opened): ${message.notification?.title}',
+      );
     });
   }
 
   Future<void> showNotification(RemoteMessage message) async {
+    // Double-check permission before showing notification
+    final bool notificationsEnabled = await areNotificationsEnabled();
+    if (!notificationsEnabled) {
+      debugPrint('🔕 Notifications disabled - skipping notification display');
+      return;
+    }
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(100000).toString(),
       'High Importance Notifications',
@@ -80,15 +107,21 @@ class NotificationServices {
   }
 
   void initLocalNotifications(BuildContext context) async {
-    const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@drawable/notification_icon');
+    const AndroidInitializationSettings androidInit =
+        AndroidInitializationSettings('@drawable/notification_icon');
     const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
 
-    const InitializationSettings initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidInit,
+      iOS: iosInit,
+    );
 
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint('🔹 Notification tapped (foreground/local): ${response.payload}');
+        debugPrint(
+          '🔹 Notification tapped (foreground/local): ${response.payload}',
+        );
       },
     );
   }

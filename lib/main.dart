@@ -7,21 +7,41 @@ import 'package:personal_wellness/core/services/server_key.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final GlobalKey<NavigatorState> nevegator = GlobalKey();
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
-  const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@drawable/notification_icon');
-  const InitializationSettings initSettings = InitializationSettings(android: androidInit);
+  // Check if notifications are enabled from device settings
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
+  final NotificationSettings settings = await messaging
+      .getNotificationSettings();
+  final bool notificationsEnabled =
+      settings.authorizationStatus == AuthorizationStatus.authorized ||
+      settings.authorizationStatus == AuthorizationStatus.provisional;
+
+  if (!notificationsEnabled) {
+    debugPrint(
+      '🔕 Background: Notifications disabled from device settings - not showing notification',
+    );
+    return;
+  }
+
+  const AndroidInitializationSettings androidInit =
+      AndroidInitializationSettings('@drawable/notification_icon');
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidInit,
+  );
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
   const NotificationDetails notificationDetails = NotificationDetails(
     android: AndroidNotificationDetails(
       'bg_channel',
       'Background Notifications',
-      channelDescription: 'Notifications when app is terminated or in background',
+      channelDescription:
+          'Notifications when app is terminated or in background',
       importance: Importance.max,
       priority: Priority.high,
     ),
@@ -46,9 +66,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Print server key to console
   try {
@@ -58,9 +76,13 @@ void main() async {
   }
 
   // Initialize local notifications (for foreground use)
-  const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@drawable/notification_icon');
+  const AndroidInitializationSettings androidInit =
+      AndroidInitializationSettings('@drawable/notification_icon');
   const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
-  const InitializationSettings initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidInit,
+    iOS: iosInit,
+  );
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
   // Background message handler registration

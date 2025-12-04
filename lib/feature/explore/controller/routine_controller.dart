@@ -82,15 +82,24 @@ class RoutineController extends GetxController {
   var selectedOrder = 0.obs;
   var selectedEveningOrder = 0.obs;
   final List<String> availableTimes = [
-    '12:00 am', '12:15 am', '12:30 am', '12:45 am',
-    '1:00 am', '1:15 am', '1:30 am', '1:45 am',
-  
+    '12:00 am',
+    '12:15 am',
+    '12:30 am',
+    '12:45 am',
+    '1:00 am',
+    '1:15 am',
+    '1:30 am',
+    '1:45 am',
   ];
   final List<String> availableeveningTimes = [
-    '12:00 pm', '12:15 pm', '12:30 pm', '12:45 pm',
-    '1:00 pm', '1:15 pm', '1:30 pm', '1:45 pm',
-   
-    
+    '12:00 pm',
+    '12:15 pm',
+    '12:30 pm',
+    '12:45 pm',
+    '1:00 pm',
+    '1:15 pm',
+    '1:30 pm',
+    '1:45 pm',
   ];
 
   var selectedEveningTimes = <String>[].obs;
@@ -116,9 +125,11 @@ class RoutineController extends GetxController {
 
   final RxString instructionText = ''.obs;
 
-  bool get hasMorningRoutine => selectedOrder.value != 0 && selectedTimes.isNotEmpty;
-  
-  bool get hasEveningRoutine => selectedEveningOrder.value != 0 && selectedEveningTimes.isNotEmpty;
+  bool get hasMorningRoutine =>
+      selectedOrder.value != 0 && selectedTimes.isNotEmpty;
+
+  bool get hasEveningRoutine =>
+      selectedEveningOrder.value != 0 && selectedEveningTimes.isNotEmpty;
 
   bool get isFormValid {
     // Check if at least one routine is selected (morning OR evening)
@@ -144,127 +155,146 @@ class RoutineController extends GetxController {
   var progress = 0.obs;
   var progressMessage = 'Setting up your routine...'.obs;
 
-  final RxList<RoutineItem> routines = <RoutineItem>[].obs;  // For time slots view (no completed)
-  final RxList<RoutineItem> allDayRoutines = <RoutineItem>[].obs;  // For All Day section (no completed)
-  final RxList<RoutineItem> timeSlotRoutines = <RoutineItem>[].obs;  // For timeline display (includes completed)
+  final RxList<RoutineItem> routines =
+      <RoutineItem>[].obs; // For time slots view (no completed)
+  final RxList<RoutineItem> allDayRoutines =
+      <RoutineItem>[].obs; // For All Day section (no completed)
+  final RxList<RoutineItem> timeSlotRoutines =
+      <RoutineItem>[].obs; // For timeline display (includes completed)
   var isLoadingRoutines = false.obs;
 
-void submitRoutine() async {
-  try {
-    progress.value = 0;
-    progressMessage.value = 'Setting up your routine';
-
-    // Debug print all the data being sent
-    debugPrint('=== Submitting Routine ===');
-    debugPrint('Product ID: ${productId.value}');
-    debugPrint('Product Name: ${productName.value}');
-    debugPrint('Category: ${selectedCategory.value}');
-    debugPrint('Start Date: ${startDate.value}');
-    debugPrint('End Date: ${endDate.value}');
-    debugPrint('Morning Order: ${selectedOrder.value}');
-    debugPrint('Morning Times: ${selectedTimes.toList()}');
-    debugPrint('Evening Order: ${selectedEveningOrder.value}');
-    debugPrint('Evening Times: ${selectedEveningTimes.toList()}');
-    debugPrint('Instructions: ${instructionText.value}');
-
-
-    await Future.delayed(const Duration(seconds: 1));
-    progress.value = 50;
-    progressMessage.value = 'Adding to routine';
-
-    // Call server API to add the routine as well
+  void submitRoutine() async {
     try {
-      // Convert times to server format (HH:mm)
-      List<String>? morningTimes;
-      List<String>? eveningTimes;
-      if (selectedTimes.isNotEmpty) {
-        morningTimes = selectedTimes.map((t) => _convertTo24Hour(t)).whereType<String>().toList();
-      }
-      if (selectedEveningTimes.isNotEmpty) {
-        eveningTimes = selectedEveningTimes.map((t) => _convertTo24Hour(t)).whereType<String>().toList();
+      progress.value = 0;
+      progressMessage.value = 'Setting up your routine';
+
+      // Debug print all the data being sent
+      debugPrint('=== Submitting Routine ===');
+      debugPrint('Product ID: ${productId.value}');
+      debugPrint('Product Name: ${productName.value}');
+      debugPrint('Category: ${selectedCategory.value}');
+      debugPrint('Start Date: ${startDate.value}');
+      debugPrint('End Date: ${endDate.value}');
+      debugPrint('Morning Order: ${selectedOrder.value}');
+      debugPrint('Morning Times: ${selectedTimes.toList()}');
+      debugPrint('Evening Order: ${selectedEveningOrder.value}');
+      debugPrint('Evening Times: ${selectedEveningTimes.toList()}');
+      debugPrint('Instructions: ${instructionText.value}');
+
+      await Future.delayed(const Duration(seconds: 1));
+      progress.value = 50;
+      progressMessage.value = 'Adding to routine';
+
+      // Call server API to add the routine as well
+      try {
+        // Convert times to server format (HH:mm)
+        List<String>? morningTimes;
+        List<String>? eveningTimes;
+        if (selectedTimes.isNotEmpty) {
+          morningTimes = selectedTimes
+              .map((t) => _convertTo24Hour(t))
+              .whereType<String>()
+              .toList();
+        }
+        if (selectedEveningTimes.isNotEmpty) {
+          eveningTimes = selectedEveningTimes
+              .map((t) => _convertTo24Hour(t))
+              .whereType<String>()
+              .toList();
+        }
+
+        final apiSuccess = await ApiService.addProductToRoutine(
+          productId: productId.value,
+          category: selectedCategory.value.isEmpty
+              ? 'Skin Product'
+              : selectedCategory.value,
+          startDate: startDate.value ?? DateTime.now(),
+          endDate:
+              endDate.value ?? (DateTime.now().add(const Duration(days: 1))),
+          morningOrder: selectedOrder.value == 0 ? null : selectedOrder.value,
+          morningTimeOfDay: morningTimes,
+          eveningOrder: selectedEveningOrder.value == 0
+              ? null
+              : selectedEveningOrder.value,
+          eveningTimeOfDay: eveningTimes,
+          additionalIntroduction: instructionText.value,
+        );
+
+        if (!apiSuccess) {
+          Get.snackbar(
+            'Routine',
+            'Failed to add routine to server. Saved locally.',
+          );
+          debugPrint('API returned failure, continuing to save locally');
+        } else {
+          debugPrint('Routine successfully added on server');
+        }
+      } catch (e) {
+        debugPrint('Exception while calling addProductToRoutine: $e');
       }
 
-      final apiSuccess = await ApiService.addProductToRoutine(
-        productId: productId.value,
-        category: selectedCategory.value.isEmpty ? 'Skin Product' : selectedCategory.value,
-        startDate: startDate.value ?? DateTime.now(),
-        endDate: endDate.value ?? (DateTime.now().add(const Duration(days: 1))),
-        morningOrder: selectedOrder.value == 0 ? null : selectedOrder.value,
-        morningTimeOfDay: morningTimes,
-        eveningOrder: selectedEveningOrder.value == 0 ? null : selectedEveningOrder.value,
-        eveningTimeOfDay: eveningTimes,
-        additionalIntroduction: instructionText.value,
-      );
+      // Create routine items from selected times and save to SharedPreferences
+      await _addRoutinesToSharedPreferences();
 
-      if (!apiSuccess) {
-        Get.snackbar('Routine', 'Failed to add routine to server. Saved locally.');
-        debugPrint('API returned failure, continuing to save locally');
-      } else {
-        debugPrint('Routine successfully added on server');
+      await Future.delayed(const Duration(seconds: 1));
+      progress.value = 75;
+      progressMessage.value = 'Almost done';
+
+      // Refresh routines from SharedPreferences
+      await loadRoutinesFromSharedPreferences();
+
+      progress.value = 100;
+      progressMessage.value = 'Routine added successfully!';
+
+      // Trigger global event to notify all listeners
+      RoutineEvents.instance.notifyRoutineAdded();
+
+      // Refresh Today controller to show new routine immediately
+      try {
+        final todayController = Get.find<TodayController>();
+        debugPrint('Refreshing Today controller after routine added');
+        await todayController.refreshRoutineData();
+      } catch (e) {
+        debugPrint('Today controller not found or error refreshing: $e');
+        // This is normal if Today tab hasn't been visited yet
       }
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Reset form
+      selectedCategory.value = '';
+      startDate.value = null;
+      endDate.value = null;
+      selectedOrder.value = 0;
+      selectedEveningOrder.value = 0;
+      selectedTimes.clear();
+      selectedEveningTimes.clear();
+      instructionText.value = '';
+      productName.value = '';
+      productId.value = '';
+      instructionController.clear();
+
+      Get.back();
+      final BottomNavcontroller navController = Get.find();
+      Get.off(() => BottomNavbar());
+      navController.changeIndex(2);
     } catch (e) {
-      debugPrint('Exception while calling addProductToRoutine: $e');
+      debugPrint('Error in submitRoutine: $e');
+      progress.value = 100;
+      progressMessage.value = 'Error occurred';
     }
-
-    // Create routine items from selected times and save to SharedPreferences
-    await _addRoutinesToSharedPreferences();
-
-    await Future.delayed(const Duration(seconds: 1));
-    progress.value = 75;
-    progressMessage.value = 'Almost done';
-
-    // Refresh routines from SharedPreferences
-    await loadRoutinesFromSharedPreferences();
-    
-    progress.value = 100;
-    progressMessage.value = 'Routine added successfully!';
-    
-    // Trigger global event to notify all listeners
-    RoutineEvents.instance.notifyRoutineAdded();
-    
-    // Refresh Today controller to show new routine immediately
-    try {
-      final todayController = Get.find<TodayController>();
-      debugPrint('Refreshing Today controller after routine added');
-      await todayController.refreshRoutineData();
-    } catch (e) {
-      debugPrint('Today controller not found or error refreshing: $e');
-      // This is normal if Today tab hasn't been visited yet
-    }
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Reset form
-    selectedCategory.value = '';
-    startDate.value = null;
-    endDate.value = null;
-    selectedOrder.value = 0;
-    selectedEveningOrder.value = 0;
-    selectedTimes.clear();
-    selectedEveningTimes.clear();
-    instructionText.value = '';
-    productName.value = '';
-    productId.value = '';
-    instructionController.clear();
-
-    Get.back();
-    final BottomNavcontroller navController = Get.find();
-    Get.off(() => BottomNavbar());
-    navController.changeIndex(2);
-  } catch (e) {
-    debugPrint('Error in submitRoutine: $e');
-    progress.value = 100;
-    progressMessage.value = 'Error occurred';
   }
-}
+
   // Add routines to SharedPreferences when user submits a new routine
   Future<void> _addRoutinesToSharedPreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Get existing routines from SharedPreferences
       final existingRoutinesJson = prefs.getString('saved_routines') ?? '[]';
-      final List<dynamic> existingRoutinesList = jsonDecode(existingRoutinesJson);
+      final List<dynamic> existingRoutinesList = jsonDecode(
+        existingRoutinesJson,
+      );
       final List<RoutineItem> existingRoutines = existingRoutinesList
           .map((json) => RoutineItem.fromJson(json))
           .toList();
@@ -283,57 +313,71 @@ void submitRoutine() async {
 
       // Generate new routines from selected times
       List<RoutineItem> newRoutines = [];
-      
-      // Add morning routines
-        // Add morning routines (valid for only one day)
-        for (String morningTime in selectedTimes) {
-          // Remove older items for the same time slot so only the latest stays
-          existingRoutines.removeWhere((r) => _isSameTimeSlot(r.time, morningTime));
-          final start = startDate.value ?? DateTime.now();
-          final end = start.add(Duration(days: 1));
-          final newRoutine = RoutineItem(
-            productName: '${productName.value} (Morning)',
-            backgroundColor: colors[newRoutines.length % colors.length],
-            time: morningTime,
-            productId: productId.value,
-            startDate: start,
-            endDate: end,
-            id: '${productId.value}_morning_${morningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
-          );
-          newRoutines.add(newRoutine);
-          debugPrint('Created morning routine: ${productName.value} at $morningTime');
-        }
 
-        // Add evening routines (valid for only one day)
-        for (String eveningTime in selectedEveningTimes) {
-          // Remove older items for the same time slot so only the latest stays
-          existingRoutines.removeWhere((r) => _isSameTimeSlot(r.time, eveningTime));
-          final start = startDate.value ?? DateTime.now();
-          final end = start.add(Duration(days: 1));
-          final newRoutine = RoutineItem(
-            productName: '${productName.value} (Evening)',
-            backgroundColor: colors[newRoutines.length % colors.length],
-            time: eveningTime,
-            productId: productId.value,
-            startDate: start,
-            endDate: end,
-            id: '${productId.value}_evening_${eveningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
-          );
-          newRoutines.add(newRoutine);
-          debugPrint('Created evening routine: ${productName.value} at $eveningTime');
-        }
+      // Add morning routines
+      // Add morning routines (valid for only one day)
+      for (String morningTime in selectedTimes) {
+        // Remove older items for the same time slot so only the latest stays
+        existingRoutines.removeWhere(
+          (r) => _isSameTimeSlot(r.time, morningTime),
+        );
+        final start = startDate.value ?? DateTime.now();
+        final end = start.add(Duration(days: 1));
+        final newRoutine = RoutineItem(
+          productName: '${productName.value} (Morning)',
+          backgroundColor: colors[newRoutines.length % colors.length],
+          time: morningTime,
+          productId: productId.value,
+          startDate: start,
+          endDate: end,
+          id: '${productId.value}_morning_${morningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+        );
+        newRoutines.add(newRoutine);
+        debugPrint(
+          'Created morning routine: ${productName.value} at $morningTime',
+        );
+      }
+
+      // Add evening routines (valid for only one day)
+      for (String eveningTime in selectedEveningTimes) {
+        // Remove older items for the same time slot so only the latest stays
+        existingRoutines.removeWhere(
+          (r) => _isSameTimeSlot(r.time, eveningTime),
+        );
+        final start = startDate.value ?? DateTime.now();
+        final end = start.add(Duration(days: 1));
+        final newRoutine = RoutineItem(
+          productName: '${productName.value} (Evening)',
+          backgroundColor: colors[newRoutines.length % colors.length],
+          time: eveningTime,
+          productId: productId.value,
+          startDate: start,
+          endDate: end,
+          id: '${productId.value}_evening_${eveningTime}_${DateTime.now().millisecondsSinceEpoch}_${newRoutines.length}',
+        );
+        newRoutines.add(newRoutine);
+        debugPrint(
+          'Created evening routine: ${productName.value} at $eveningTime',
+        );
+      }
 
       // Add new routines to existing ones (don't replace, add to the list)
       existingRoutines.addAll(newRoutines);
-      
+
       // Convert back to JSON and save
-      final allRoutinesJson = jsonEncode(existingRoutines.map((r) => r.toJson()).toList());
+      final allRoutinesJson = jsonEncode(
+        existingRoutines.map((r) => r.toJson()).toList(),
+      );
       await prefs.setString('saved_routines', allRoutinesJson);
-      
-      debugPrint('=== Saved ${newRoutines.length} new routines to SharedPreferences ===');
+
+      debugPrint(
+        '=== Saved ${newRoutines.length} new routines to SharedPreferences ===',
+      );
       debugPrint('New routines added:');
       for (var routine in newRoutines) {
-        debugPrint('- ${routine.productName} at ${routine.time} (ID: ${routine.id})');
+        debugPrint(
+          '- ${routine.productName} at ${routine.time} (ID: ${routine.id})',
+        );
       }
       debugPrint('Total routines now: ${existingRoutines.length}');
     } catch (e) {
@@ -346,11 +390,11 @@ void submitRoutine() async {
     try {
       isLoadingRoutines.value = true;
       debugPrint('=== Loading Routines from SharedPreferences ===');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final routinesJson = prefs.getString('saved_routines') ?? '[]';
       final List<dynamic> routinesList = jsonDecode(routinesJson);
-      
+
       if (routinesList.isEmpty) {
         debugPrint('No routines found in SharedPreferences');
         routines.clear();
@@ -364,28 +408,40 @@ void submitRoutine() async {
           .map((json) => RoutineItem.fromJson(json))
           .toList();
 
-      debugPrint('Loaded ${loadedRoutines.length} routines from SharedPreferences');
+      debugPrint(
+        'Loaded ${loadedRoutines.length} routines from SharedPreferences',
+      );
 
       // Purge expired items and save back if any were removed
       final int beforePurge = loadedRoutines.length;
       loadedRoutines.removeWhere((r) => r.endDate.isBefore(DateTime.now()));
       // Extra cleanup: remove legacy items older than 24 hours based on timestamp in id
       final int beforeLegacyCleanup = loadedRoutines.length;
-      final DateTime cutoff = DateTime.now().subtract(const Duration(hours: 24));
+      final DateTime cutoff = DateTime.now().subtract(
+        const Duration(hours: 24),
+      );
       loadedRoutines.removeWhere((r) {
         final ts = _extractTimestampFromId(r.id);
         // If timestamp is missing/unparsable (legacy), drop it; else keep only newer than cutoff
         return ts == null || ts.isBefore(cutoff);
       });
       if (loadedRoutines.length != beforePurge) {
-        final purgedJson = jsonEncode(loadedRoutines.map((r) => r.toJson()).toList());
+        final purgedJson = jsonEncode(
+          loadedRoutines.map((r) => r.toJson()).toList(),
+        );
         await prefs.setString('saved_routines', purgedJson);
-        debugPrint('Purged ${beforePurge - loadedRoutines.length} expired routines');
+        debugPrint(
+          'Purged ${beforePurge - loadedRoutines.length} expired routines',
+        );
       }
       if (loadedRoutines.length != beforeLegacyCleanup) {
-        final cleanedJson = jsonEncode(loadedRoutines.map((r) => r.toJson()).toList());
+        final cleanedJson = jsonEncode(
+          loadedRoutines.map((r) => r.toJson()).toList(),
+        );
         await prefs.setString('saved_routines', cleanedJson);
-        debugPrint('Removed ${beforeLegacyCleanup - loadedRoutines.length} legacy routines older than 24h');
+        debugPrint(
+          'Removed ${beforeLegacyCleanup - loadedRoutines.length} legacy routines older than 24h',
+        );
       }
 
       // Sort routines by time (no more time-based filtering)
@@ -403,20 +459,26 @@ void submitRoutine() async {
 
       // Time slot routines (for timeline display) - includes ALL routines (even completed)
       timeSlotRoutines.assignAll(loadedRoutines);
-      
+
       // Filter out completed routines for "all day" and "today" views
-      final filteredRoutines = await _getFilteredRoutinesForTimeSlots(loadedRoutines);
-      
+      final filteredRoutines = await _getFilteredRoutinesForTimeSlots(
+        loadedRoutines,
+      );
+
       // All day routines (for "All Day" section) - excludes completed
       allDayRoutines.assignAll(filteredRoutines);
-      
-      // Time slots view routines (for "Today" section) - excludes completed  
+
+      // Time slots view routines (for "Today" section) - excludes completed
       routines.assignAll(filteredRoutines);
 
-      debugPrint('Time Slot Routines (includes completed): ${timeSlotRoutines.length}');
-      debugPrint('All Day Routines (excludes completed): ${allDayRoutines.length}');
+      debugPrint(
+        'Time Slot Routines (includes completed): ${timeSlotRoutines.length}',
+      );
+      debugPrint(
+        'All Day Routines (excludes completed): ${allDayRoutines.length}',
+      );
       debugPrint('Today Routines (excludes completed): ${routines.length}');
-      
+
       for (int i = 0; i < loadedRoutines.length; i++) {
         final routine = loadedRoutines[i];
         debugPrint('${i + 1}. ${routine.productName} at ${routine.time}');
@@ -432,16 +494,20 @@ void submitRoutine() async {
   }
 
   // Get filtered routines for time slots (remove completed ones)
-  Future<List<RoutineItem>> _getFilteredRoutinesForTimeSlots(List<RoutineItem> allRoutines) async {
+  Future<List<RoutineItem>> _getFilteredRoutinesForTimeSlots(
+    List<RoutineItem> allRoutines,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      
+
       return allRoutines.where((routine) {
         final completionKey = 'completed_${routine.id}_$today';
         final isCompleted = prefs.getBool(completionKey) ?? false;
         if (isCompleted) {
-          debugPrint('Filtering out completed routine: ${routine.productName} at ${routine.time}');
+          debugPrint(
+            'Filtering out completed routine: ${routine.productName} at ${routine.time}',
+          );
         }
         return !isCompleted;
       }).toList();
@@ -456,15 +522,16 @@ void submitRoutine() async {
     try {
       // Normalize time string format
       String normalizedTime = timeStr.replaceAll('.', ':').trim();
-      
+
       // Ensure proper AM/PM formatting
-      if (!normalizedTime.toLowerCase().contains('am') && !normalizedTime.toLowerCase().contains('pm')) {
+      if (!normalizedTime.toLowerCase().contains('am') &&
+          !normalizedTime.toLowerCase().contains('pm')) {
         normalizedTime += ' am'; // Default to AM if no period specified
       }
-      
+
       // Convert to uppercase for proper parsing since DateFormat expects uppercase AM/PM
       String upperTime = normalizedTime.toUpperCase();
-      
+
       // Use 'aa' for full form (AM/PM) or 'a' for single character (A/P)
       DateFormat format;
       if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
@@ -473,7 +540,7 @@ void submitRoutine() async {
         format = DateFormat('h:mm a'); // For "6:30 A" or "6:30 P"
       }
       final parsedTime = format.parse(upperTime);
-      
+
       // Return minutes from midnight for sorting
       return parsedTime.hour * 60 + parsedTime.minute;
     } catch (e) {
@@ -540,14 +607,12 @@ void submitRoutine() async {
     await loadRoutinesFromSharedPreferences();
   }
 
-
-
   // Method to mark a specific routine as completed
   Future<void> markRoutineCompleted(String routineId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      
+
       // Find the routine to mark as completed
       final routineToComplete = routines.firstWhere(
         (routine) => routine.id == routineId,
@@ -556,31 +621,33 @@ void submitRoutine() async {
           orElse: () => throw Exception('Routine not found'),
         ),
       );
-      
+
       debugPrint('=== Marking Routine as Completed ===');
-      debugPrint('Routine: ${routineToComplete.productName} at ${routineToComplete.time}');
+      debugPrint(
+        'Routine: ${routineToComplete.productName} at ${routineToComplete.time}',
+      );
       debugPrint('Routine ID: $routineId');
-      
+
       // Create completion key using routine ID
       final completionKey = 'completed_${routineId}_$today';
-      
+
       // Save completion status
       await prefs.setBool(completionKey, true);
-      
+
       // Remove from "All Day" section (allDayRoutines)
       allDayRoutines.removeWhere((routine) => routine.id == routineId);
-      
-      // Remove from "Today" section (routines) 
+
+      // Remove from "Today" section (routines)
       routines.removeWhere((routine) => routine.id == routineId);
-      
+
       // BUT keep in timeSlotRoutines for timeline display (stays in time slot)
       // timeSlotRoutines keeps all routines regardless of completion status
-      
+
       // Force refresh the reactive lists
       routines.refresh();
       allDayRoutines.refresh();
       timeSlotRoutines.refresh();
-      
+
       debugPrint('✅ Routine marked as completed');
       debugPrint('❌ Removed from All Day section');
       debugPrint('❌ Removed from Today section');
@@ -589,7 +656,7 @@ void submitRoutine() async {
       debugPrint('Remaining All Day routines: ${allDayRoutines.length}');
       debugPrint('Remaining Today routines: ${routines.length}');
       debugPrint('Time Slot routines (all): ${timeSlotRoutines.length}');
-      
+
       // Notify today controller to refresh
       try {
         final todayController = Get.find<TodayController>();
@@ -597,16 +664,17 @@ void submitRoutine() async {
       } catch (e) {
         debugPrint('Today controller not found: $e');
       }
-      
+
       // Refresh progress controller to update timeline and charts
       try {
-        final progressController = Get.find<ProgressController>();
+        final progressController = Get.find<ProgressController>(
+          tag: 'progress',
+        );
         await progressController.fetchRoutineChartData();
         await progressController.refreshTimelineData();
       } catch (e) {
         debugPrint('Progress controller not found: $e');
       }
-      
     } catch (e) {
       debugPrint('Error marking routine as completed: $e');
     }
@@ -620,10 +688,11 @@ void submitRoutine() async {
         (r) => r.productId == productId,
         orElse: () => allDayRoutines.firstWhere(
           (r) => r.productId == productId,
-          orElse: () => throw Exception('No routine found for product: $productId'),
+          orElse: () =>
+              throw Exception('No routine found for product: $productId'),
         ),
       );
-      
+
       await markRoutineCompleted(routine.id);
     } catch (e) {
       debugPrint('Error marking routine by product ID: $e');
@@ -659,10 +728,12 @@ void submitRoutine() async {
     super.onInit();
     // Don't use Get.arguments here as it can conflict with AddToRoutine's arguments handling
     // Product name will be set via setProductName() from AddToRoutine
-    
+
     // Load routines from SharedPreferences when controller initializes
     // Start migration + routines load
-    _runOneTimeMigrationIfNeeded().then((_) => loadRoutinesFromSharedPreferences());
+    _runOneTimeMigrationIfNeeded().then(
+      (_) => loadRoutinesFromSharedPreferences(),
+    );
 
     // Load current user's name from Firebase Auth / Firestore and cache locally
     loadAndCacheUserName();
