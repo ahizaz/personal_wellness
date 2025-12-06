@@ -166,50 +166,167 @@ class TodayController extends GetxController {
       // Sort by time of day (chronological order: morning -> afternoon -> evening)
       int _parseTimeForSorting(String timeStr) {
         try {
+          if (timeStr.isEmpty) {
+            return 1440; // Put empty times at the end
+          }
+
           // Normalize time string format
           String normalizedTime = timeStr.replaceAll('.', ':').trim();
+          
+          // Check if it contains period indicators (morning/afternoon/night/evening)
+          final lowerTime = normalizedTime.toLowerCase();
+          if (lowerTime.contains('morning')) {
+            // Morning routines: assign to early hours (6-11 AM)
+            return 360; // 6:00 AM as default morning time
+          } else if (lowerTime.contains('afternoon')) {
+            // Afternoon routines: assign to afternoon hours (12-5 PM)
+            return 840; // 2:00 PM as default afternoon time
+          } else if (lowerTime.contains('night') || lowerTime.contains('evening')) {
+            // Night/Evening routines: assign to evening hours (6-11 PM)
+            return 1200; // 8:00 PM as default evening time
+          }
 
           // Ensure proper AM/PM formatting
-          if (!normalizedTime.toLowerCase().contains('am') &&
-              !normalizedTime.toLowerCase().contains('pm')) {
-            normalizedTime += ' am'; // Default to AM if no period specified
+          bool hasAm = lowerTime.contains('am');
+          bool hasPm = lowerTime.contains('pm');
+          
+          if (!hasAm && !hasPm) {
+            // If no AM/PM specified, try to infer from context or default to AM
+            normalizedTime += ' am';
           }
 
           // Convert to uppercase for proper parsing
           String upperTime = normalizedTime.toUpperCase();
 
-          // Parse the time
-          DateFormat format;
-          if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
-            format = DateFormat('h:mm aa'); // For "6:30 AM" or "6:30 PM"
-          } else {
-            format = DateFormat('h:mm a'); // For "6:30 A" or "6:30 P"
+          // Try multiple date formats
+          List<DateFormat> formats = [
+            DateFormat('h:mm aa'),      // "6:30 AM" or "6:30 PM"
+            DateFormat('h:mm a'),       // "6:30 A" or "6:30 P"
+            DateFormat('h:m aa'),       // "6:3 AM" format
+            DateFormat('h:m a'),        // "6:3 A" format
+            DateFormat('hh:mm aa'),     // "06:30 AM"
+            DateFormat('hh:mm a'),      // "06:30 A"
+            DateFormat('h:mmaa'),       // "6:30AM" (no space)
+            DateFormat('h:mma'),        // "6:30AM" (no space, short)
+          ];
+
+          for (DateFormat format in formats) {
+            try {
+              final parsedTime = format.parse(upperTime);
+              int minutes = parsedTime.hour * 60 + parsedTime.minute;
+              
+              // Handle 12:00 AM (midnight) and 12:00 PM (noon) correctly
+              if (parsedTime.hour == 12) {
+                if (hasAm) {
+                  minutes = parsedTime.minute; // 12:XX AM = 0:XX (midnight)
+                } else if (hasPm) {
+                  minutes = 720 + parsedTime.minute; // 12:XX PM = 12:XX (noon)
+                }
+              }
+              
+              return minutes;
+            } catch (e) {
+              // Try next format
+              continue;
+            }
           }
 
-          try {
-            final parsedTime = format.parse(upperTime);
-            // Return minutes since midnight for sorting
-            return parsedTime.hour * 60 + parsedTime.minute;
-          } catch (e) {
-            // Try alternative formats
-            DateFormat alternativeFormat;
-            if (upperTime.endsWith('AM') || upperTime.endsWith('PM')) {
-              alternativeFormat = DateFormat('h:m aa'); // For "6:3 AM" format
-            } else {
-              alternativeFormat = DateFormat('h:m a'); // For "6:3 A" format
+          // If all parsing fails, try manual parsing
+          final regex = RegExp(r'(\d{1,2}):(\d{1,2})\s*(am|pm|AM|PM|a|p|A|P)');
+          final match = regex.firstMatch(upperTime);
+          if (match != null) {
+            int hour = int.parse(match.group(1)!);
+            int minute = int.parse(match.group(2)!);
+            String period = match.group(3)!.toUpperCase();
+            
+            // Convert to 24-hour format
+            if (period.contains('AM')) {
+              if (hour == 12) {
+                hour = 0; // 12:XX AM = 0:XX
+              }
+            } else if (period.contains('PM')) {
+              if (hour != 12) {
+                hour += 12; // 1-11 PM = 13-23
+              }
             }
-            final parsedTime = alternativeFormat.parse(upperTime);
-            return parsedTime.hour * 60 + parsedTime.minute;
+            
+            return hour * 60 + minute;
           }
+
+          debugPrint('Failed to parse time for sorting: $timeStr');
+          return 1440; // Put unparseable times at the end
         } catch (e) {
-          debugPrint('Failed to parse time for sorting: $timeStr, error: $e');
-          return 0; // Default to start of day if parsing fails
+          debugPrint('Error parsing time for sorting: $timeStr, error: $e');
+          return 1440; // Put errors at the end
         }
+      }
+
+      // Helper function to get period priority (morning=1, afternoon=2, night/evening=3)
+      int _getPeriodPriority(Map<String, dynamic> routine) {
+        final productName = (routine['productName'] ?? '').toString().toLowerCase();
+        final id = (routine['id'] ?? '').toString().toLowerCase();
+        final time = (routine['time'] ?? '').toString().toLowerCase();
+        
+        // Check product name first
+        if (productName.contains('morning')) return 1;
+        if (productName.contains('afternoon')) return 2;
+        if (productName.contains('night') || productName.contains('evening')) return 3;
+        
+        // Check ID
+        if (id.contains('morning')) return 1;
+        if (id.contains('afternoon')) return 2;
+        if (id.contains('night') || id.contains('evening')) return 3;
+        
+        // Check time string
+        if (time.contains('morning')) return 1;
+        if (time.contains('afternoon')) return 2;
+        if (time.contains('night') || time.contains('evening')) return 3;
+        
+        // Infer from time value (AM = morning, PM = afternoon/evening)
+        if (time.contains('am')) {
+          // Parse hour to determine if it's morning (before 12 PM)
+          try {
+            final regex = RegExp(r'(\d{1,2})');
+            final match = regex.firstMatch(time);
+            if (match != null) {
+              final hour = int.parse(match.group(1)!);
+              if (hour >= 6 && hour < 12) return 1; // Morning
+            }
+          } catch (e) {
+            // Ignore parsing errors
+          }
+          return 1; // Default AM to morning
+        } else if (time.contains('pm')) {
+          // Parse hour to determine if it's afternoon or evening
+          try {
+            final regex = RegExp(r'(\d{1,2})');
+            final match = regex.firstMatch(time);
+            if (match != null) {
+              final hour = int.parse(match.group(1)!);
+              // For PM times: 12 PM and 1-5 PM = afternoon, 6-11 PM = evening
+              if (hour == 12 || (hour >= 1 && hour < 6)) return 2; // Afternoon (12 PM - 5 PM)
+              if (hour >= 6 && hour < 12) return 3; // Evening (6 PM - 11 PM)
+            }
+          } catch (e) {
+            // Ignore parsing errors
+          }
+          return 2; // Default PM to afternoon
+        }
+        
+        return 0; // Unknown period
       }
 
       final List<Map<String, dynamic>> sortedByLatest =
           List<Map<String, dynamic>>.from(notCompletedToday)
             ..sort((a, b) {
+              // First, sort by period (morning -> afternoon -> night)
+              final aPeriod = _getPeriodPriority(a);
+              final bPeriod = _getPeriodPriority(b);
+              if (aPeriod != bPeriod) {
+                return aPeriod.compareTo(bPeriod);
+              }
+              
+              // If same period, sort by time
               final aTime = _parseTimeForSorting(a['time'] ?? '');
               final bTime = _parseTimeForSorting(b['time'] ?? '');
               return aTime.compareTo(bTime); // Ascending order: earliest first
