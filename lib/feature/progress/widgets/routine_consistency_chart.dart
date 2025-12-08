@@ -135,7 +135,10 @@ class RoutineConsistencyChart extends StatelessWidget {
                   : null,
               child: showGraph
                   ? Obx(() {
-                      // Build simple two-point lines: x=0 pending, x=1 completed
+                      // Observe local counts to trigger updates when they change
+                      controller.localCounts; // This makes the widget reactive to localCounts changes
+                      
+                      // Build simple two-point lines: x=0 completed, x=1 pending
                       final counts = isCurrentMonth
                           ? controller.getCurrentMonthCounts()
                           : controller.getPreviousMonthCounts();
@@ -143,6 +146,9 @@ class RoutineConsistencyChart extends StatelessWidget {
                           ? const Color(0xff1A5D1A)
                           : Colors.grey;
                       final maxY = controller.getMaxRoutineChartY();
+                      
+                      // Debug print to verify counts
+                      debugPrint('Chart counts for ${isCurrentMonth ? "current" : "previous"} month - Completed: ${counts['completed']}, Pending: ${counts['pending']}');
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

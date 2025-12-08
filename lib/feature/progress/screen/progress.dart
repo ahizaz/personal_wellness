@@ -34,6 +34,8 @@ class _ProgressDataState extends State<ProgressData>
     super.initState();
     controller = Get.put(ProgressController(), tag: 'progress');
     WidgetsBinding.instance.addObserver(this);
+    // Refresh local counts when screen is initialized
+    controller.refreshLocalCounts();
   }
 
   @override
@@ -53,6 +55,7 @@ class _ProgressDataState extends State<ProgressData>
   void didPopNext() {
     // Called when user returns to this screen from another screen
     controller.refreshPhotoProgress(); // Force refresh to get latest uploads
+    controller.refreshLocalCounts(); // Refresh routine counts
   }
 
   @override
@@ -60,6 +63,7 @@ class _ProgressDataState extends State<ProgressData>
     if (state == AppLifecycleState.resumed) {
       // Automatically refresh when app comes to foreground
       controller.refreshPhotoProgress(); // Force refresh
+      controller.refreshLocalCounts(); // Refresh routine counts
     }
   }
 

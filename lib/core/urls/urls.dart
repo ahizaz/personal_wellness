@@ -17,6 +17,7 @@ class Urls{
   static const String photoProgressGetAll = "$baseUrl/photo-progress/get-all"; // Photo progress get all endpoint
   static const String photoProgressTimeline = "$baseUrl/photo-progress/get-timeline"; // Photo progress timeline endpoint
   static const String routineconsistencyChart = "$baseUrl/add-routine/get-data-chart";
+  static const String routineChangeStatus = "$baseUrl/add-routine/change-status";
   static const String notificationsGetAll = "$baseUrl/push-notification/get-all";
   static const String updateProfile ="$baseUrl/user/update-profile";
   static const String addroutine = "$baseUrl/add-routine/add";

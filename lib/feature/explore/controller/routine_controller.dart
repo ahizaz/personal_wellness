@@ -15,6 +15,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
+import 'package:http/http.dart' as http;
+import 'package:personal_wellness/core/urls/urls.dart';
 
 class RoutineItem {
   final String productName;
@@ -257,6 +259,16 @@ class RoutineController extends GetxController {
       } catch (e) {
         debugPrint('Today controller not found or error refreshing: $e');
         // This is normal if Today tab hasn't been visited yet
+      }
+
+      // Refresh progress controller to update counts
+      try {
+        final progressController = Get.find<ProgressController>(
+          tag: 'progress',
+        );
+        await progressController.refreshLocalCounts();
+      } catch (e) {
+        debugPrint('Progress controller not found when adding routine: $e');
       }
 
       await Future.delayed(const Duration(seconds: 1));
@@ -672,6 +684,7 @@ class RoutineController extends GetxController {
         );
         await progressController.fetchRoutineChartData();
         await progressController.refreshTimelineData();
+        await progressController.refreshLocalCounts(); // Refresh local counts for chart
       } catch (e) {
         debugPrint('Progress controller not found: $e');
       }
@@ -680,9 +693,92 @@ class RoutineController extends GetxController {
     }
   }
 
+  // Helper method to get access token
+  Future<String?> getAccessToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+      return token;
+    } catch (e) {
+      debugPrint('Error getting access token: $e');
+      return null;
+    }
+  }
+
+  // Method to change routine status via API
+  Future<bool> changeRoutineStatus(String productId) async {
+    try {
+      final accessToken = await getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for change routine status');
+        return false;
+      }
+
+      final url = '${Urls.routineChangeStatus}/$productId';
+      debugPrint('=== PATCH API Call ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: {Content-Type: application/json, Authorization: Bearer [TOKEN]}');
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        debugPrint('=== Success ===');
+        debugPrint('Response Data: $data');
+        return true;
+      } else {
+        debugPrint('=== Error ===');
+        debugPrint('Failed with status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('=== Exception ===');
+      debugPrint('Error changing routine status: $e');
+      return false;
+    }
+  }
+
   // Method for backward compatibility - marks routine by product ID
   Future<void> markCurrentTimeSlotCompleted(String productId) async {
     try {
+      // First, call the PATCH API to change status
+      debugPrint('=== Changing Routine Status via API ===');
+      debugPrint('Product ID: $productId');
+      final apiSuccess = await changeRoutineStatus(productId);
+      
+      if (apiSuccess) {
+        debugPrint('✅ Routine status changed successfully via API');
+        
+        // Wait a bit for server to update data
+        await Future.delayed(Duration(milliseconds: 500));
+        
+        // Then fetch updated chart data
+        try {
+          final progressController = Get.find<ProgressController>(
+            tag: 'progress',
+          );
+          await progressController.fetchRoutineChartData();
+          debugPrint('✅ Chart data refreshed after status change');
+          
+          // Force UI update by refreshing the reactive variable
+          progressController.routineChartRaw.refresh();
+        } catch (e) {
+          debugPrint('Progress controller not found for chart refresh: $e');
+        }
+      } else {
+        debugPrint('⚠️ API call failed, but continuing with local update');
+      }
+
       // Find first routine with this product ID
       final routine = routines.firstWhere(
         (r) => r.productId == productId,

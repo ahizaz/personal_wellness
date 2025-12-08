@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
 import 'package:personal_wellness/feature/progress/screen/progress.dart';
+import 'package:intl/intl.dart';
 
 class ProgressController extends GetxController{
   var progressItems = <Map<String,dynamic>>[].obs;
@@ -48,6 +49,9 @@ class ProgressController extends GetxController{
   // Routine consistency chart raw data from API: {"MM-YYYY": {"pending": x, "completed": y}}
   final RxMap<String, dynamic> routineChartRaw = <String, dynamic>{}.obs;
   final RxBool isLoadingRoutineChart = false.obs;
+  
+  // Local counts calculated from today/all day routines
+  final RxMap<String, int> localCounts = <String, int>{'completed': 0, 'pending': 0}.obs;
   @override
   void onInit() {
    
@@ -56,6 +60,7 @@ class ProgressController extends GetxController{
     loadGraphData();
     getAllPhotoProgress(showLoading: true); // Load photo progress from API
     fetchRoutineChartData();
+    calculateLocalCounts(); // Calculate local counts from routines
   }
   
   // Load timeline data from API
@@ -144,12 +149,19 @@ class ProgressController extends GetxController{
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         if (body is Map && body['success'] == true && body['data'] is Map) {
-          routineChartRaw.assignAll(Map<String, dynamic>.from(body['data'] as Map));
+          final data = Map<String, dynamic>.from(body['data'] as Map);
+          
+          // Clear old data and assign new
+          routineChartRaw.clear();
+          routineChartRaw.addAll(data);
+          routineChartRaw.refresh(); // Force UI update
+          
+          debugPrint('Routine chart data updated: ${routineChartRaw.keys.length} months');
         } else {
-          debugPrint('Routine chart API returned unexpected payload: ${response.body}');
+          debugPrint('Routine chart API returned unexpected payload');
         }
       } else {
-        debugPrint('Routine chart API error ${response.statusCode}: ${response.body}');
+        debugPrint('Routine chart API error ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Routine chart fetch error: $e');
@@ -175,12 +187,27 @@ class ProgressController extends GetxController{
   Map<String, int> getCountsForMonthIndex(int monthIndex, {int? preferYear}) {
     int? bestYear;
     Map<String, int> result = { 'pending': 0, 'completed': 0 };
+    
+    if (routineChartRaw.isEmpty) {
+      return result;
+    }
+    
+    // First pass: try to find exact match with preferred year
     routineChartRaw.forEach((k, v) {
       final parsed = _parseMonthYearKey(k);
+      
       if (parsed.monthIndex == monthIndex) {
         if (preferYear == null || parsed.year == preferYear) {
           bestYear = parsed.year;
-          final map = (v is Map) ? v : <String, dynamic>{};
+          
+          // Ensure v is a Map
+          Map<String, dynamic> map;
+          if (v is Map) {
+            map = Map<String, dynamic>.from(v);
+          } else {
+            map = <String, dynamic>{};
+          }
+          
           result = {
             'pending': (map['pending'] is num) ? (map['pending'] as num).toInt() : 0,
             'completed': (map['completed'] is num) ? (map['completed'] as num).toInt() : 0,
@@ -188,12 +215,18 @@ class ProgressController extends GetxController{
         }
       }
     });
+    
     // If not found with preferYear, try any year
     if (bestYear == null && preferYear != null) {
       routineChartRaw.forEach((k, v) {
         final parsed = _parseMonthYearKey(k);
         if (parsed.monthIndex == monthIndex) {
-          final map = (v is Map) ? v : <String, dynamic>{};
+          Map<String, dynamic> map;
+          if (v is Map) {
+            map = Map<String, dynamic>.from(v);
+          } else {
+            map = <String, dynamic>{};
+          }
           result = {
             'pending': (map['pending'] is num) ? (map['pending'] as num).toInt() : 0,
             'completed': (map['completed'] is num) ? (map['completed'] as num).toInt() : 0,
@@ -201,20 +234,90 @@ class ProgressController extends GetxController{
         }
       });
     }
+    
     return result;
+  }
+
+  // Calculate completed and pending counts from local routines (today/all day)
+  Future<void> calculateLocalCounts() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      
+      // Get all routines from SharedPreferences
+      final routinesJson = prefs.getString('saved_routines') ?? '[]';
+      final List<dynamic> routinesList = jsonDecode(routinesJson);
+      
+      int completedCount = 0;
+      int pendingCount = 0;
+      
+      for (var routineJson in routinesList) {
+        final String id = (routineJson['id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        
+        final completionKey = 'completed_${id}_$todayStr';
+        final bool isCompleted = prefs.getBool(completionKey) ?? false;
+        
+        if (isCompleted) {
+          completedCount++;
+        } else {
+          pendingCount++;
+        }
+      }
+      
+      debugPrint('Local counts - Completed: $completedCount, Pending: $pendingCount');
+      localCounts.value = {
+        'completed': completedCount,
+        'pending': pendingCount,
+      };
+    } catch (e) {
+      debugPrint('Error calculating local counts: $e');
+      localCounts.value = {'completed': 0, 'pending': 0};
+    }
   }
 
   Map<String, int> getCurrentMonthCounts() {
     final now = DateTime.now();
-    return getCountsForMonthIndex(getCurrentMonthIndex(), preferYear: now.year);
+    final currentMonthIndex = getCurrentMonthIndex();
+    
+    // For current month, prioritize local counts (from today/all day routines)
+    if (currentMonthIndex == getCurrentMonthIndex()) {
+      // Use local counts if available (they reflect today/all day routines)
+      if (localCounts['pending']! > 0 || localCounts['completed']! > 0) {
+        return {
+          'completed': localCounts['completed'] ?? 0,
+          'pending': localCounts['pending'] ?? 0,
+        };
+      }
+    }
+    
+    // Fallback to API data
+    var result = getCountsForMonthIndex(currentMonthIndex, preferYear: now.year);
+    
+    // If no data found, try without year preference (any year)
+    if ((result['pending'] ?? 0) == 0 && (result['completed'] ?? 0) == 0) {
+      result = getCountsForMonthIndex(currentMonthIndex, preferYear: null);
+    }
+    
+    return result;
   }
 
   Map<String, int> getPreviousMonthCounts() {
     final now = DateTime.now();
-    // If previous month is December, prefer previous year
     final prevMonthIndex = getPreviousMonthIndex();
+    // If current month is January (0), previous month is December (11) of previous year
+    // Otherwise, previous month is in the same year
     final preferYear = (getCurrentMonthIndex() == 0) ? now.year - 1 : now.year;
-    return getCountsForMonthIndex(prevMonthIndex, preferYear: preferYear);
+    
+    // First try with preferred year
+    var result = getCountsForMonthIndex(prevMonthIndex, preferYear: preferYear);
+    
+    // If no data found, try without year preference (any year)
+    if ((result['pending'] ?? 0) == 0 && (result['completed'] ?? 0) == 0) {
+      result = getCountsForMonthIndex(prevMonthIndex, preferYear: null);
+    }
+    
+    return result;
   }
 
   double getMaxRoutineChartY() {
@@ -223,6 +326,11 @@ class ProgressController extends GetxController{
     final maxVal = [c['pending'] ?? 0, c['completed'] ?? 0, p['pending'] ?? 0, p['completed'] ?? 0].reduce((a, b) => a > b ? a : b);
     // Ensure a minimum headroom
     return (maxVal <= 0) ? 5 : (maxVal + 1).toDouble();
+  }
+  
+  // Method to refresh local counts (call this when routines are added/completed)
+  Future<void> refreshLocalCounts() async {
+    await calculateLocalCounts();
   }
   
   // Fallback static data in case API fails
