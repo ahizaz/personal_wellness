@@ -23,7 +23,7 @@ class GetStarted extends StatelessWidget {
             Spacer(),
             Padding(padding: EdgeInsets.symmetric(horizontal: 17.w),
             child: CustomButton(text: "Get Started ", color: Color(0xff0E1701), onTap: (){
-              Get.to(()=> SignInForm (),transition: Transition.noTransition);
+              Get.to(()=> const SignInForm(),transition: Transition.noTransition);
               
             })
             

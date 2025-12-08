@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/services/notification_services.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/question_answer.dart';
 
 class SignInPassController extends GetxController {
   var obscureText = true.obs;
@@ -63,7 +64,7 @@ class SignInPassController extends GetxController {
           await prefs.setString('accessToken', accessToken);
           await prefs.setString('userId', userId); 
           EasyLoading.showSuccess('Login successful!');
-          Get.offAll(() => BottomNavbar());
+          Get.offAll(() => const QuestionAnswer());
           return true;
         } else {
           EasyLoading.showError('Invalid response from server');

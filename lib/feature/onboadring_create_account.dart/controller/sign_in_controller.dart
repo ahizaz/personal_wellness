@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/feature/bottom_navBar.dart/screen/bottom_navbar.dart';
 import 'package:personal_wellness/core/services/notification_services.dart';
+import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/question_answer.dart';
 
 class SignInController extends GetxController {
   final emailController = TextEditingController();
@@ -168,7 +169,7 @@ class SignInController extends GetxController {
             debugPrint("Saved Google firstName: $firstName");
           }
 
-          Get.offAll(() => BottomNavbar());
+          Get.offAll(() => const QuestionAnswer());
         } else {
           debugPrint("Backend error: ${data["message"]}");
         }

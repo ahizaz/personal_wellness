@@ -164,7 +164,7 @@ Obx(() => CustomButton(
       bool success = await controller.login(email, password);
       if (success) {
         controller.signInPasswordController.clear();
-       Get.offAll(() => BottomNavbar());// Navigate to BottomNavbar on success
+        // Navigation is handled in controller.login() method
       }
     } else {
       EasyLoading.showError('Please enter both email and password');
