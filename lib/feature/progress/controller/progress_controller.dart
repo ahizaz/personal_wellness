@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:personal_wellness/feature/bottom_navBar.dart/controller/bottom_navcontroller.dart';
+import 'package:personal_wellness/feature/progress/screen/progress.dart';
 
 class ProgressController extends GetxController{
   var progressItems = <Map<String,dynamic>>[].obs;
@@ -674,7 +676,7 @@ class ProgressController extends GetxController{
   }
 
   // Upload all 3 photos (left, right, front) individually
-  Future<void> uploadAllPhotos(List<String> imagePaths) async {
+  Future<void> uploadAllPhotos(List<String> imagePaths, String fromScreen) async {
     if (imagePaths.length != 3) {
       debugPrint('Invalid number of images. Expected 3, got ${imagePaths.length}');
       return;
@@ -721,10 +723,31 @@ class ProgressController extends GetxController{
         // Wait a bit for data to load
         await Future.delayed(Duration(milliseconds: 500));
         
-        // Auto-navigate back to progress screen
-        debugPrint('=== Auto Navigation Back ===');
-        Get.back(); // Go back from TextPage
-        Get.back(); // Go back from GoPicture to Progress screen
+        // Navigate based on where the user came from
+        debugPrint('=== Auto Navigation ===');
+        debugPrint('From Screen: $fromScreen');
+        
+        if (fromScreen == 'today') {
+          // If coming from Today screen, navigate to Progress screen
+          // Close TextPage and GoPicture screens
+          Get.back(); // Go back from TextPage
+          Get.back(); // Go back from GoPicture
+          
+          // Navigate to Progress screen via bottom nav
+          try {
+            final BottomNavcontroller navController = Get.find<BottomNavcontroller>();
+            navController.changeIndex(3); // Progress is at index 3
+            debugPrint('=== Navigated to Progress screen via bottom nav ===');
+          } catch (e) {
+            // Fallback: navigate directly to Progress screen
+            debugPrint('=== Fallback: Navigating directly to Progress screen ===');
+            Get.to(() => ProgressData());
+          }
+        } else {
+          // If coming from Progress screen, just go back
+          Get.back(); // Go back from TextPage
+          Get.back(); // Go back from GoPicture to Progress screen
+        }
       });
     } else if (successCount > 0) {
       EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
@@ -911,15 +934,16 @@ class ProgressController extends GetxController{
   }
 
   // Method to save captured progress images from GoPicture
-  void saveCapturedImages(List<String> imagePaths) {
+  void saveCapturedImages(List<String> imagePaths, String fromScreen) {
     if (imagePaths.length >= 3) {
       debugPrint('=== Saving Captured Images ===');
       debugPrint('Left: ${imagePaths[0]}');
       debugPrint('Right: ${imagePaths[1]}');
       debugPrint('Front: ${imagePaths[2]}');
+      debugPrint('From Screen: $fromScreen');
       
       // Upload all 3 photos to API first, then refresh from server
-      uploadAllPhotos(imagePaths);
+      uploadAllPhotos(imagePaths, fromScreen);
     }
   }
   

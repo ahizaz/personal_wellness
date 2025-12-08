@@ -9,7 +9,9 @@ import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/progress/controller/progress_controller.dart';
 
 class GoPicture extends StatelessWidget {
-  const GoPicture({super.key});
+  final String fromScreen; // 'today' or 'progress'
+  
+  const GoPicture({super.key, this.fromScreen = 'progress'});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +69,7 @@ class GoPicture extends StatelessWidget {
           builder: (context, currentStage, child) {
             if (currentStage == 3) {
               controllerManager.dispose(); // Clean up controller
-              return TextPage(imagePaths: imagePaths);
+              return TextPage(imagePaths: imagePaths, fromScreen: fromScreen);
             }
 
             final screenWidth = MediaQuery.of(context).size.width;
@@ -224,8 +226,9 @@ class OverlayPainter extends CustomPainter {
 // Text page after capturing all images
 class TextPage extends StatefulWidget {
   final List<String> imagePaths;
+  final String fromScreen; // 'today' or 'progress'
 
-  const TextPage({super.key, required this.imagePaths});
+  const TextPage({super.key, required this.imagePaths, this.fromScreen = 'progress'});
 
   @override
   State<TextPage> createState() => _TextPageState();
@@ -241,7 +244,7 @@ class _TextPageState extends State<TextPage> {
         ProgressController(),
         tag: 'progress',
       );
-      progressController.saveCapturedImages(widget.imagePaths);
+      progressController.saveCapturedImages(widget.imagePaths, widget.fromScreen);
     });
   }
 

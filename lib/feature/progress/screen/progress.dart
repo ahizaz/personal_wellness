@@ -366,7 +366,7 @@ class _ProgressDataState extends State<ProgressData>
                             SizedBox(height: 16.h),
                             InkWell(
                               onTap: () {
-                                Get.to(() => GoPicture());
+                                Get.to(() => GoPicture(fromScreen: 'progress'));
                               },
                               child: Container(
                                 width: 141.w,
