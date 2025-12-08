@@ -147,10 +147,15 @@ class RoutineInProgressview extends StatelessWidget {
                                                   final routineController = Get.find<RoutineController>();
                                                   await routineController.markCurrentTimeSlotCompleted(productId);
                                                   await routineController.refreshRoutines();
+                                                  // Update progress after marking as completed
+                                                  await controller.updateTodayProgress();
                                                 } catch (e) {
                                                   debugPrint('Error marking time slot as completed: $e');
                                                 }
                                               }
+                                            } else {
+                                              // If unchecked, also update progress
+                                              await controller.updateTodayProgress();
                                             }
                                           }
                                         },
@@ -184,7 +189,7 @@ class RoutineInProgressview extends StatelessWidget {
                     child: Row(
                       children: [
                     Obx(() => Text(
-              "Today: ${controller.routineData.where((data) => data['isCompleted'].value).length}/${controller.routineData.length} completed",
+              "Today: ${controller.totalCompletedToday.value}/${controller.totalRoutinesToday.value} completed",
               style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 17.sp,
@@ -195,7 +200,7 @@ class RoutineInProgressview extends StatelessWidget {
                         SizedBox(width: 12.w,),
                         Expanded(
                           child: Obx(() => LinearProgressIndicator(
-                            value: controller.routineData.isEmpty ? 0 : controller.routineData.where((data) => data['isCompleted'].value).length / controller.routineData.length,
+                            value: controller.totalRoutinesToday.value == 0 ? 0 : controller.totalCompletedToday.value / controller.totalRoutinesToday.value,
                             backgroundColor: Color(0xff04BF7B).withValues(alpha: 0.25),
                             valueColor: AlwaysStoppedAnimation<Color>(Color(0xff04BF7B)),
                             borderRadius: BorderRadius.circular(999.r),

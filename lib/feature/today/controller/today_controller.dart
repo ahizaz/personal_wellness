@@ -13,6 +13,8 @@ class TodayController extends GetxController {
   var profileImagePath = "".obs; // Default no image
   var routineData = <Map<String, dynamic>>[].obs; // Reactive list for routine data
   var isLoading = false.obs; // Loading state
+  var totalCompletedToday = 0.obs; // Total completed routines today
+  var totalRoutinesToday = 0.obs; // Total routines today (completed + pending)
 
   @override
   void onInit() {
@@ -37,15 +39,19 @@ class TodayController extends GetxController {
     
     // Listen to routine events
     _listenToRoutineEvents();
+    
+    // Initialize progress counts
+    updateTodayProgress();
   }
 
   void _listenToRoutineEvents() {
     try {
       final routineEvents = RoutineEvents.instance;
       // Listen to routine added events
-      ever(routineEvents.routineAdded, (_) {
+      ever(routineEvents.routineAdded, (_) async {
         debugPrint('Routine event received in Today controller - refreshing data');
-        refreshRoutineData();
+        await refreshRoutineData();
+        await updateTodayProgress();
       });
     } catch (e) {
       debugPrint('Error setting up routine event listener: $e');
@@ -380,6 +386,9 @@ class TodayController extends GetxController {
 
       routineData.assignAll(formattedData);
       debugPrint('Today view updated with ${routineData.length} items');
+      
+      // Update progress counts
+      await updateTodayProgress();
     } catch (e) {
       debugPrint('Error fetching routine data from SharedPreferences: $e');
       routineData.clear();
@@ -415,14 +424,17 @@ class TodayController extends GetxController {
     profileImagePath.value = path;
   }
 
-  void toggleCompletion(int index, bool value) {
+  void toggleCompletion(int index, bool value) async {
     if (index >= 0 && index < routineData.length) {
       routineData[index]['isCompleted'].value = value;
+      // Update progress counts after toggling completion
+      await updateTodayProgress();
     }
   }
 
   Future<void> refreshRoutineData() async {
     await fetchHomeRoutineData();
+    await updateTodayProgress();
   }
 
   // Method to be called when returning from Add Routine screen
@@ -454,5 +466,35 @@ class TodayController extends GetxController {
     // Try to fetch data again
     debugPrint('Attempting to fetch routine data...');
     await fetchHomeRoutineData();
+  }
+
+  // Calculate and update total completed and total routines for today
+  Future<void> updateTodayProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final routinesJson = prefs.getString('saved_routines') ?? '[]';
+      final List<dynamic> routinesList = jsonDecode(routinesJson);
+      
+      // Update total routines count
+      totalRoutinesToday.value = routinesList.length;
+      
+      // Count completed routines
+      int completedCount = 0;
+      for (final routineJson in routinesList) {
+        final String id = (routineJson['id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        final completionKey = 'completed_${id}_$todayStr';
+        final isCompleted = prefs.getBool(completionKey) ?? false;
+        if (isCompleted) {
+          completedCount++;
+        }
+      }
+      totalCompletedToday.value = completedCount;
+    } catch (e) {
+      debugPrint('Error updating today progress: $e');
+      totalCompletedToday.value = 0;
+      totalRoutinesToday.value = 0;
+    }
   }
 }
