@@ -54,7 +54,9 @@ class _ProgressDataState extends State<ProgressData>
   @override
   void didPopNext() {
     // Called when user returns to this screen from another screen
+    debugPrint('=== Progress Screen: didPopNext - Refreshing data ===');
     controller.refreshPhotoProgress(); // Force refresh to get latest uploads
+    controller.refreshTimelineData(); // Force refresh timeline data
     controller.refreshLocalCounts(); // Refresh routine counts
   }
 
@@ -62,7 +64,9 @@ class _ProgressDataState extends State<ProgressData>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // Automatically refresh when app comes to foreground
+      debugPrint('=== Progress Screen: App Resumed - Refreshing data ===');
       controller.refreshPhotoProgress(); // Force refresh
+      controller.refreshTimelineData(); // Force refresh timeline data
       controller.refreshLocalCounts(); // Refresh routine counts
     }
   }

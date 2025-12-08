@@ -53,10 +53,10 @@ class QuestionAnswerController extends GetxController {
   void submitAnswers() {
     if (isFormValid) {
      
-      print('Why using app: ${whyUsingAppController.text}');
-      print('Age 18+: ${ageVerification.value}');
-      print('Question 1: ${question1Controller.text}');
-      print('Question 2: ${question2Controller.text}');
+      debugPrint('Why using app: ${whyUsingAppController.text}');
+      debugPrint('Age 18+: ${ageVerification.value}');
+      debugPrint('Question 1: ${question1Controller.text}');
+      debugPrint('Question 2: ${question2Controller.text}');
       
       // Navigate to BottomNavbar after submitting answers
       Get.to(() => BottomNavbar());

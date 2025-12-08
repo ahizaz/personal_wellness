@@ -803,13 +803,15 @@ class ProgressController extends GetxController{
         debugPrint('Successfully uploaded ${types[i]} photo');
         
         // Immediately refresh this specific type after successful upload
-        await getPhotoProgressByType(types[i]);
+        await getPhotoProgressByType(types[i], showLoading: false);
+        // Force UI update after each successful upload
+        await Future.delayed(Duration(milliseconds: 200));
       } else {
         debugPrint('Failed to upload ${types[i]} photo');
       }
       
       // Small delay between uploads to prevent server overload
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 150));
     }
     
     debugPrint('=== Upload Summary ===');
@@ -827,6 +829,10 @@ class ProgressController extends GetxController{
         // Force refresh all photo progress (clears cache)
         lastPhotoLoadTime = null; // Clear cache to force fresh data
         await getAllPhotoProgress(showLoading: false);
+        
+        // Also refresh timeline data to show new photos immediately
+        debugPrint('=== Refreshing Timeline Data ===');
+        await loadData();
         
         // Wait a bit for data to load
         await Future.delayed(Duration(milliseconds: 500));
@@ -914,16 +920,19 @@ class ProgressController extends GetxController{
           debugPrint('Total $type photos: ${result.length}');
           debugPrint('Meta data: $meta');
           
-          // Clear existing images for this type only
+          // Clear existing images and dates for this type only
           switch (type) {
             case 'left':
               leftProgressImages.clear();
+              leftProgressDates.clear();
               break;
             case 'right':
               rightProgressImages.clear();
+              rightProgressDates.clear();
               break;
             case 'front':
               frontProgressImages.clear();
+              frontProgressDates.clear();
               break;
           }
           
