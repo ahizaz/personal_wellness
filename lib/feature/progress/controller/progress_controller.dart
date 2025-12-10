@@ -794,6 +794,9 @@ class ProgressController extends GetxController{
     final types = ['left', 'right', 'front'];
     int successCount = 0;
     
+    // Clear cache before uploading to ensure fresh data after upload
+    lastPhotoLoadTime = null;
+    
     // Upload each photo individually
     for (int i = 0; i < imagePaths.length; i++) {
       debugPrint('Uploading photo ${i + 1}/3: ${types[i]}');
@@ -802,10 +805,25 @@ class ProgressController extends GetxController{
         successCount++;
         debugPrint('Successfully uploaded ${types[i]} photo');
         
-        // Immediately refresh this specific type after successful upload
+        // Wait a bit for server to process the upload
+        await Future.delayed(Duration(milliseconds: 500));
+        
+        // Clear cache and immediately refresh this specific type after successful upload
+        lastPhotoLoadTime = null; // Clear cache to force fresh data
         await getPhotoProgressByType(types[i], showLoading: false);
-        // Force UI update after each successful upload
-        await Future.delayed(Duration(milliseconds: 200));
+        
+        // Force reactive list update
+        switch (types[i]) {
+          case 'left':
+            leftProgressImages.refresh();
+            break;
+          case 'right':
+            rightProgressImages.refresh();
+            break;
+          case 'front':
+            frontProgressImages.refresh();
+            break;
+        }
       } else {
         debugPrint('Failed to upload ${types[i]} photo');
       }
@@ -822,21 +840,20 @@ class ProgressController extends GetxController{
       EasyLoading.showSuccess('All photos uploaded successfully!', duration: Duration(seconds: 2));
       debugPrint('=== All Photos Uploaded Successfully ===');
       
+      // Immediately refresh all photo progress to ensure UI is up to date
+      lastPhotoLoadTime = null; // Clear cache
+      await getAllPhotoProgress(showLoading: false);
+      
+      // Force refresh all reactive lists
+      leftProgressImages.refresh();
+      rightProgressImages.refresh();
+      frontProgressImages.refresh();
+      
       // Wait for success message to show, then refresh data and auto-navigate back
       Future.delayed(Duration(seconds: 2), () async {
         debugPrint('=== Starting Auto Refresh and Navigation ===');
         
-        // Force refresh all photo progress (clears cache)
-        lastPhotoLoadTime = null; // Clear cache to force fresh data
-        await getAllPhotoProgress(showLoading: false);
-        
-        // Also refresh timeline data to show new photos immediately
-        debugPrint('=== Refreshing Timeline Data ===');
-        await loadData();
-        
-        // Wait a bit for data to load
-        await Future.delayed(Duration(milliseconds: 500));
-        
+        // Navigate first, then refresh data in background
         // Navigate based on where the user came from
         debugPrint('=== Auto Navigation ===');
         debugPrint('From Screen: $fromScreen');
@@ -852,18 +869,46 @@ class ProgressController extends GetxController{
             final BottomNavcontroller navController = Get.find<BottomNavcontroller>();
             navController.changeIndex(3); // Progress is at index 3
             debugPrint('=== Navigated to Progress screen via bottom nav ===');
+            
+            // Wait a bit for navigation to complete, then refresh data
+            await Future.delayed(Duration(milliseconds: 300));
           } catch (e) {
             // Fallback: navigate directly to Progress screen
             debugPrint('=== Fallback: Navigating directly to Progress screen ===');
+            Get.back(); // Go back from TextPage
+            Get.back(); // Go back from GoPicture
             Get.to(() => ProgressData());
+            await Future.delayed(Duration(milliseconds: 300));
           }
         } else {
           // If coming from Progress screen, just go back
           Get.back(); // Go back from TextPage
           Get.back(); // Go back from GoPicture to Progress screen
+          await Future.delayed(Duration(milliseconds: 300));
         }
+        
+        // After navigation, refresh data in background (don't block navigation)
+        debugPrint('=== Refreshing Photo Progress in Background ===');
+        lastPhotoLoadTime = null; // Clear cache to force fresh data
+        await getAllPhotoProgress(showLoading: false);
+        
+        // Force refresh reactive lists
+        leftProgressImages.refresh();
+        rightProgressImages.refresh();
+        frontProgressImages.refresh();
+        
+        // Refresh timeline data in background (without blocking)
+        debugPrint('=== Refreshing Timeline Data in Background ===');
+        await loadData();
       });
     } else if (successCount > 0) {
+      // Even if partial success, refresh what was uploaded
+      lastPhotoLoadTime = null;
+      await getAllPhotoProgress(showLoading: false);
+      leftProgressImages.refresh();
+      rightProgressImages.refresh();
+      frontProgressImages.refresh();
+      
       EasyLoading.showError('$successCount out of 3 photos uploaded', duration: Duration(seconds: 2));
     } else {
       EasyLoading.showError('Failed to upload photos', duration: Duration(seconds: 2));
@@ -986,6 +1031,22 @@ class ProgressController extends GetxController{
             }
           }
           
+          // Force refresh reactive lists to trigger UI update
+          switch (type) {
+            case 'left':
+              leftProgressImages.refresh();
+              leftProgressDates.refresh();
+              break;
+            case 'right':
+              rightProgressImages.refresh();
+              rightProgressDates.refresh();
+              break;
+            case 'front':
+              frontProgressImages.refresh();
+              frontProgressDates.refresh();
+              break;
+          }
+          
           debugPrint('=== $type Images Updated ===');
           debugPrint('$type images count: ${type == 'left' ? leftProgressImages.length : type == 'right' ? rightProgressImages.length : frontProgressImages.length}');
         } else {
@@ -1006,10 +1067,10 @@ class ProgressController extends GetxController{
   }
 
   // Get all photo progress from API (loads all types)
-  Future<void> getAllPhotoProgress({int page = 1, int limit = 20, bool showLoading = false}) async {
+  Future<void> getAllPhotoProgress({int page = 1, int limit = 20, bool showLoading = false, bool forceRefresh = false}) async {
     try {
-      // Check cache first to avoid unnecessary API calls
-      if (lastPhotoLoadTime != null && 
+      // Check cache first to avoid unnecessary API calls (unless force refresh)
+      if (!forceRefresh && lastPhotoLoadTime != null && 
           DateTime.now().difference(lastPhotoLoadTime!) < cacheExpiry &&
           leftProgressImages.isNotEmpty) {
         debugPrint('=== Using cached photo data (${DateTime.now().difference(lastPhotoLoadTime!).inSeconds}s old) ===');
@@ -1031,6 +1092,11 @@ class ProgressController extends GetxController{
       
       // Update cache timestamp
       lastPhotoLoadTime = DateTime.now();
+      
+      // Force refresh reactive lists to update UI
+      leftProgressImages.refresh();
+      rightProgressImages.refresh();
+      frontProgressImages.refresh();
       
       if (showLoading) {
         isLoadingImages.value = false;
@@ -1116,7 +1182,11 @@ class ProgressController extends GetxController{
   Future<void> refreshPhotoProgress() async {
     debugPrint('=== Force Refreshing Photo Progress ===');
     lastPhotoLoadTime = null; // Clear cache
-    await getAllPhotoProgress(showLoading: true);
+    await getAllPhotoProgress(showLoading: true, forceRefresh: true);
+    // Force refresh reactive lists to update UI
+    leftProgressImages.refresh();
+    rightProgressImages.refresh();
+    frontProgressImages.refresh();
   }
   
   // Method to refresh specific type photo progress
@@ -1124,6 +1194,18 @@ class ProgressController extends GetxController{
     debugPrint('=== Refreshing $type Photo Progress ===');
     lastPhotoLoadTime = null; // Clear cache
     await getPhotoProgressByType(type);
+    // Force refresh reactive list for this type
+    switch (type) {
+      case 'left':
+        leftProgressImages.refresh();
+        break;
+      case 'right':
+        rightProgressImages.refresh();
+        break;
+      case 'front':
+        frontProgressImages.refresh();
+        break;
+    }
   }
   
   // Method to upload photos via refresh button
