@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:personal_wellness/core/common/widgets/custom_button.dart';
-import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/question_answer_controller.dart';
 
@@ -125,7 +124,7 @@ class QuestionAnswer extends StatelessWidget {
                           // Question 1: Gender (from API)
                           if (controller.genderQuestion != null) ...[
                             Text(
-                              controller.genderQuestion!.question,
+                              controller.genderQuestion!['question'] ?? '',
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w500,
@@ -166,7 +165,7 @@ class QuestionAnswer extends StatelessWidget {
                                                   ),
                                                   borderRadius: BorderRadius.circular(12.r),
                                                   color: isSelected
-                                                      ? const Color(0xff485908).withOpacity(0.1)
+                                                      ? const Color(0xff485908).withValues(alpha: .1)
                                                       : Colors.transparent,
                                                 ),
                                                 child: Center(
@@ -212,7 +211,7 @@ class QuestionAnswer extends StatelessWidget {
                                               ),
                                               borderRadius: BorderRadius.circular(12.r),
                                               color: isSelected
-                                                  ? const Color(0xff485908).withOpacity(0.1)
+                                                  ? const Color(0xff485908).withValues(alpha: .1)
                                                   : Colors.transparent,
                                             ),
                                             child: Center(
@@ -242,7 +241,7 @@ class QuestionAnswer extends StatelessWidget {
                           // Question 2: Types of user (from API)
                           if (controller.userTypeQuestion != null) ...[
                             Text(
-                              controller.userTypeQuestion!.question,
+                              controller.userTypeQuestion!['question'] ?? '',
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w500,
@@ -276,7 +275,7 @@ class QuestionAnswer extends StatelessWidget {
                                             ),
                                             borderRadius: BorderRadius.circular(12.r),
                                             color: isSelected
-                                                ? const Color(0xff485908).withOpacity(0.1)
+                                                ? const Color(0xff485908).withValues(alpha: .1)
                                                 : Colors.transparent,
                                           ),
                                           child: Center(
@@ -346,7 +345,7 @@ class QuestionAnswer extends StatelessWidget {
                           // Question 3: Why are you using the app? (from API)
                       if (controller.whyUsingAppQuestion != null) ...[
                         Text(
-                          controller.whyUsingAppQuestion!.question,
+                          controller.whyUsingAppQuestion!['question'] ?? '',
                           style: TextStyle(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w500,
@@ -378,7 +377,7 @@ class QuestionAnswer extends StatelessWidget {
                                       ),
                                       borderRadius: BorderRadius.circular(12.r),
                                       color: isSelected
-                                          ? const Color(0xff485908).withOpacity(0.1)
+                                          ? const Color(0xff485908).withValues(alpha: .1)
                                           : Colors.transparent,
                                     ),
                                     child: Text(

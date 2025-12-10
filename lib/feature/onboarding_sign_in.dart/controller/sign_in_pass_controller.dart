@@ -62,9 +62,24 @@ class SignInPassController extends GetxController {
           String userId = responseData['data']['user']['_id'];
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('accessToken', accessToken);
-          await prefs.setString('userId', userId); 
+          await prefs.setString('userId', userId);
+          
+          debugPrint('=== Login successful ===');
+          debugPrint('Checking if questions have been answered...');
+          
+          // Check if questions have been answered
+          final hasAnsweredQuestions = prefs.getBool('hasAnsweredQuestions') ?? false;
+          debugPrint('hasAnsweredQuestions: $hasAnsweredQuestions');
+          
           EasyLoading.showSuccess('Login successful!');
-          Get.offAll(() => const QuestionAnswer());
+          
+          if (hasAnsweredQuestions) {
+            debugPrint('Questions already answered, navigating to BottomNavbar');
+            Get.offAll(() => BottomNavbar());
+          } else {
+            debugPrint('Questions not answered yet, navigating to QuestionAnswer');
+            Get.offAll(() => const QuestionAnswer());
+          }
           return true;
         } else {
           EasyLoading.showError('Invalid response from server');

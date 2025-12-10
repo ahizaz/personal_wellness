@@ -169,7 +169,20 @@ class SignInController extends GetxController {
             debugPrint("Saved Google firstName: $firstName");
           }
 
-          Get.offAll(() => const QuestionAnswer());
+          debugPrint('=== Google Sign In successful ===');
+          debugPrint('Checking if questions have been answered...');
+          
+          // Check if questions have been answered
+          final hasAnsweredQuestions = prefs.getBool('hasAnsweredQuestions') ?? false;
+          debugPrint('hasAnsweredQuestions: $hasAnsweredQuestions');
+          
+          if (hasAnsweredQuestions) {
+            debugPrint('Questions already answered, navigating to BottomNavbar');
+            Get.offAll(() => BottomNavbar());
+          } else {
+            debugPrint('Questions not answered yet, navigating to QuestionAnswer');
+            Get.offAll(() => const QuestionAnswer());
+          }
         } else {
           debugPrint("Backend error: ${data["message"]}");
         }
