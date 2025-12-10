@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:personal_wellness/core/utils/constants/icon_path.dart';
 import 'package:personal_wellness/core/services/api_service.dart';
 import 'package:personal_wellness/core/events/routine_events.dart';
+import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:intl/intl.dart';
 
 class TodayController extends GetxController {
@@ -15,6 +18,7 @@ class TodayController extends GetxController {
   var isLoading = false.obs; // Loading state
   var totalCompletedToday = 0.obs; // Total completed routines today
   var totalRoutinesToday = 0.obs; // Total routines today (completed + pending)
+  var questions = <Map<String, dynamic>>[].obs; // List to store questions from API
 
   @override
   void onInit() {
@@ -495,6 +499,65 @@ class TodayController extends GetxController {
       debugPrint('Error updating today progress: $e');
       totalCompletedToday.value = 0;
       totalRoutinesToday.value = 0;
+    }
+  }
+
+  // Fetch all questions from API
+  Future<void> fetchAllQuestions() async {
+    try {
+      EasyLoading.show(
+        status: 'Loading questions...',
+        maskType: EasyLoadingMaskType.black,
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null || accessToken.isEmpty) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.getAllQuestion),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true && data["data"] != null && data["data"]["result"] != null) {
+          questions.clear();
+          
+          // Extract questions from the result array
+          for (var questionItem in data["data"]["result"]) {
+            questions.add({
+              "_id": questionItem["_id"] ?? "",
+              "question": questionItem["question"] ?? "",
+              "isVisible": questionItem["isVisible"] ?? true,
+              "createdAt": questionItem["createdAt"] ?? "",
+              "updatedAt": questionItem["updatedAt"] ?? "",
+            });
+          }
+
+          debugPrint('Successfully loaded ${questions.length} questions');
+          EasyLoading.showSuccess("Questions loaded successfully");
+        } else {
+          debugPrint('Failed to load questions: ${data["message"] ?? "Unknown error"}');
+          EasyLoading.showError("Failed to load questions");
+        }
+      } else {
+        debugPrint('Server error: ${response.statusCode}');
+        EasyLoading.showError("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint('Error fetching questions: $e');
+      EasyLoading.showError("Error loading questions");
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 }

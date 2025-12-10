@@ -44,284 +44,363 @@ class QuestionAnswer extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32.r),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Question and Answer',
+                child: Obx(
+                  () {
+                    if (controller.isLoading.value) {
+                      return Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 50.h),
+                          child: CircularProgressIndicator(
+                            color: const Color(0xff485908),
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (controller.errorMessage.value.isNotEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 50.h),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Error loading questions',
                                 style: TextStyle(
-                                  fontSize: 17.sp,
+                                  fontSize: 16.sp,
                                   fontWeight: FontWeight.w600,
-                                  color: const Color(0xff172601),
+                                  color: Colors.red,
                                   fontFamily: 'SFPro',
                                 ),
                               ),
-                            ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                controller.errorMessage.value,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: const Color(0xff999999),
+                                  fontFamily: 'SFPro',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 16.h),
+                              ElevatedButton(
+                                onPressed: () {
+                                  controller.fetchQuestions();
+                                },
+                                child: Text('Retry'),
+                              ),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Image.asset(
-                              IconPath.cross,
-                              width: 32.w,
-                              height: 32.h,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 33.h),
-
-                      // Question 1: Why are you using this apps?
-                      Text(
-                        'Why are you using this apps?',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff172601),
-                          fontFamily: 'SFPro',
                         ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 8.h),
-                      Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: controller.hasWhyUsingAppText.value
-                                  ? const Color(0xff485908)
-                                  : const Color(0xffE8E9E6),
-                              width: controller.hasWhyUsingAppText.value ? 3.w : 1.w,
-                            ),
-                            borderRadius: BorderRadius.circular(12.r),
+                      );
+                    }
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    'Question and Answer',
+                                    style: TextStyle(
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xff172601),
+                                      fontFamily: 'SFPro',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          
+                            ],
                           ),
-                          child: TextField(
-                            controller: controller.whyUsingAppController,
-                            maxLines: 3,
-                            style: TextStyle(
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff172601),
-                              fontFamily: 'SFPro',
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Tell us why you are using this app...',
-                              hintStyle: TextStyle(
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff999999),
+                          SizedBox(height: 33.h),
+
+                          // Question 1: Gender (from API)
+                          if (controller.genderQuestion != null) ...[
+                            Text(
+                              controller.genderQuestion!.question,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff172601),
                                 fontFamily: 'SFPro',
                               ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 16.h,
-                              ),
+                              textAlign: TextAlign.left,
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-
-                      // Question 2: Are you 18+?
-                      Text(
-                        'Are you 18+?',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff172601),
-                          fontFamily: 'SFPro',
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 8.h),
-                      Obx(
-                        () => Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  controller.setAgeVerification('yes');
-                                },
-                                child: Container(
-                                  height: 54.h,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: controller.ageVerification.value == 'yes'
-                                          ? const Color(0xff485908)
-                                          : const Color(0xffE8E9E6),
-                                      width: controller.ageVerification.value == 'yes' ? 3.w : 1.w,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    color: controller.ageVerification.value == 'yes'
-                                        ? const Color(0xff485908).withOpacity(0.1)
-                                        : Colors.transparent,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'Yes',
-                                      style: TextStyle(
-                                        fontSize: 17.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: controller.ageVerification.value == 'yes'
-                                            ? const Color(0xff485908)
-                                            : const Color(0xff999999),
-                                        fontFamily: 'SFPro',
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            SizedBox(height: 8.h),
+                            Obx(
+                              () {
+                                final genderOptions = controller.genderOptions;
+                                if (genderOptions.length <= 3) {
+                                  // Display in a row if 3 or fewer options
+                                  return Row(
+                                    children: [
+                                      ...genderOptions.asMap().entries.map((entry) {
+                                        final index = entry.key;
+                                        final option = entry.value;
+                                        final isSelected = controller.selectedGender.value == option;
+                                        return Expanded(
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              right: index < genderOptions.length - 1 ? 12.w : 0,
+                                            ),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                controller.setGender(option);
+                                              },
+                                              child: Container(
+                                                height: 54.h,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? const Color(0xff485908)
+                                                        : const Color(0xffE8E9E6),
+                                                    width: isSelected ? 3.w : 1.w,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12.r),
+                                                  color: isSelected
+                                                      ? const Color(0xff485908).withOpacity(0.1)
+                                                      : Colors.transparent,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    option,
+                                                    style: TextStyle(
+                                                      fontSize: 17.sp,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: isSelected
+                                                          ? const Color(0xff485908)
+                                                          : const Color(0xff999999),
+                                                      fontFamily: 'SFPro',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                  );
+                                } else {
+                                  // Display in a column if more than 3 options
+                                  return Column(
+                                    children: genderOptions.map((option) {
+                                      final isSelected = controller.selectedGender.value == option;
+                                      return Padding(
+                                        padding: EdgeInsets.only(bottom: 12.h),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            controller.setGender(option);
+                                          },
+                                          child: Container(
+                                            width: double.infinity,
+                                            height: 54.h,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? const Color(0xff485908)
+                                                    : const Color(0xffE8E9E6),
+                                                width: isSelected ? 3.w : 1.w,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12.r),
+                                              color: isSelected
+                                                  ? const Color(0xff485908).withOpacity(0.1)
+                                                  : Colors.transparent,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                option,
+                                                style: TextStyle(
+                                                  fontSize: 17.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isSelected
+                                                      ? const Color(0xff485908)
+                                                      : const Color(0xff999999),
+                                                  fontFamily: 'SFPro',
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                }
+                              },
                             ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  controller.setAgeVerification('no');
-                                },
-                                child: Container(
-                                  height: 54.h,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: controller.ageVerification.value == 'no'
-                                          ? const Color(0xff485908)
-                                          : const Color(0xffE8E9E6),
-                                      width: controller.ageVerification.value == 'no' ? 3.w : 1.w,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    color: controller.ageVerification.value == 'no'
-                                        ? const Color(0xff485908).withOpacity(0.1)
-                                        : Colors.transparent,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'No',
-                                      style: TextStyle(
-                                        fontSize: 17.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: controller.ageVerification.value == 'no'
-                                            ? const Color(0xff485908)
-                                            : const Color(0xff999999),
-                                        fontFamily: 'SFPro',
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            SizedBox(height: 20.h),
                           ],
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
 
-                      // Question 3: Additional question 1
-                      Text(
-                        'What are your main skincare goals?',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff172601),
-                          fontFamily: 'SFPro',
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 8.h),
-                      Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: controller.hasQuestion1Text.value
-                                  ? const Color(0xff485908)
-                                  : const Color(0xffE8E9E6),
-                              width: controller.hasQuestion1Text.value ? 3.w : 1.w,
-                            ),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: TextField(
-                            controller: controller.question1Controller,
-                            maxLines: 2,
-                            style: TextStyle(
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff172601),
-                              fontFamily: 'SFPro',
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Enter your skincare goals...',
-                              hintStyle: TextStyle(
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff999999),
+                          // Question 2: Types of user (from API)
+                          if (controller.userTypeQuestion != null) ...[
+                            Text(
+                              controller.userTypeQuestion!.question,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff172601),
                                 fontFamily: 'SFPro',
                               ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 16.h,
+                              textAlign: TextAlign.left,
+                            ),
+                            SizedBox(height: 8.h),
+                            Obx(
+                              () => Column(
+                                children: [
+                                  // User type options
+                                  ...controller.userTypes.map((userType) {
+                                    final isSelected = controller.selectedUserType.value == userType;
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: 12.h),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          controller.setUserType(userType);
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 54.h,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? const Color(0xff485908)
+                                                  : const Color(0xffE8E9E6),
+                                              width: isSelected ? 3.w : 1.w,
+                                            ),
+                                            borderRadius: BorderRadius.circular(12.r),
+                                            color: isSelected
+                                                ? const Color(0xff485908).withOpacity(0.1)
+                                                : Colors.transparent,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              userType,
+                                              style: TextStyle(
+                                                fontSize: 17.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: isSelected
+                                                    ? const Color(0xff485908)
+                                                    : const Color(0xff999999),
+                                                fontFamily: 'SFPro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  
+                                  // Other text field (shown when "Other" is selected)
+                                  if (controller.showOtherTextField.value) ...[
+                                    SizedBox(height: 8.h),
+                                    Obx(
+                                      () => Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: controller.hasOtherUserTypeText.value
+                                                ? const Color(0xff485908)
+                                                : const Color(0xffE8E9E6),
+                                            width: controller.hasOtherUserTypeText.value ? 3.w : 1.w,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.r),
+                                        ),
+                                        child: TextField(
+                                          controller: controller.otherUserTypeController,
+                                          style: TextStyle(
+                                            fontSize: 17.sp,
+                                            fontWeight: FontWeight.w400,
+                                            color: const Color(0xff172601),
+                                            fontFamily: 'SFPro',
+                                          ),
+                                          decoration: InputDecoration(
+                                            hintText: 'Give the option type',
+                                            hintStyle: TextStyle(
+                                              fontSize: 17.sp,
+                                              fontWeight: FontWeight.w400,
+                                              color: const Color(0xff999999),
+                                              fontFamily: 'SFPro',
+                                            ),
+                                            border: InputBorder.none,
+                                            contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 12.w,
+                                              vertical: 16.h,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
+                            SizedBox(height: 20.h),
+                          ],
 
-                      // Question 4: Additional question 2
-                      Text(
-                        'How did you hear about us?',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff172601),
-                          fontFamily: 'SFPro',
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 8.h),
-                      Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: controller.hasQuestion2Text.value
-                                  ? const Color(0xff485908)
-                                  : const Color(0xffE8E9E6),
-                              width: controller.hasQuestion2Text.value ? 3.w : 1.w,
-                            ),
-                            borderRadius: BorderRadius.circular(12.r),
+                          // Question 3: Why are you using the app? (from API)
+                      if (controller.whyUsingAppQuestion != null) ...[
+                        Text(
+                          controller.whyUsingAppQuestion!.question,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff172601),
+                            fontFamily: 'SFPro',
                           ),
-                          child: TextField(
-                            controller: controller.question2Controller,
-                            maxLines: 2,
-                            style: TextStyle(
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff172601),
-                              fontFamily: 'SFPro',
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Tell us how you found us...',
-                              hintStyle: TextStyle(
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff999999),
-                                fontFamily: 'SFPro',
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 16.h,
-                              ),
-                            ),
+                          textAlign: TextAlign.left,
+                        ),
+                        SizedBox(height: 8.h),
+                        Obx(
+                          () => Column(
+                            children: controller.whyUsingAppOptions.map((option) {
+                              final isSelected = controller.selectedWhyUsingApp.value == option;
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 12.h),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    controller.setWhyUsingApp(option);
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? const Color(0xff485908)
+                                            : const Color(0xffE8E9E6),
+                                        width: isSelected ? 3.w : 1.w,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      color: isSelected
+                                          ? const Color(0xff485908).withOpacity(0.1)
+                                          : Colors.transparent,
+                                    ),
+                                    child: Text(
+                                      option,
+                                      style: TextStyle(
+                                        fontSize: 17.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: isSelected
+                                            ? const Color(0xff485908)
+                                            : const Color(0xff999999),
+                                        fontFamily: 'SFPro',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
-                      ),
+                        SizedBox(height: 20.h),
+                      ],
+
                       SizedBox(height: 24.h),
 
                       // Submit Button
@@ -347,6 +426,8 @@ class QuestionAnswer extends StatelessWidget {
                       SizedBox(height: 24.h),
                     ],
                   ),
+                );
+                  },
                 ),
               ),
             ),

@@ -849,42 +849,34 @@ class ProgressController extends GetxController{
       rightProgressImages.refresh();
       frontProgressImages.refresh();
       
-      // Wait for success message to show, then refresh data and auto-navigate back
+      // Wait for success message to show, then refresh data and ALWAYS navigate to Progress screen
       Future.delayed(Duration(seconds: 2), () async {
         debugPrint('=== Starting Auto Refresh and Navigation ===');
-        
-        // Navigate first, then refresh data in background
-        // Navigate based on where the user came from
-        debugPrint('=== Auto Navigation ===');
         debugPrint('From Screen: $fromScreen');
         
-        if (fromScreen == 'today') {
-          // If coming from Today screen, navigate to Progress screen
-          // Close TextPage and GoPicture screens
-          Get.back(); // Go back from TextPage
-          Get.back(); // Go back from GoPicture
+        // Close all camera/photo screens properly
+        // Close TextPage and GoPicture screens (we know there are 2 screens to close)
+        Get.back(); // Go back from TextPage
+        await Future.delayed(Duration(milliseconds: 200));
+        Get.back(); // Go back from GoPicture
+        await Future.delayed(Duration(milliseconds: 200));
+        
+        // ALWAYS navigate to Progress screen regardless of fromScreen
+        debugPrint('=== Auto Navigation to Progress Screen ===');
+        try {
+          final BottomNavcontroller navController = Get.find<BottomNavcontroller>();
+          navController.changeIndex(3); // Progress is at index 3
+          debugPrint('=== Navigated to Progress screen via bottom nav ===');
           
-          // Navigate to Progress screen via bottom nav
-          try {
-            final BottomNavcontroller navController = Get.find<BottomNavcontroller>();
-            navController.changeIndex(3); // Progress is at index 3
-            debugPrint('=== Navigated to Progress screen via bottom nav ===');
-            
-            // Wait a bit for navigation to complete, then refresh data
-            await Future.delayed(Duration(milliseconds: 300));
-          } catch (e) {
-            // Fallback: navigate directly to Progress screen
-            debugPrint('=== Fallback: Navigating directly to Progress screen ===');
-            Get.back(); // Go back from TextPage
-            Get.back(); // Go back from GoPicture
-            Get.to(() => ProgressData());
-            await Future.delayed(Duration(milliseconds: 300));
-          }
-        } else {
-          // If coming from Progress screen, just go back
-          Get.back(); // Go back from TextPage
-          Get.back(); // Go back from GoPicture to Progress screen
-          await Future.delayed(Duration(milliseconds: 300));
+          // Wait a bit for navigation to complete, then refresh data
+          await Future.delayed(Duration(milliseconds: 500));
+        } catch (e) {
+          // Fallback: navigate directly to Progress screen
+          debugPrint('=== Fallback: Navigating directly to Progress screen ===');
+          debugPrint('Error: $e');
+          // Use Get.offAll to clear navigation stack and ensure we're on Progress screen
+          Get.offAll(() => ProgressData());
+          await Future.delayed(Duration(milliseconds: 500));
         }
         
         // After navigation, refresh data in background (don't block navigation)
@@ -897,7 +889,7 @@ class ProgressController extends GetxController{
         rightProgressImages.refresh();
         frontProgressImages.refresh();
         
-        // Refresh timeline data in background (without blocking)
+        // Refresh timeline data in background
         debugPrint('=== Refreshing Timeline Data in Background ===');
         await loadData();
       });

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
 import 'package:personal_wellness/core/models/routine_home_model.dart';
 import 'package:personal_wellness/core/models/product_details_model.dart';
+import 'package:personal_wellness/core/models/question_model.dart';
 import 'package:flutter/material.dart';
 
 class ApiService {
@@ -238,6 +239,49 @@ class ApiService {
     } catch (e) {
       debugPrint('Error fetching and caching user profile: $e');
       return false;
+    }
+  }
+
+  // Fetch all questions for user
+  static Future<QuestionModel?> getAllQuestions() async {
+    try {
+      final accessToken = await getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        debugPrint('No access token found for get all questions');
+        return null;
+      }
+
+      debugPrint('=== GET All Questions API Call ===');
+      debugPrint('URL: ${Urls.getAllQuestion}');
+      debugPrint('Headers: {Content-Type: application/json, Authorization: Bearer $accessToken}');
+
+      final response = await http.get(
+        Uri.parse(Urls.getAllQuestion),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      debugPrint('=== API Response ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('=== Success ===');
+        debugPrint('Response Data: $data');
+        return QuestionModel.fromJson(data);
+      } else {
+        debugPrint('=== Error ===');
+        debugPrint('Failed with status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('=== Exception ===');
+      debugPrint('Error fetching questions: $e');
+      return null;
     }
   }
 }
