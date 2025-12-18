@@ -256,12 +256,12 @@ class QuestionAnswer extends StatelessWidget {
                                 children: [
                                   // User type options
                                   ...controller.userTypes.map((userType) {
-                                    final isSelected = controller.selectedUserType.value == userType;
+                                    final isSelected = controller.selectedUserTypes.contains(userType);
                                     return Padding(
                                       padding: EdgeInsets.only(bottom: 12.h),
                                       child: GestureDetector(
                                         onTap: () {
-                                          controller.setUserType(userType);
+                                          controller.toggleUserType(userType);
                                         },
                                         child: Container(
                                           width: double.infinity,
@@ -278,18 +278,37 @@ class QuestionAnswer extends StatelessWidget {
                                                 ? const Color(0xff485908).withValues(alpha: .1)
                                                 : Colors.transparent,
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              userType,
-                                              style: TextStyle(
-                                                fontSize: 17.sp,
-                                                fontWeight: FontWeight.w600,
-                                                color: isSelected
-                                                    ? const Color(0xff485908)
-                                                    : const Color(0xff999999),
-                                                fontFamily: 'SFPro',
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  userType,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 17.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: isSelected
+                                                        ? const Color(0xff485908)
+                                                        : const Color(0xff999999),
+                                                    fontFamily: 'SFPro',
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              SizedBox(width: 8.w),
+                                              Container(
+                                                width: 22.w,
+                                                height: 22.w,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: isSelected ? const Color(0xff485908) : const Color(0xffE8E9E6),
+                                                    width: isSelected ? 2.w : 1.w,
+                                                  ),
+                                                  color: isSelected ? const Color(0xff485908) : Colors.transparent,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -358,12 +377,12 @@ class QuestionAnswer extends StatelessWidget {
                         Obx(
                           () => Column(
                             children: controller.whyUsingAppOptions.map((option) {
-                              final isSelected = controller.selectedWhyUsingApp.value == option;
+                              final isSelected = controller.selectedWhyUsingApp.contains(option);
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 12.h),
                                 child: GestureDetector(
                                   onTap: () {
-                                    controller.setWhyUsingApp(option);
+                                    controller.toggleWhyUsingApp(option);
                                   },
                                   child: Container(
                                     width: double.infinity,
@@ -380,16 +399,35 @@ class QuestionAnswer extends StatelessWidget {
                                           ? const Color(0xff485908).withValues(alpha: .1)
                                           : Colors.transparent,
                                     ),
-                                    child: Text(
-                                      option,
-                                      style: TextStyle(
-                                        fontSize: 17.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: isSelected
-                                            ? const Color(0xff485908)
-                                            : const Color(0xff999999),
-                                        fontFamily: 'SFPro',
-                                      ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            option,
+                                            style: TextStyle(
+                                              fontSize: 17.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: isSelected
+                                                  ? const Color(0xff485908)
+                                                  : const Color(0xff999999),
+                                              fontFamily: 'SFPro',
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Container(
+                                          width: 22.w,
+                                          height: 22.w,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: isSelected ? const Color(0xff485908) : const Color(0xffE8E9E6),
+                                              width: isSelected ? 2.w : 1.w,
+                                            ),
+                                            color: isSelected ? const Color(0xff485908) : Colors.transparent,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

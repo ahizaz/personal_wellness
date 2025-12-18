@@ -19,15 +19,15 @@ class QuestionAnswerController extends GetxController {
   final RxString selectedGender = ''.obs; // 'Male', 'Female', 'Non-binary'
   Map<String, dynamic>? genderQuestion;
   
-  // Question 2: User Type
-  final RxString selectedUserType = ''.obs; // Selected user type
-  final RxBool showOtherTextField = false.obs; // Show text field when "Other" is selected
+  // Question 2: User Type (allow multiple selections)
+  final RxList<String> selectedUserTypes = <String>[].obs; // Selected user types
+  final RxBool showOtherTextField = false.obs; // Show text field when "Other" is selected among selections
   final TextEditingController otherUserTypeController = TextEditingController();
   final RxBool hasOtherUserTypeText = false.obs;
   Map<String, dynamic>? userTypeQuestion;
   
-  // Question 3: Why using the app
-  final RxString selectedWhyUsingApp = ''.obs; // Selected reason
+  // Question 3: Why using the app (allow multiple selections)
+  final RxList<String> selectedWhyUsingApp = <String>[].obs; // Selected reasons
   Map<String, dynamic>? whyUsingAppQuestion;
   
   // Get default options based on question text
@@ -41,7 +41,7 @@ class QuestionAnswerController extends GetxController {
         'High-School Student',
         'College Student',
         'Graduate Student',
-        'Busy Professional',
+        'Busy Professionalssssssssssssssssss',
         'Busy Parent',
         'Other',
       ];
@@ -56,11 +56,36 @@ class QuestionAnswerController extends GetxController {
     }
     return [];
   }
+
+  // Normalize various option payload shapes from API into List<String>
+  List<String> _normalizeOptions(dynamic raw) {
+    if (raw == null) return [];
+    if (raw is List) {
+      return raw.map<String>((e) {
+        if (e == null) return '';
+        if (e is String) return e;
+        if (e is Map) {
+          return (e['label'] ?? e['value'] ?? e['option'] ?? e['ans'] ?? e['text'] ?? e.toString()).toString();
+        }
+        return e.toString();
+      }).where((s) => s.isNotEmpty).toList();
+    }
+    if (raw is String) {
+      try {
+        final decoded = jsonDecode(raw);
+        return _normalizeOptions(decoded);
+      } catch (_) {
+        return [raw];
+      }
+    }
+    return [];
+  }
   
   // Getter for user types from API or defaults
   List<String> get userTypes {
     if (userTypeQuestion != null) {
-      // Return default options if API doesn't provide them
+      final opts = userTypeQuestion!['options'] as List<String>?;
+      if (opts != null && opts.isNotEmpty) return opts;
       return _getDefaultOptions(userTypeQuestion!['question'] ?? '');
     }
     return [];
@@ -69,7 +94,8 @@ class QuestionAnswerController extends GetxController {
   // Getter for why using app options from API or defaults
   List<String> get whyUsingAppOptions {
     if (whyUsingAppQuestion != null) {
-      // Return default options if API doesn't provide them
+      final opts = whyUsingAppQuestion!['options'] as List<String>?;
+      if (opts != null && opts.isNotEmpty) return opts;
       return _getDefaultOptions(whyUsingAppQuestion!['question'] ?? '');
     }
     return [];
@@ -78,7 +104,8 @@ class QuestionAnswerController extends GetxController {
   // Getter for gender options from API or defaults
   List<String> get genderOptions {
     if (genderQuestion != null) {
-      // Return default options if API doesn't provide them
+      final opts = genderQuestion!['options'] as List<String>?;
+      if (opts != null && opts.isNotEmpty) return opts;
       return _getDefaultOptions(genderQuestion!['question'] ?? '');
     }
     return [];
@@ -148,15 +175,21 @@ class QuestionAnswerController extends GetxController {
           debugPrint('=== Found ${resultList.length} questions ===');
           
           for (var questionItem in resultList) {
+            // Try to read option lists from common keys that APIs might use
+            final dynamic rawOptions = questionItem['options'] ?? questionItem['option'] ?? questionItem['choices'] ?? questionItem['optionsList'] ?? questionItem['answers'];
+            final List<String> normalizedOptions = _normalizeOptions(rawOptions);
+
             final questionMap = {
               "_id": questionItem["_id"] ?? "",
               "question": questionItem["question"] ?? "",
               "isVisible": questionItem["isVisible"] ?? true,
               "createdAt": questionItem["createdAt"] ?? "",
               "updatedAt": questionItem["updatedAt"] ?? "",
+              // store normalized options (may be empty)
+              "options": normalizedOptions,
             };
             questions.add(questionMap);
-            debugPrint('Question: ${questionMap["question"]} (ID: ${questionMap["_id"]})');
+            debugPrint('Question: ${questionMap["question"]} (ID: ${questionMap["_id"]}) Options: ${normalizedOptions.length}');
           }
           
           // Map questions to specific question types based on question text
@@ -230,12 +263,15 @@ class QuestionAnswerController extends GetxController {
     selectedGender.value = gender;
   }
   
-  // Set user type
-  void setUserType(String userType) {
-    debugPrint('=== Setting User Type: $userType ===');
-    selectedUserType.value = userType;
-    // Check if the selected option is "Other" type
-    bool isOther = userType.toLowerCase() == 'other';
+  void toggleUserType(String userType) {
+    debugPrint('=== Toggling User Type: $userType ===');
+    if (selectedUserTypes.contains(userType)) {
+      selectedUserTypes.remove(userType);
+    } else {
+      selectedUserTypes.add(userType);
+    }
+    // Show other text field if any selected option is "Other"
+    bool isOther = selectedUserTypes.any((e) => e.toLowerCase() == 'other');
     showOtherTextField.value = isOther;
     if (!showOtherTextField.value) {
       otherUserTypeController.clear();
@@ -243,18 +279,22 @@ class QuestionAnswerController extends GetxController {
     debugPrint('Show Other Text Field: $isOther');
   }
   
-  // Set why using app
-  void setWhyUsingApp(String reason) {
-    debugPrint('=== Setting Why Using App: $reason ===');
-    selectedWhyUsingApp.value = reason;
+  // Toggle why using app option
+  void toggleWhyUsingApp(String reason) {
+    debugPrint('=== Toggling Why Using App: $reason ===');
+    if (selectedWhyUsingApp.contains(reason)) {
+      selectedWhyUsingApp.remove(reason);
+    } else {
+      selectedWhyUsingApp.add(reason);
+    }
   }
   
   // Check if all required fields are filled
   bool get isFormValid {
     bool genderValid = genderQuestion == null || selectedGender.value.isNotEmpty;
-    bool userTypeValid = userTypeQuestion == null || selectedUserType.value.isNotEmpty;
+    bool userTypeValid = userTypeQuestion == null || selectedUserTypes.isNotEmpty;
     bool otherTypeValid = !showOtherTextField.value || hasOtherUserTypeText.value;
-    bool whyUsingAppValid = whyUsingAppQuestion == null || selectedWhyUsingApp.value.isNotEmpty;
+    bool whyUsingAppValid = whyUsingAppQuestion == null || selectedWhyUsingApp.isNotEmpty;
     
     final isValid = genderValid && userTypeValid && otherTypeValid && whyUsingAppValid;
     debugPrint('=== Form Validation ===');
@@ -304,11 +344,13 @@ class QuestionAnswerController extends GetxController {
         debugPrint('Added Gender Answer: ${genderQuestion!['_id']} -> ${selectedGender.value}');
       }
 
-      // Add user type answer
-      if (userTypeQuestion != null && selectedUserType.value.isNotEmpty) {
-        String answerText = selectedUserType.value;
+      // Add user type answer (join multiple selections with comma)
+      if (userTypeQuestion != null && selectedUserTypes.isNotEmpty) {
+        String answerText;
         if (showOtherTextField.value && otherUserTypeController.text.isNotEmpty) {
           answerText = otherUserTypeController.text;
+        } else {
+          answerText = selectedUserTypes.join(', ');
         }
         answersList.add({
           "questionId": userTypeQuestion!['_id'] ?? '',
@@ -317,13 +359,14 @@ class QuestionAnswerController extends GetxController {
         debugPrint('Added User Type Answer: ${userTypeQuestion!['_id']} -> $answerText');
       }
 
-      // Add why using app answer
-      if (whyUsingAppQuestion != null && selectedWhyUsingApp.value.isNotEmpty) {
+      // Add why using app answer (join multiple selections with comma)
+      if (whyUsingAppQuestion != null && selectedWhyUsingApp.isNotEmpty) {
+        String whyAns = selectedWhyUsingApp.join(', ');
         answersList.add({
           "questionId": whyUsingAppQuestion!['_id'] ?? '',
-          "ans": selectedWhyUsingApp.value,
+          "ans": whyAns,
         });
-        debugPrint('Added Why Using App Answer: ${whyUsingAppQuestion!['_id']} -> ${selectedWhyUsingApp.value}');
+        debugPrint('Added Why Using App Answer: ${whyUsingAppQuestion!['_id']} -> $whyAns');
       }
 
       debugPrint('=== Total answers to submit: ${answersList.length} ===');
@@ -378,10 +421,10 @@ class QuestionAnswerController extends GetxController {
   // Clear all data
   void clearAll() {
     selectedGender.value = '';
-    selectedUserType.value = '';
+    selectedUserTypes.clear();
     showOtherTextField.value = false;
     otherUserTypeController.clear();
-    selectedWhyUsingApp.value = '';
+    selectedWhyUsingApp.clear();
   }
   
   @override
