@@ -37,6 +37,7 @@ class IconPath {
   static const edit = "assets/icons/edit.png";
   static const progresshistory = "assets/icons/progresshistory.png";
   static const logroutine = "assets/icons/logroutine.png";
+  static const appicon = "assets/icons/spinspiredlogo.png";
 
 
 
