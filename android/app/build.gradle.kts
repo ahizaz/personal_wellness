@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -6,7 +9,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
 }
-
+//loadkeystore 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
 android {
     namespace = "com.lauren.personal_wellness"
     compileSdk = 36
@@ -29,12 +37,22 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    //Sign the app
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+            storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
+            storePassword = keystoreProperties["storePassword"] as String?
+        }
+    }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            //signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isMinifyEnabled = false
