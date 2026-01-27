@@ -4,11 +4,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
     <application
-        android:label="Skin Spired"
+        android:label="Skinspired Tracking"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
            <meta-data
-        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:name="com.google.firebase.messaging.default_notification_icon" 
         android:resource="@drawable/notification_icon" />
         <activity
             android:name=".MainActivity"

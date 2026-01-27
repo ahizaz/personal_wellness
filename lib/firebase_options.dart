@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -58,5 +55,18 @@ class DefaultFirebaseOptions {
     messagingSenderId: '971700125899',
     projectId: 'personalwellness-192da',
     storageBucket: 'personalwellness-192da.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDXObGZgITnExeI0yIbYi9bPk5ycjj5AdU',
+    appId: '1:971700125899:ios:62535dea8d199ebb0f9b4e',
+    messagingSenderId: '971700125899',
+    projectId: 'personalwellness-192da',
+    storageBucket: 'personalwellness-192da.firebasestorage.app',
+    androidClientId:
+        '971700125899-dn6cire1j35gkjptber69427trcrte0b.apps.googleusercontent.com',
+    iosClientId:
+        '971700125899-2839444j39c9g8qv85f0h1hv86n2iiri.apps.googleusercontent.com',
+    iosBundleId: 'com.lauren.lpersonalwellness',
   );
 }
