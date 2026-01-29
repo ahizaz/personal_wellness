@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class NotificationServices {
       FlutterLocalNotificationsPlugin();
 
   // 🔹 Call this in initState or at app start
-  void requestNotificationPermission() async {
+  Future<void> requestNotificationPermission() async {
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,
@@ -21,12 +22,53 @@ class NotificationServices {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('✅ User granted permission');
+
+      // For iOS, get APNS token after permission is granted
+      if (Platform.isIOS) {
+        await _setupAPNSToken();
+      }
     } else if (settings.authorizationStatus ==
         AuthorizationStatus.provisional) {
       debugPrint('⚠️ User granted provisional permission');
+
+      // For iOS, get APNS token after permission is granted
+      if (Platform.isIOS) {
+        await _setupAPNSToken();
+      }
     } else {
       AppSettings.openAppSettings();
       debugPrint('🚫 Please enable notifications from device settings.');
+    }
+  }
+
+  // Helper method to setup APNS token for iOS
+  Future<void> _setupAPNSToken() async {
+    if (!Platform.isIOS) return;
+
+    try {
+      String? apnsToken = await messaging.getAPNSToken();
+      if (apnsToken != null) {
+        debugPrint('📱 APNS Token received: ${apnsToken.substring(0, 20)}...');
+        return;
+      }
+
+      debugPrint('⚠️ APNS Token not available yet, waiting...');
+
+      // Retry mechanism with exponential backoff
+      for (int i = 0; i < 5; i++) {
+        await Future.delayed(Duration(milliseconds: 500 * (i + 1)));
+        apnsToken = await messaging.getAPNSToken();
+        if (apnsToken != null) {
+          debugPrint(
+            '📱 APNS Token received on retry $i: ${apnsToken.substring(0, 20)}...',
+          );
+          return;
+        }
+      }
+
+      debugPrint('⚠️ APNS Token still not available after retries');
+    } catch (e) {
+      debugPrint('❌ Error getting APNS token: $e');
     }
   }
 
@@ -38,7 +80,12 @@ class NotificationServices {
         settings.authorizationStatus == AuthorizationStatus.provisional;
   }
 
-  void firebaseInit() {
+  Future<void> firebaseInit() async {
+    // For iOS, ensure APNS token is set up first
+    if (Platform.isIOS) {
+      await _setupAPNSToken();
+    }
+
     FirebaseMessaging.onMessage.listen((message) async {
       debugPrint('🔔 Foreground Message: ${message.notification?.title}');
 
@@ -127,9 +174,26 @@ class NotificationServices {
   }
 
   Future<String> getDeviceToken() async {
-    String? token = await messaging.getToken();
-    debugPrint('📱 FCM Token: $token');
-    return token!;
+    try {
+      // For iOS, ensure APNS token is available first
+      if (Platform.isIOS) {
+        await _setupAPNSToken();
+
+        // Wait a bit more for APNS token to be processed
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      String? token = await messaging.getToken();
+      if (token != null) {
+        debugPrint('📱 FCM Token: $token');
+        return token;
+      } else {
+        throw Exception('FCM token is null');
+      }
+    } catch (e) {
+      debugPrint('❌ Error getting device token: $e');
+      rethrow;
+    }
   }
 
   void isTokenRefresh() async {

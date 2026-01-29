@@ -115,8 +115,13 @@ class SignInController extends GetxController {
       // Get current FCM token to send with Google login
       String? fcmToken;
       try {
-        fcmToken = await NotificationServices().getDeviceToken();
-      } catch (_) {}
+        final notificationServices = NotificationServices();
+        // For iOS, ensure proper initialization first
+        await notificationServices.requestNotificationPermission();
+        fcmToken = await notificationServices.getDeviceToken();
+      } catch (e) {
+        debugPrint('FCM token retrieval error: $e');
+      }
 
       final body = {
         "email": googleUser.email,
@@ -171,16 +176,21 @@ class SignInController extends GetxController {
 
           debugPrint('=== Google Sign In successful ===');
           debugPrint('Checking if questions have been answered...');
-          
+
           // Check if questions have been answered
-          final hasAnsweredQuestions = prefs.getBool('hasAnsweredQuestions') ?? false;
+          final hasAnsweredQuestions =
+              prefs.getBool('hasAnsweredQuestions') ?? false;
           debugPrint('hasAnsweredQuestions: $hasAnsweredQuestions');
-          
+
           if (hasAnsweredQuestions) {
-            debugPrint('Questions already answered, navigating to BottomNavbar');
+            debugPrint(
+              'Questions already answered, navigating to BottomNavbar',
+            );
             Get.offAll(() => BottomNavbar());
           } else {
-            debugPrint('Questions not answered yet, navigating to QuestionAnswer');
+            debugPrint(
+              'Questions not answered yet, navigating to QuestionAnswer',
+            );
             Get.offAll(() => const QuestionAnswer());
           }
         } else {

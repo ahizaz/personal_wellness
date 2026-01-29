@@ -35,19 +35,30 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    notificationServices.requestNotificationPermission();
-    notificationServices.firebaseInit();
-    // notificationServices.isTokenRefresh();
-    notificationServices.getDeviceToken().then((value){
-      debugPrint('devicetoken');
-      debugPrint(value);
-    });
+    _initializeNotifications();
 
     Get.put(NotificationController()); // Initialize NotificationController here
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notificationServices.initLocalNotifications(context);
     });
+  }
+
+  // Initialize notifications properly with async handling
+  Future<void> _initializeNotifications() async {
+    try {
+      // First request permission and setup APNS token
+      await notificationServices.requestNotificationPermission();
+
+      // Then initialize Firebase messaging
+      await notificationServices.firebaseInit();
+
+      // Finally get the device token
+      final token = await notificationServices.getDeviceToken();
+      debugPrint('devicetoken: $token');
+    } catch (e) {
+      debugPrint('Error initializing notifications: $e');
+    }
   }
 
   @override
@@ -68,7 +79,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
   String _getGreetingMessage() {
     final now = DateTime.now();
     final hour = now.hour;
-    
+
     if (hour >= 5 && hour < 12) {
       return "Good Morning";
     } else if (hour >= 12 && hour < 17) {
@@ -79,10 +90,15 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
   }
 
   void _showMenu(BuildContext context) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final RenderBox fabBox = _fabKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RenderBox fabBox =
+        _fabKey.currentContext!.findRenderObject() as RenderBox;
     final Size fabSize = fabBox.size;
-    final Offset fabTopRight = fabBox.localToGlobal(fabSize.topRight(Offset.zero), ancestor: overlay);
+    final Offset fabTopRight = fabBox.localToGlobal(
+      fabSize.topRight(Offset.zero),
+      ancestor: overlay,
+    );
 
     const int itemCount = 4;
     const double itemHeight = 48.0;
@@ -138,7 +154,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -228,7 +244,7 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
         ),
         PopupMenuItem(
           onTap: () {
-           Get.to(()=>NotificationScreen());
+            Get.to(() => NotificationScreen());
           },
           child: Row(
             children: const [
@@ -260,7 +276,6 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
             ],
           ),
         ),
-       
       ],
       elevation: 8.0,
       shape: const RoundedRectangleBorder(
@@ -298,33 +313,35 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                 }),
               ),
               SizedBox(width: 16.w),
-              Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Hi ${controller.userName.value}!",
-                        style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff3E4B2C),
-                        ),
+              Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hi ${controller.userName.value}!",
+                      style: TextStyle(
+                        fontFamily: "SFPro",
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff3E4B2C),
                       ),
-                      Text(
-                        _getGreetingMessage(),
-                        style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff3E4B2C),
-                        ),
+                    ),
+                    Text(
+                      _getGreetingMessage(),
+                      style: TextStyle(
+                        fontFamily: "SFPro",
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff3E4B2C),
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
               const Spacer(),
               InkWell(
-                onTap: (){
-                  Get.to(()=>NotificationScreen());
+                onTap: () {
+                  Get.to(() => NotificationScreen());
                 },
                 child: Obx(() {
                   final unread = notificationController.unreadCount;
@@ -341,7 +358,10 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
                           right: 0,
                           top: 0,
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 2.h,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(12.r),
@@ -380,16 +400,15 @@ class _TodayState extends State<Today> with WidgetsBindingObserver {
               child: Obx(() {
                 if (controller.isLoading.value) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xff485908),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xff485908)),
                   );
                 }
                 if (controller.routineData.isEmpty) {
                   return const EmptyRoutineView();
                 }
-                bool allCompleted = controller.routineData
-                    .every((data) => data['isCompleted'].value == true);
+                bool allCompleted = controller.routineData.every(
+                  (data) => data['isCompleted'].value == true,
+                );
                 if (allCompleted) {
                   return const RoutineCompletedView();
                 }

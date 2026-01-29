@@ -11,7 +11,8 @@ import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/
 
 class SignInPassController extends GetxController {
   var obscureText = true.obs;
-  final TextEditingController signInPasswordController = TextEditingController();
+  final TextEditingController signInPasswordController =
+      TextEditingController();
   var hasText = false.obs;
 
   @override
@@ -38,8 +39,11 @@ class SignInPassController extends GetxController {
       final NotificationServices notificationServices = NotificationServices();
       String? fcmToken;
       try {
+        // For iOS, ensure proper initialization first
+        await notificationServices.requestNotificationPermission();
         fcmToken = await notificationServices.getDeviceToken();
       } catch (e) {
+        debugPrint('FCM token retrieval error: $e');
         fcmToken = null; // proceed without token if retrieval fails
       }
 
@@ -63,21 +67,26 @@ class SignInPassController extends GetxController {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('accessToken', accessToken);
           await prefs.setString('userId', userId);
-          
+
           debugPrint('=== Login successful ===');
           debugPrint('Checking if questions have been answered...');
-          
+
           // Check if questions have been answered
-          final hasAnsweredQuestions = prefs.getBool('hasAnsweredQuestions') ?? false;
+          final hasAnsweredQuestions =
+              prefs.getBool('hasAnsweredQuestions') ?? false;
           debugPrint('hasAnsweredQuestions: $hasAnsweredQuestions');
-          
+
           EasyLoading.showSuccess('Login successful!');
-          
+
           if (hasAnsweredQuestions) {
-            debugPrint('Questions already answered, navigating to BottomNavbar');
+            debugPrint(
+              'Questions already answered, navigating to BottomNavbar',
+            );
             Get.offAll(() => BottomNavbar());
           } else {
-            debugPrint('Questions not answered yet, navigating to QuestionAnswer');
+            debugPrint(
+              'Questions not answered yet, navigating to QuestionAnswer',
+            );
             Get.offAll(() => const QuestionAnswer());
           }
           return true;
