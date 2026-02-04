@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -158,25 +160,26 @@ class SignInForm extends StatelessWidget {
                     SizedBox(height: 21.h),
 
                     // Google Sign In
-                    CustomButton(
-                      text: "Continue with Google",
-                      textStyle: TextStyle(
-                        color: const Color(0xff172601),
-                        fontFamily: 'SFPro',
-                        fontSize: 17.5.sp,
-                        fontWeight: FontWeight.w600,
+                    if (Platform.isAndroid)
+                      CustomButton(
+                        text: "Continue with Google",
+                        textStyle: TextStyle(
+                          color: const Color(0xff172601),
+                          fontFamily: 'SFPro',
+                          fontSize: 17.5.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        color: const Color(0xffEDEEE6),
+                        leadingIcon: Image.asset(
+                          IconPath.google,
+                          width: 20.w,
+                          height: 20.h,
+                          fit: BoxFit.cover,
+                        ),
+                        onTap: () async {
+                          controller.signInWithGoogle();
+                        },
                       ),
-                      color: const Color(0xffEDEEE6),
-                      leadingIcon: Image.asset(
-                        IconPath.google,
-                        width: 20.w,
-                        height: 20.h,
-                        fit: BoxFit.cover,
-                      ),
-                      onTap: () async {
-                        controller.signInWithGoogle();
-                      },
-                    ),
 
                     SizedBox(height: 24.h),
 

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Personal Wellness</string>
+	<string>SKINspired</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -43,6 +43,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SKINspired needs camera access to take skin photos for progress tracking.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SKINspired needs access to your photos to track your skin progress over time.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>SKINspired needs permission to save skin photos to your library.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
