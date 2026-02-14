@@ -5,12 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:personal_wellness/core/common/widgets/health_disclaimer_dialog.dart';
 import 'dart:convert';
 
 class QuestionAnswerController extends GetxController {
   // Loading state
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
+  final RxBool disclaimerShown = false.obs;
   
   // Questions from API - storing raw question data
   final RxList<Map<String, dynamic>> questions = <Map<String, dynamic>>[].obs;
@@ -236,6 +238,13 @@ class QuestionAnswerController extends GetxController {
           debugPrint('Why using app question: ${whyUsingAppQuestion?['question']}');
           
           EasyLoading.showSuccess("Questions loaded successfully");
+          
+          // Show health disclaimer after questions are loaded
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (!disclaimerShown.value) {
+              showHealthDisclaimer();
+            }
+          });
         } else {
           errorMessage.value = data["message"] ?? 'Failed to load questions';
           debugPrint('ERROR: Failed to load questions: ${errorMessage.value}');
@@ -425,6 +434,19 @@ class QuestionAnswerController extends GetxController {
     showOtherTextField.value = false;
     otherUserTypeController.clear();
     selectedWhyUsingApp.clear();
+  }
+  
+  // Show health disclaimer dialog
+  void showHealthDisclaimer() {
+    if (Get.context != null && !disclaimerShown.value) {
+      disclaimerShown.value = true;
+      HealthDisclaimerDialog.show(
+        Get.context!,
+        () {
+          debugPrint('Health disclaimer accepted');
+        },
+      );
+    }
   }
   
   @override

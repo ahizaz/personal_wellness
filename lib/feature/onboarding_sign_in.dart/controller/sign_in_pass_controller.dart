@@ -85,13 +85,20 @@ class SignInPassController extends GetxController {
           EasyLoading.showError('Invalid response from server');
           return false;
         }
+      } else if (response.statusCode == 401) {
+        EasyLoading.showError('Invalid email or password. Please check your credentials.');
+        return false;
+      } else if (response.statusCode == 404) {
+        EasyLoading.showError('Account not found. Please register first.');
+        return false;
       } else {
-        EasyLoading.showError('Invalid email or password');
+        EasyLoading.showError('Unable to connect. Please check your internet connection.');
         return false;
       }
     } catch (e) {
       await EasyLoading.dismiss();
-      EasyLoading.showError('Something went wrong. Please try again.');
+      debugPrint('Login error: $e');
+      EasyLoading.showError('Connection failed. Please check your internet and try again.');
       return false;
     }
   }

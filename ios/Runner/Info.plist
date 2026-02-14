@@ -44,11 +44,13 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
-	<string>SKINspired needs camera access to take skin photos for progress tracking.</string>
+	<string>We need camera access to capture photos for tracking your wellness progress. Your photos are stored securely and are never shared without your consent.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>SKINspired needs access to your photos to track your skin progress over time.</string>
+	<string>We need access to your photo library to help you track your progress over time. Your photos remain private and secure.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>SKINspired needs permission to save skin photos to your library.</string>
+	<string>We need permission to save progress photos to your library so you can track your wellness journey.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We respect your privacy. This data helps us provide you with a personalized experience and improve the app. You can opt out anytime.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

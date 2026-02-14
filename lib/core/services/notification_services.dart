@@ -127,9 +127,14 @@ class NotificationServices {
   }
 
   Future<String> getDeviceToken() async {
-    String? token = await messaging.getToken();
-    debugPrint('📱 FCM Token: $token');
-    return token!;
+    try {
+      String? token = await messaging.getToken();
+      debugPrint('📱 FCM Token: $token');
+      return token ?? '';
+    } catch (e) {
+      debugPrint('❌ Error getting FCM token: $e');
+      return '';
+    }
   }
 
   void isTokenRefresh() async {

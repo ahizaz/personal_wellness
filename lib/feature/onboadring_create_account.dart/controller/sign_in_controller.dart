@@ -188,13 +188,23 @@ class SignInController extends GetxController {
         }
       } else {
         debugPrint("Server error: ${response.statusCode}");
+        EasyLoading.showError('Unable to sign in with Google. Please try again later.');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException code: ${e.code}');
       debugPrint('PlatformException message: ${e.message ?? ''}');
       debugPrint('PlatformException details: ${e.details?.toString() ?? ''}');
+      
+      if (e.code == 'sign_in_canceled') {
+        EasyLoading.showInfo('Sign in cancelled');
+      } else if (e.code == 'network_error') {
+        EasyLoading.showError('Network error. Please check your connection.');
+      } else {
+        EasyLoading.showError('Sign in failed. Please try again.');
+      }
     } catch (e) {
       debugPrint('Generic sign-in error: $e');
+      EasyLoading.showError('Sign in failed. Please try again later.');
     } finally {
       isLoading.value = false;
       EasyLoading.dismiss();
