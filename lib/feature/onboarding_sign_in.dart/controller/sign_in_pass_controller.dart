@@ -18,7 +18,7 @@ class SignInPassController extends GetxController {
   void onInit() {
     super.onInit();
     signInPasswordController.addListener(() {
-      hasText.value = signInPasswordController.text.isNotEmpty;
+      hasText.value = signInPasswordController.text.isNotEmpty;//
     });
   }
 
