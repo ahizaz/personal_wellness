@@ -8,6 +8,7 @@ class Urls{
   static const String resetpassword = "$baseUrl/auth/reset-password";
   static const String verifyemail = "$baseUrl/auth/verify-email";
   static const String googlesignin = "$baseUrl/auth/google-login";
+  static const String deleteAccount = "https://skinspired.cloud/delete-account";
   static const String getallskinconditon = "$baseUrl/skin-condition/get-all";
   static const String imageurl = "https://api.skinspired.cloud";
   static const String getallproduct = "$baseUrl/product/get-all";

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -188,8 +189,41 @@ class SkinCondition extends StatelessWidget {
                               ),
                             ),
                           );
-                        }),
-                         
+                        }                        ),
+                        SizedBox(height: 12.h),
+                        Text("Sources:", style: TextStyle(
+                          fontFamily: "SFPro", fontSize: 14.sp,
+                          fontWeight: FontWeight.w600, color: Color(0xff172601),
+                        )),
+                        SizedBox(height: 4.h),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: () async {
+                                final uri = Uri.parse("https://www.aad.org");
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: Text("American Academy of Dermatology - aad.org",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908),
+                                  decoration: TextDecoration.underline)),
+                            ),
+                            SizedBox(height: 4.h),
+                            InkWell(
+                              onTap: () async {
+                                final uri = Uri.parse("https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/skin-care/art-20048237");
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: Text("Mayo Clinic - Skin Care",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908),
+                                  decoration: TextDecoration.underline)),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

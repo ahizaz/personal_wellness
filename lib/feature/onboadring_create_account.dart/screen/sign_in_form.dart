@@ -126,41 +126,36 @@ class SignInForm extends StatelessWidget {
                       },
                     ),
 
-                    SizedBox(height: 24.h),
-
-                    // OR Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: const Color(0xff000000).withAlpha(25),
-                            thickness: 1,
-                            endIndent: 10,
+                    if (Platform.isAndroid) ...[
+                      SizedBox(height: 24.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: const Color(0xff000000).withAlpha(25),
+                              thickness: 1,
+                              endIndent: 10,
+                            ),
                           ),
-                        ),
-                        Text(
-                          "Or",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xff121221).withAlpha(128),
+                          Text(
+                            "Or",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff121221).withAlpha(128),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: const Color(0xff000000).withAlpha(25),
-                            thickness: 1,
-                            indent: 10,
+                          Expanded(
+                            child: Divider(
+                              color: const Color(0xff000000).withAlpha(25),
+                              thickness: 1,
+                              indent: 10,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 21.h),
-
-                    // Google Sign In
-                    if (Platform.isAndroid)
+                        ],
+                      ),
+                      SizedBox(height: 21.h),
                       CustomButton(
                         text: "Continue with Google",
                         textStyle: TextStyle(
@@ -176,12 +171,10 @@ class SignInForm extends StatelessWidget {
                           height: 20.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () async {
-                          controller.signInWithGoogle();
-                        },
+                        onTap: () => controller.signInWithGoogle(),
                       ),
-
-                    SizedBox(height: 24.h),
+                      SizedBox(height: 24.h),
+                    ],
 
                     CustomTermsText(),
                   ],

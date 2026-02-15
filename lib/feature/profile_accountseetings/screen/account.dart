@@ -9,6 +9,8 @@ import 'package:personal_wellness/feature/profile_accountseetings/screen/invento
 import 'package:personal_wellness/feature/profile_accountseetings/screen/logout.dart';
 import 'package:personal_wellness/feature/profile_accountseetings/screen/update_password.dart';
 import 'package:personal_wellness/feature/reminders/screen/notification_seetings.dart';
+import 'package:personal_wellness/core/urls/urls.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:personal_wellness/feature/today/controller/today_controller.dart';
 import 'dart:io';
 
@@ -258,6 +260,43 @@ class Account extends StatelessWidget {
                          InkWell(onTap:(){
                           Get.to(()=>Inventory());
                          },child: InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)))
+                        ],
+                      ),
+                        SizedBox(height: 16.h,),
+                        Row(
+                        children: [
+                         Icon(Icons.delete_outline, size: 24.sp, color: Color(0xffB00020)),
+                         SizedBox(width: 16.w,),
+                         Expanded(
+                          child: Column(
+                           mainAxisAlignment: MainAxisAlignment.start,
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           children: [
+                            Text("Delete account",style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xffB00020)
+                            ),),
+                            SizedBox(height: 4.h,),
+                            Text("Permanently delete your account and data",style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xff3E4B2C)
+                            ),)
+                           ],
+                          ),
+                         ),
+                         InkWell(
+                          onTap: () async {
+                            final uri = Uri.parse(Urls.deleteAccount);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            }
+                          },
+                          child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)
+                         )
                         ],
                       ),
                         SizedBox(height: 16.h,),

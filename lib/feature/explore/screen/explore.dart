@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -11,6 +12,25 @@ import 'package:personal_wellness/feature/explore/screen/view_product.dart';
 
 class Explore extends StatelessWidget {
   const Explore({super.key});
+
+  Widget _buildSourceLink(String title, String url) {
+    return Padding(
+      padding: EdgeInsets.only(top: 4.h),
+      child: InkWell(
+        onTap: () async {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: Text(title, style: TextStyle(
+          fontFamily: "SFPro", fontSize: 13.sp,
+          color: Color(0xff485908), fontWeight: FontWeight.w500,
+          decoration: TextDecoration.underline,
+        )),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +390,32 @@ class Explore extends StatelessWidget {
                 );
               }),
 
+              SizedBox(height: 24.h),
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Color(0xffE8E9E6)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Sources & References", style: TextStyle(
+                      fontFamily: "SFPro", fontSize: 15.sp,
+                      fontWeight: FontWeight.w600, color: Color(0xff172601),
+                    )),
+                    SizedBox(height: 8.h),
+                    Text("Skin and wellness information is for educational purposes. Consult a healthcare professional for medical advice.",
+                      style: TextStyle(fontFamily: "SFPro", fontSize: 13.sp, color: Color(0xff3E4B2C)),
+                    ),
+                    SizedBox(height: 8.h),
+                    _buildSourceLink("American Academy of Dermatology", "https://www.aad.org"),
+                    _buildSourceLink("Mayo Clinic - Skin Care", "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/skin-care/art-20048237"),
+                    _buildSourceLink("NIH - Skin Conditions", "https://www.niams.nih.gov/health-topics/skin-diseases"),
+                  ],
+                ),
+              ),
               SizedBox(height: 24.h),
             ],
           ),

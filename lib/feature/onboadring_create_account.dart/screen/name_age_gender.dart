@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -270,64 +272,57 @@ class NameAgeGender extends StatelessWidget {
                         Get.back();
                       },
                     ),
-                    SizedBox(height: 24.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: const Color(0xff000000).withAlpha(25),
-                            height: 1,
-                            thickness: 1,
-                            endIndent: 10,
-                          ),
-                        ),
-                        Text(
-                          "Or Continue with",
-                          style: TextStyle(
-                            fontFamily: "SFPro",
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xff121221).withAlpha(128),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: const Color(0xff000000).withAlpha(25),
-                            height: 1,
-                            thickness: 1,
-                            indent: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 21.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: CustomButton(
-                            text: "Continue with Google",
-                            textStyle: TextStyle(
-                              color: const Color(0xff172601),
-                              fontFamily: 'SFPro',
-                              fontSize: 17.5.sp,
-                              fontWeight: FontWeight.w600,
+                    if (Platform.isAndroid) ...[
+                      SizedBox(height: 24.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: const Color(0xff000000).withAlpha(25),
+                              height: 1,
+                              thickness: 1,
+                              endIndent: 10,
                             ),
-                            color: const Color(0xffEDEEE6),
-                            leadingIcon: Image.asset(
-                              IconPath.google,
-                              width: 20.w,
-                              height: 20.h,
-                              fit: BoxFit.cover,
-                            ),
-                            onTap: () async {
-                              controller.signInWithGoogle();
-                            },
                           ),
+                          Text(
+                            "Or Continue with",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff121221).withAlpha(128),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: const Color(0xff000000).withAlpha(25),
+                              height: 1,
+                              thickness: 1,
+                              indent: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 21.h),
+                      CustomButton(
+                        text: "Continue with Google",
+                        textStyle: TextStyle(
+                          color: const Color(0xff172601),
+                          fontFamily: 'SFPro',
+                          fontSize: 17.5.sp,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 24.h),
+                        color: const Color(0xffEDEEE6),
+                        leadingIcon: Image.asset(
+                          IconPath.google,
+                          width: 20.w,
+                          height: 20.h,
+                          fit: BoxFit.cover,
+                        ),
+                        onTap: () => controller.signInWithGoogle(),
+                      ),
+                      SizedBox(height: 24.h),
+                    ],
                     CustomTermsText(),
                     SizedBox(height: 24.h),
                   ],
