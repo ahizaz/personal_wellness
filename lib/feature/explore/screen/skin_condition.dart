@@ -201,26 +201,46 @@ class SkinCondition extends StatelessWidget {
                           children: [
                             InkWell(
                               onTap: () async {
-                                final uri = Uri.parse("https://www.aad.org");
+                                final uri = Uri.parse("https://health.clevelandclinic.org/what-products-do-i-actually-need-for-a-simple-everyday-skin-care-routine");
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                                 }
                               },
-                              child: Text("American Academy of Dermatology - aad.org",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908),
-                                  decoration: TextDecoration.underline)),
+                              child: Text("Cleveland Clinic - Everyday skin-care products",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
                             SizedBox(height: 4.h),
                             InkWell(
                               onTap: () async {
-                                final uri = Uri.parse("https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/skin-care/art-20048237");
+                                final uri = Uri.parse("https://www.nm.org/healthbeat/healthy-tips/Top-Skin-Care-Ingredients-Recommended-by-Dermatologists");
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                                 }
                               },
-                              child: Text("Mayo Clinic - Skin Care",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908),
-                                  decoration: TextDecoration.underline)),
+                              child: Text("Northwestern Medicine - Top skin-care ingredients",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
+                            ),
+                            SizedBox(height: 4.h),
+                            InkWell(
+                              onTap: () async {
+                                final uri = Uri.parse("https://www.aad.org/public/everyday-care/skin-care-basics");
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: Text("American Academy of Dermatology - Skin care basics",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
+                            ),
+                            SizedBox(height: 4.h),
+                            InkWell(
+                              onTap: () async {
+                                final uri = Uri.parse("https://www.health.harvard.edu/staying-healthy/skin-care-for-aging-skin-minimizing-age-spots-wrinkles-and-undereye-bags");
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: Text("Harvard Health - Skin care for aging skin",
+                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
                           ],
                         ),
