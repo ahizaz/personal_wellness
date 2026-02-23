@@ -24,7 +24,7 @@ class PeronalWellNess extends StatelessWidget {
       splitScreenMode: true,
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Personal Wellness',
+        title: 'Skinspired Tracking',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
