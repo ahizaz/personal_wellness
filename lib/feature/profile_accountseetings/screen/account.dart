@@ -132,23 +132,23 @@ class Account extends StatelessWidget {
                          ),
                          Spacer(),
                       InkWell(
-  onTap: () {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      pageBuilder: (_, __, ___) {
-        return const AccountSeetings();
-      },
-    );
-  },
-  child: Image(
-    image: AssetImage(IconPath.profilearrow),
-    width: 24.w,
-    height: 24.h,
-    fit: BoxFit.cover,
-  ),
-)
+                        onTap: () {
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierLabel: '',
+                            pageBuilder: (_, __, ___) {
+                              return const AccountSeetings();
+                            },
+                          );
+                        },
+                        child: Image(
+                          image: AssetImage(IconPath.profilearrow),
+                          width: 24.w,
+                          height: 24.h,
+                          fit: BoxFit.cover,
+                        ),
+                      )
                         ],
                       ),
                       SizedBox(height: 16.h,),
@@ -177,17 +177,19 @@ class Account extends StatelessWidget {
                           ],
                          ),
                          Spacer(),
-                         InkWell(onTap:(){
-                            showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      pageBuilder: (_, __, ___) {
-        return UpdatePassword();
-      },
-    );
-
-                         },child: InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)))
+                         InkWell(
+                           onTap:(){
+                             showGeneralDialog(
+                               context: context,
+                               barrierDismissible: true,
+                               barrierLabel: '',
+                               pageBuilder: (_, __, ___) {
+                                 return UpdatePassword();
+                               },
+                             );
+                           },
+                           child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)
+                         )
                         ],
                       ),
                       SizedBox(height: 16.h,),
@@ -218,17 +220,18 @@ class Account extends StatelessWidget {
                          ),
                          Spacer(),
                          InkWell(
-                          onTap: (){
-                                            showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      pageBuilder: (_, __, ___) {
-        return NotificationSeetings();
-      },
-    );
-                          },
-                          child: InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)))
+                           onTap: (){
+                             showGeneralDialog(
+                               context: context,
+                               barrierDismissible: true,
+                               barrierLabel: '',
+                               pageBuilder: (_, __, ___) {
+                                 return NotificationSeetings();
+                               },
+                             );
+                           },
+                           child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)
+                         )
                         ],
                       ),
                         SizedBox(height: 16.h,),
@@ -319,16 +322,19 @@ class Account extends StatelessWidget {
                           ],
                          ),
                          Spacer(),
-                         InkWell(onTap:(){
-                         showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      pageBuilder: (_, __, ___) {
-        return Logout();
-      },
-    );
-                         },child: InkWell(child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)))
+                         InkWell(
+                           onTap:(){
+                             showGeneralDialog(
+                               context: context,
+                               barrierDismissible: true,
+                               barrierLabel: '',
+                               pageBuilder: (_, __, ___) {
+                                 return Logout();
+                               },
+                             );
+                           },
+                           child: Image(image: AssetImage(IconPath.profilearrow),width: 24.w,height: 24.h,fit: BoxFit.cover,)
+                         )
                         ],
                       ),
                       SizedBox(height: 16.h,),
