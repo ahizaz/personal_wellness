@@ -1,6 +1,6 @@
 {
-    "name": "personal_wellness",
-    "short_name": "personal_wellness",
+    "name": "Skinspired Tracking",
+    "short_name": "Skinspired",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
