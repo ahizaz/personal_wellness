@@ -117,10 +117,9 @@ class Explore extends StatelessWidget {
                             margin: EdgeInsets.only(right: 16.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisSize: MainAxisSize.max,
                               children: [
-                                SizedBox(
-                                  height: 160.h,
+                                Expanded(
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.r),
                                     child: Image.network(
@@ -181,6 +180,8 @@ class Explore extends StatelessWidget {
                                     fontWeight: FontWeight.w500,
                                     color: Color(0xff000000),
                                   ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -211,10 +212,9 @@ class Explore extends StatelessWidget {
                             margin: EdgeInsets.only(right: 16.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisSize: MainAxisSize.max,
                               children: [
-                                SizedBox(
-                                  height: 160.h,
+                                Expanded(
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.r),
                                     child: Image.network(
@@ -254,6 +254,8 @@ class Explore extends StatelessWidget {
                                     color: Color(0xff000000),
                                   ),
                                   textAlign: TextAlign.start,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
