@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform, kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -126,7 +126,7 @@ class SignInForm extends StatelessWidget {
                       },
                     ),
 
-                    if (Platform.isAndroid) ...[
+                    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) ...[
                       SizedBox(height: 24.h),
                       Row(
                         children: [

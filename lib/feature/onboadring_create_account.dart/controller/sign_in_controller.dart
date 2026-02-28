@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -90,6 +91,22 @@ class SignInController extends GetxController {
   }
 
   Future<void> signInWithGoogle() async {
+    // Only allow Google Sign-In on Android devices (not web or iOS/iPad)
+    if (kIsWeb || !Platform.isAndroid) {
+      EasyLoading.showInfo('Google Sign-In is available only on Android devices');
+      return;
+    }
+
+    // If running on a tablet, skip Google Sign-In
+    final ctx = Get.context;
+    if (ctx != null) {
+      final bool _isTablet = MediaQuery.of(ctx).size.shortestSide >= 600;
+      if (_isTablet) {
+        EasyLoading.showInfo('Google Sign-In skipped on tablets');
+        return;
+      }
+    }
+
     try {
       isLoading.value = true;
       EasyLoading.show(status: 'Signing in...');
