@@ -24,6 +24,18 @@ class SkinCondition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exploreController = Get.find<ExploreController>();
+    // Helper to open external urls with error handling
+    Future<void> _openUrl(String url) async {
+      final uri = Uri.parse(url);
+      try {
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open link')));
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      }
+    }
     
     if (id != null && exploreController.currentSkinId.value != id) {
       exploreController.currentSkinId.value = id!;
@@ -200,45 +212,25 @@ class SkinCondition extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InkWell(
-                              onTap: () async {
-                                final uri = Uri.parse("https://health.clevelandclinic.org/what-products-do-i-actually-need-for-a-simple-everyday-skin-care-routine");
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                }
-                              },
+                              onTap: () => _openUrl("https://health.clevelandclinic.org/what-products-do-i-actually-need-for-a-simple-everyday-skin-care-routine"),
                               child: Text("Cleveland Clinic - Everyday skin-care products",
                                 style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
                             SizedBox(height: 4.h),
                             InkWell(
-                              onTap: () async {
-                                final uri = Uri.parse("https://www.nm.org/healthbeat/healthy-tips/Top-Skin-Care-Ingredients-Recommended-by-Dermatologists");
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                }
-                              },
+                              onTap: () => _openUrl("https://www.nm.org/healthbeat/healthy-tips/Top-Skin-Care-Ingredients-Recommended-by-Dermatologists"),
                               child: Text("Northwestern Medicine - Top skin-care ingredients",
                                 style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
                             SizedBox(height: 4.h),
                             InkWell(
-                              onTap: () async {
-                                final uri = Uri.parse("https://www.aad.org/public/everyday-care/skin-care-basics");
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                }
-                              },
+                              onTap: () => _openUrl("https://www.aad.org/public/everyday-care/skin-care-basics"),
                               child: Text("American Academy of Dermatology - Skin care basics",
                                 style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
                             SizedBox(height: 4.h),
                             InkWell(
-                              onTap: () async {
-                                final uri = Uri.parse("https://www.health.harvard.edu/staying-healthy/skin-care-for-aging-skin-minimizing-age-spots-wrinkles-and-undereye-bags");
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                }
-                              },
+                              onTap: () => _openUrl("https://www.health.harvard.edu/staying-healthy/skin-care-for-aging-skin-minimizing-age-spots-wrinkles-and-undereye-bags"),
                               child: Text("Harvard Health - Skin care for aging skin",
                                 style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
                             ),
