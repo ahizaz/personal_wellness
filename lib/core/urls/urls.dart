@@ -2,6 +2,7 @@ class Urls{
   //static const String baseUrl = "http://10.10.12.25:5005/api/v1";
   //static const String baseUrl = "http://69.62.70.69:5005/api/v1";//
   static const String baseUrl="https://api.skinspired.cloud/api/v1";
+ 
   
   static const String register ="$baseUrl/user/create-user";
   static const String forgetpassword = "$baseUrl/auth/forgot-password";
@@ -26,6 +27,8 @@ class Urls{
     static const String addRoutineGetAll = "$baseUrl/add-routine/get-all";
     static const String getAllQuestion = "$baseUrl/quesntion/get-all-question-for-user";
     static const String answer = "$baseUrl/ans/create-ans";
+
+     static const String getAlllink = "$baseUrl/link-info/get-all";
   
 
   

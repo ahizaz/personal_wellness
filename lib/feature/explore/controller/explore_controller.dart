@@ -14,7 +14,8 @@ class ExploreController extends GetxController {
   final RxString currentSkinId = ''.obs;
   final RxString searchTerm = ''.obs;
   final RxBool isLoading = false.obs;
-  
+  final RxList<String> sourceLinks = <String>[].obs;
+
   final RxMap<String, dynamic> skinDetails = <String, dynamic>{
     "symptoms": "Consists of pimples, blackheads, and cysts,\n"
         "often caused by blocked pores, bacteria, and\n"
@@ -30,6 +31,53 @@ class ExploreController extends GetxController {
     super.onInit();
     fetchSkinData();
     fetchProducts();
+    fetchLinkInfo();
+  }
+
+  Future<void> fetchLinkInfo() async {
+    try {
+      EasyLoading.show(status: "Loading sources...", maskType: EasyLoadingMaskType.black);
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      if (accessToken == null) {
+        EasyLoading.showError("Please login again");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(Urls.getAlllink),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      debugPrint("fetchLinkInfo status: ${response.statusCode}");
+      debugPrint("fetchLinkInfo body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if (data["success"] == true &&
+            data["data"]["result"] != null &&
+            (data["data"]["result"] as List).isNotEmpty) {
+          final links = data["data"]["result"][0]["link"] as List;
+          sourceLinks.assignAll(links.map((e) => e.toString()));
+          EasyLoading.showSuccess("Sources loaded");
+        } else {
+          EasyLoading.showError("Failed to load sources");
+        }
+      } else {
+        EasyLoading.showError("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error fetching link info: $e");
+      EasyLoading.showError("Error loading sources");
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
   
   Future<void> fetchProducts() async {

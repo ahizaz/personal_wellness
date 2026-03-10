@@ -208,34 +208,31 @@ class SkinCondition extends StatelessWidget {
                           fontWeight: FontWeight.w600, color: Color(0xff172601),
                         )),
                         SizedBox(height: 4.h),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () => _openUrl("https://health.clevelandclinic.org/what-products-do-i-actually-need-for-a-simple-everyday-skin-care-routine"),
-                              child: Text("Cleveland Clinic - Everyday skin-care products",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
-                            ),
-                            SizedBox(height: 4.h),
-                            InkWell(
-                              onTap: () => _openUrl("https://www.nm.org/healthbeat/healthy-tips/Top-Skin-Care-Ingredients-Recommended-by-Dermatologists"),
-                              child: Text("Northwestern Medicine - Top skin-care ingredients",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
-                            ),
-                            SizedBox(height: 4.h),
-                            InkWell(
-                              onTap: () => _openUrl("https://www.aad.org/public/everyday-care/skin-care-basics"),
-                              child: Text("American Academy of Dermatology - Skin care basics",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
-                            ),
-                            SizedBox(height: 4.h),
-                            InkWell(
-                              onTap: () => _openUrl("https://www.health.harvard.edu/staying-healthy/skin-care-for-aging-skin-minimizing-age-spots-wrinkles-and-undereye-bags"),
-                              child: Text("Harvard Health - Skin care for aging skin",
-                                style: TextStyle(fontSize: 13.sp, color: Color(0xff485908), decoration: TextDecoration.underline)),
-                            ),
-                          ],
-                        ),
+                        Obx(() {
+                          final links = exploreController.sourceLinks;
+                          if (links.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(links.length, (index) {
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 4.h),
+                                child: InkWell(
+                                  onTap: () => _openUrl(links[index]),
+                                  child: Text(
+                                    links[index],
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: Color(0xff485908),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        }),
                       ],
                     ),
                   ),
