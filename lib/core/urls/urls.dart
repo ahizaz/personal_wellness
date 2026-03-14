@@ -29,6 +29,8 @@ class Urls{
     static const String answer = "$baseUrl/ans/create-ans";
 
      static const String getAlllink = "$baseUrl/link-info/get-all";
+     static const String notificationmanagement = "$baseUrl/notification-management/update";
+
   
 
   
