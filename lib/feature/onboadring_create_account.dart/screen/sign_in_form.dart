@@ -126,7 +126,7 @@ class SignInForm extends StatelessWidget {
                       },
                     ),
 
-                    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) ...[
+                    if (!kIsWeb) ...[
                       SizedBox(height: 24.h),
                       Row(
                         children: [
@@ -171,7 +171,7 @@ class SignInForm extends StatelessWidget {
                           height: 20.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => controller.signInWithGoogle(),
+                        onTap: () => controller.signInWithPlatform(),
                       ),
                        SizedBox(height: 21.h),
                       CustomButton(
@@ -189,7 +189,7 @@ class SignInForm extends StatelessWidget {
                           height: 25.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => controller.signInWithApple(),
+                        onTap: () => controller.signInWithPlatform(),
                       ),
                       SizedBox(height: 24.h),
                     ],
