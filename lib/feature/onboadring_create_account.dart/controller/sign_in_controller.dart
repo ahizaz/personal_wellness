@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/sign_in_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +65,96 @@ class SignInController extends GetxController {
       hasAgeText.value = ageController.text.isNotEmpty;
       age.value = ageController.text;
     });
+  }
+
+  Future<void> signInWithApple() async {
+    // Only attempt on supported platforms (iOS / macOS). Show message on others.
+    if (kIsWeb || !(Platform.isIOS || Platform.isMacOS)) {
+      EasyLoading.showInfo('Apple Sign-In is available only on iOS / macOS devices');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      EasyLoading.show(status: 'Signing in with Apple...');
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      if (credential.identityToken == null) {
+        debugPrint('🍎 Apple Sign-In: no identityToken');
+        EasyLoading.showError('Apple Sign in failed.');
+        return;
+      }
+
+      final payload = {
+        'token': credential.identityToken,
+        'email': credential.email ?? '',
+        'firstName': credential.givenName ?? '',
+        'lastName': credential.familyName ?? '',
+        'image': 'https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg',
+      };
+
+      debugPrint('🍎 Sending payload to backend: $payload');
+
+      final response = await http.post(
+        Uri.parse(Urls.appleSignIN),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({'token': payload['token']}),
+      );
+
+      debugPrint('📥 Apple Login Response code: ${response.statusCode}');
+      debugPrint('📥 Apple Login Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          final accessToken = data['data']?['accessToken'];
+          final userData = data['data']?['user'] ?? {};
+
+          final prefs = await SharedPreferences.getInstance();
+          if (accessToken is String) {
+            await prefs.setString('accessToken', accessToken);
+          }
+          final userId = userData['_id'] ?? userData['id'];
+          if (userId is String) {
+            await prefs.setString('userId', userId);
+          }
+
+          // Optionally save first name
+          final firstName = userData['firstName'] ?? credential.givenName ?? '';
+          if (firstName.isNotEmpty) {
+            await prefs.setString('personalization_firstName', firstName);
+            await prefs.setString('user_name', firstName);
+          }
+
+          debugPrint('=== Apple Sign In successful ===');
+
+          final hasAnsweredQuestions = prefs.getBool('hasAnsweredQuestions') ?? false;
+          if (hasAnsweredQuestions) {
+            Get.offAll(() => BottomNavbar());
+          } else {
+            Get.offAll(() => const QuestionAnswer());
+          }
+        } else {
+          final msg = data['message'] ?? 'Login failed';
+          EasyLoading.showError(msg);
+        }
+      } else {
+        EasyLoading.showError('Server error: ${response.statusCode}');
+      }
+    } catch (e, st) {
+      debugPrint('❌ Apple Sign-In error: $e');
+      debugPrint(st.toString());
+      EasyLoading.showError('Apple Sign in failed.');
+    } finally {
+      isLoading.value = false;
+      EasyLoading.dismiss();
+    }
   }
 
   void clearEmail() {

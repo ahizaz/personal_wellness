@@ -189,9 +189,7 @@ class SignInForm extends StatelessWidget {
                           height: 25.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => (){
-
-                        }
+                        onTap: () => controller.signInWithApple(),
                       ),
                       SizedBox(height: 24.h),
                     ],

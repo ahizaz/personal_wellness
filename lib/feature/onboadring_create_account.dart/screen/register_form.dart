@@ -183,9 +183,7 @@ class RegisterForm extends StatelessWidget {
                           height: 25.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => (){
-
-                        }
+                        onTap: () => Get.find<SignInController>().signInWithApple(),
                       ),
                       SizedBox(height: 24.h,),
                     ],
