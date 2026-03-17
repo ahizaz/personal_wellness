@@ -12,7 +12,7 @@ import 'package:personal_wellness/core/utils/constants/image_path.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/controller/sign_in_controller.dart';
 import 'package:personal_wellness/feature/onboadring_create_account.dart/screen/password.dart';
 
-class RegisterForm extends StatelessWidget {
+class RegisterForm extends StatelessWidget {//
   const RegisterForm({super.key});
 
   @override
