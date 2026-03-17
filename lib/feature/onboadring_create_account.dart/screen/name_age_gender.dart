@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -272,7 +273,7 @@ class NameAgeGender extends StatelessWidget {
                         Get.back();
                       },
                     ),
-                    if (Platform.isAndroid) ...[
+                    if (!kIsWeb) ...[
                       SizedBox(height: 24.h),
                       Row(
                         children: [
@@ -319,10 +320,10 @@ class NameAgeGender extends StatelessWidget {
                           height: 20.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => controller.signInWithGoogle(),
+                        onTap: () => controller.signInWithPlatform(),
                       ),
                       SizedBox(height: 21.h),
-                        CustomButton(
+                      CustomButton(
                         text: "Continue with Apple",
                         textStyle: TextStyle(
                           color: const Color(0xff172601),
@@ -337,9 +338,7 @@ class NameAgeGender extends StatelessWidget {
                           height: 25.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => (){
-
-                        }
+                        onTap: () => controller.signInWithPlatform(),
                       ),
                       SizedBox(height: 21.h,),
                     ],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -118,7 +119,7 @@ class RegisterForm extends StatelessWidget {
                         Get.back();
                       },
                     ),
-                    if (Platform.isAndroid) ...[
+                    if (!kIsWeb) ...[
                       SizedBox(height: 24.h),
                       Row(
                         children: [
@@ -165,7 +166,7 @@ class RegisterForm extends StatelessWidget {
                           height: 20.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => Get.find<SignInController>().signInWithGoogle(),
+                        onTap: () => Get.find<SignInController>().signInWithPlatform(),
                       ),
                       SizedBox(height: 21.h),
                       CustomButton(
@@ -183,7 +184,7 @@ class RegisterForm extends StatelessWidget {
                           height: 25.h,
                           fit: BoxFit.cover,
                         ),
-                        onTap: () => Get.find<SignInController>().signInWithApple(),
+                        onTap: () => Get.find<SignInController>().signInWithPlatform(),
                       ),
                       SizedBox(height: 24.h,),
                     ],
