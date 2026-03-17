@@ -321,7 +321,27 @@ class NameAgeGender extends StatelessWidget {
                         ),
                         onTap: () => controller.signInWithGoogle(),
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 21.h),
+                        CustomButton(
+                        text: "Continue with Apple",
+                        textStyle: TextStyle(
+                          color: const Color(0xff172601),
+                          fontFamily: 'SFPro',
+                          fontSize: 17.5.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        color: const Color(0xffEDEEE6),
+                        leadingIcon: Image.asset(
+                          IconPath.apple,
+                          width: 20.w,
+                          height: 25.h,
+                          fit: BoxFit.cover,
+                        ),
+                        onTap: () => (){
+
+                        }
+                      ),
+                      SizedBox(height: 21.h,),
                     ],
                     CustomTermsText(),
                     SizedBox(height: 24.h),

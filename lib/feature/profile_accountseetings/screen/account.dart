@@ -37,10 +37,10 @@ class Account extends StatelessWidget {
                 Row(
                   children: [
                    Image(image: AssetImage(ImagePath.apptitle),width: 201.w,height: 40.h,fit: BoxFit.cover,),
-                   Spacer(),
-                   Image(image: AssetImage(IconPath.notification),width: 24.w,height: 30.h,fit: BoxFit.cover,),
-                   SizedBox(width: 16.w),
-                   Image(image: AssetImage(IconPath.seetings),width: 24.w,height: 30.h,fit: BoxFit.cover,)
+                  //  Spacer(),
+                  //  Image(image: AssetImage(IconPath.notification),width: 24.w,height: 30.h,fit: BoxFit.cover,),
+                  //  SizedBox(width: 16.w),
+                  //  Image(image: AssetImage(IconPath.seetings),width: 24.w,height: 30.h,fit: BoxFit.cover,)
                   ],
                 ),
                 SizedBox(height: 28.h,),

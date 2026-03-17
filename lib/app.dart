@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -29,7 +30,9 @@ class PeronalWellNess extends StatelessWidget {
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
         home: SplashScreen(),
-        builder: EasyLoading.init(),
+        locale: DevicePreview.locale(context),
+        builder: (context, child) =>
+            DevicePreview.appBuilder(context, EasyLoading.init()(context, child)),
       ),
     );
   }
