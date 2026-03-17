@@ -327,6 +327,22 @@ class SignInController extends GetxController {
     }
   }
 
+  /// Dispatch sign-in based on platform: Apple on iOS/macOS, Google on Android.
+  Future<void> signInWithPlatform() async {
+    if (kIsWeb) {
+      EasyLoading.showInfo('Sign in not available on web.');
+      return;
+    }
+
+    if (Platform.isIOS || Platform.isMacOS) {
+      await signInWithApple();
+    } else if (Platform.isAndroid) {
+      await signInWithGoogle();
+    } else {
+      EasyLoading.showInfo('Sign in not supported on this platform.');
+    }
+  }
+
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove("accessToken");
